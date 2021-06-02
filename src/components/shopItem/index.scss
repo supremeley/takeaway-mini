@@ -1,0 +1,83 @@
+.shop {
+  &-item {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+  }
+  &-top {
+    display: flex;
+    align-items: stretch;
+    height: 100px;
+    margin-bottom: 12px;
+    &-avator {
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+      flex-shrink: 0;
+      border-radius: 8px;
+    }
+    &__title {
+      flex: 1;
+      overflow: hidden;
+      &-info {
+        display: flex;
+        align-items: stretch;
+        height: 45px;
+        line-height: 45px;
+        &-tag {
+          background: $global-green;
+          border-radius: 4px;
+          color: #fff;
+          min-width: 108px;
+          margin-right: 10px;
+          font-size: 22px;
+          text-align: center;
+        }
+        &-name {
+          font-weight: 500;
+          font-size: 32px;
+          color: $global-black;
+          @include text-overflow();
+        }
+      }
+      &-address {
+        line-height: 55px;
+        font-size: 24px;
+        color: $global-text-gray-b;
+        @include text-overflow();
+      }
+    }
+  }
+  &-content {
+    display: flex;
+    &__item {
+      flex: 0 0 33%;
+      padding: 0 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      &-img {
+        height: 150px;
+        width: 100%;
+        border-radius: 8px;
+
+        margin-bottom: 10px;
+      }
+      &-name {
+        font-size: 28px;
+        color: $global-text-gray-b;
+        @include text-overflow();
+      }
+      &-sale {
+        font-size: 22px;
+        color: $global-text-gray-b;
+      }
+      &-price {
+        font-size: 30px;
+        color: #ff3124;
+      }
+    }
+  }
+}

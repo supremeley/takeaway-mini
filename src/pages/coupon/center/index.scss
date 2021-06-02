@@ -1,0 +1,30 @@
+.form {
+  padding-left: 24px;
+  background: #fff;
+  margin-top: 24px;
+}
+.form-option {
+  display: flex;
+  justify-content: space-between;
+  height: 120px;
+  align-items: center;
+  padding-right: 24px;
+  &:not(:last-child) {
+    border-bottom: 2px solid #f7f7f7;
+  }
+}
+.page-btn {
+  position: fixed;
+  width: 400px;
+  height: 80px;
+  line-height: 80px;
+  border-radius: 40px;
+  left: 50%;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 600;
+  bottom: 60px;
+  text-align: center;
+  transform: translateX(-50%);
+  background: #1afa29;
+}

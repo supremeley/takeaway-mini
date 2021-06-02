@@ -1,0 +1,103 @@
+.nav {
+  background: #fff;
+  padding: 0 30px;
+  align-items: center;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  line-height: 80px;
+  height: 80px;
+  color: $global-black;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  .active-item {
+    color: $global-green;
+    border-bottom: 4px solid currentColor;
+  }
+}
+.list {
+  &-container {
+    padding: 20px 20px 0;
+  }
+  &-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+    position: relative;
+    &-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 2px dashed rgba(153, 153, 153, 0.2);
+      &__info {
+        flex: 1;
+        &-title {
+          color: $global-black;
+          font-size: 28px;
+          font-weight: 600;
+        }
+        &-date {
+          color: $global-green;
+          font-size: 20px;
+        }
+      }
+      &__price {
+        &-text {
+          color: $global-red;
+          font-size: 40px;
+          font-weight: 600;
+        }
+        &-explain {
+          font-size: 20px;
+          color: $global-black;
+        }
+      }
+    }
+    &-bottom {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &__title {
+        font-size: 24px;
+        color: $global-text-gray-b;
+      }
+      &__btn {
+        color: #fff;
+        background: $global-red;
+        line-height: 40px;
+        border-right: 20px;
+        border-radius: 20px;
+        font-size: 24px;
+        width: 140px;
+        text-align: center;
+      }
+    }
+    &-icon {
+      width: 120px;
+      height: 120px;
+      position: absolute;
+      bottom: 0;
+      right: 20px;
+    }
+    .circle {
+      background: #f3f3f3;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 60px;
+      &-left {
+        left: 0;
+        transform: translate(-50%, 50%);
+      }
+      &-right {
+        right: 0;
+        transform: translate(50%, 50%);
+      }
+    }
+  }
+}

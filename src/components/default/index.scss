@@ -1,0 +1,15 @@
+.default {
+  &-container {
+    text-align: center;
+  }
+  &-icon {
+    width: 350px;
+    margin-top: 120px;
+    height: 210px;
+  }
+  &-text {
+    color: $global-green;
+    font-size: 32px;
+    margin-top: 80px;
+  }
+}
