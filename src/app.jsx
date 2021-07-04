@@ -14,7 +14,7 @@ class App extends Component {
 
   async componentDidMount() {
     this.handleUpdate()
-    this.handleLogin()
+    // this.handleLogin()
   }
 
   handleUpdate = () => {
@@ -50,15 +50,35 @@ class App extends Component {
   }
 
   handleLogin = async () => {
-    const weixinOpenid = Taro.getStorageSync('openid')
-    const userId = Taro.getStorageSync('userId')
+    // const weixinOpenid = Taro.getStorageSync('openid')
+    // const userInfo = Taro.getStorageSync('userInfo')
 
     const { code } = await Taro.login()
 
+    // const isLogin = Object.keys(userInfo).length
+
+    // let usr = {}
+
+    // if (isLogin) {
+    //   usr = {
+    //     avatarUrl: userInfo.avatarUrl,
+    //     city: userInfo.city,
+    //     country: userInfo.country,
+    //     gender: userInfo.gender,
+    //     language: userInfo.language,
+    //     nickName: userInfo.nickName,
+    //     // phone: userInfo.phone,
+    //     province: userInfo.province
+    //   }
+    // }
+
     const query = {
       code,
-      userInfo: { weixinOpenid, userId }
+      userinfo: {}
+      // userInfo: usr
     }
+
+    // if (isLogin) query.userInfo = usr
 
     const {
       data: { token, userInfo: user }

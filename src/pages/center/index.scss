@@ -29,10 +29,13 @@
       width: 120px;
       height: 120px;
       border-radius: 50%;
+      flex-shrink: 0;
     }
     &__floor {
       font-weight: 600;
       font-size: 40px;
+      width: 600px;
+      @include text-overflow();
     }
     &__school {
       font-size: 28px;
@@ -45,7 +48,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0 30px;
-    margin: -60px 0 20px;
+    margin: -40px 0 20px;
   }
   &-item {
     background: #fff;

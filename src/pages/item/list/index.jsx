@@ -6,7 +6,7 @@ import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
 
 import api from '@/api'
-import withScrollPage from '@/hoc/scrollPage'
+import withScrollPage from '@/hocs/scrollPage'
 
 import 'taro-ui/dist/style/components/search-bar.scss'
 import './index.scss'
@@ -48,6 +48,12 @@ class ItemList extends Component {
     return { total }
   }
 
+  onSelectHandle = (e) => () => {
+    this.setState({ keywords: e }, () => {
+      this.resetPage(this.nextPage)
+    })
+  }
+
   onChange = (e) => {
     this.setState({ keywords: e.detail.value })
   }
@@ -61,25 +67,28 @@ class ItemList extends Component {
 
     Taro.setStorageSync('searchList', tagList)
 
-    this.setState({ tagList }, () => {
-      this.nextPage()
+    this.setState({ tagList, keywords }, () => {
+      this.resetPage(this.nextPage)
     })
   }
 
-  onJump = (id) => {
+  onJumpToDetail = (id) => {
+    // return
     Taro.navigateTo({ url: `/pages/item/detail/index?id=${id}` })
   }
 
   clearTag = () => {
     const tagList = []
     Taro.setStorageSync('searchList', tagList)
-    this.setState({ tagList })
+    this.setState({ tagList, keywords: '' }, () => {
+      this.resetPage(this.nextPage)
+    })
   }
 
   getBrandList = async (params) => {
-    const { schoolId } = this.state
+    const { keywords, shopList } = this.state
 
-    const query = { schoolId, ...params }
+    const query = { schoolId: this.schoolId, ...params, name: keywords }
 
     Taro.showLoading({
       title: '加载中',
@@ -87,12 +96,19 @@ class ItemList extends Component {
     })
 
     const {
-      data: { brandList: shopList, totalPages: total }
+      data: { brandList, totalPages }
     } = await api.shop.GET_BRAND_LIST(query)
 
-    let nList = shopList
+    let nList = brandList.map((item) => {
+      return {
+        merchant: { ...item },
+        ...item
+      }
+    })
 
-    nList = [...this.state.shopList, ...nList]
+    nList = [...shopList, ...nList]
+
+    const total = totalPages * params.size
 
     Taro.hideLoading()
 
@@ -101,8 +117,8 @@ class ItemList extends Component {
     return { total }
   }
 
-  get keywords() {
-    return this.route.params.keywords
+  get schoolId() {
+    return this.route.params.schoolId
   }
 
   get route() {
@@ -112,10 +128,10 @@ class ItemList extends Component {
   render() {
     const { total, pageParams, keywords, tagList, shopList } = this.state
 
-    const GoodsList =
+    const ShopList =
       shopList &&
       shopList.map((item) => {
-        return <ShopItem info={item} key={item.id} onClick={this.onJump} />
+        return <ShopItem info={item} key={item.id} onClick={this.onJumpToDetail} />
       })
 
     return (
@@ -131,26 +147,27 @@ class ItemList extends Component {
               onConfirm={this.onConfirm}
             />
           </View>
+          {tagList.length > 0 && (
+            <View className='tag-container'>
+              <View className='tag'>
+                {tagList &&
+                  tagList.map((item) => {
+                    return (
+                      <View key={item} className='tag-item' onClick={this.onSelectHandle(item)}>
+                        {item}
+                      </View>
+                    )
+                  })}
+              </View>
+              <View className='tag-btn' onClick={this.clearTag}>
+                清空
+              </View>
+            </View>
+          )}
         </View>
-        {tagList && (
-          <View className='tag-container'>
-            <View className='tag'>
-              {tagList &&
-                tagList.map((item) => {
-                  return (
-                    <View key={item} className='tag-item'>
-                      {item}
-                    </View>
-                  )
-                })}
-            </View>
-            <View className='tag-btn' onClick={this.clearTag}>
-              清空
-            </View>
-          </View>
-        )}
+
         <View className='goods-container'>
-          <View className='goods'>{GoodsList}</View>
+          <View className='goods'>{ShopList}</View>
           {total > 0 && !pageParams.isLoading && !pageParams.hasNext && <BottomText />}
           {!total && !pageParams.isLoading && !pageParams.hasNext && <Default />}
         </View>

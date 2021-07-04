@@ -14,4 +14,4 @@ export const CHECK_GOODS_IN_CART = (data) => request.post('cart/checked', data)
 
 export const DEL_TO_CART = (data) => request.post('cart/delete', data)
 
-export const CHECKOUT_BY_CART = (data) => request.get('cart/checkout_by_cart', data)
+export const CHECKOUT_BY_CART = (data) => request.get('cart/checkout', data)

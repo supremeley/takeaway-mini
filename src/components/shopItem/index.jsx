@@ -13,7 +13,8 @@ class ShopItem extends Component {
 
   handleClick = () => {
     const { onClick, info } = this.props
-    onClick && onClick(info.id)
+    // debugger
+    onClick && onClick(info.merchant.id, info.merchant.floorPrice)
   }
 
   render() {
@@ -21,37 +22,38 @@ class ShopItem extends Component {
 
     if (!info) return null
 
+    let { goodsList, merchant } = info
+
+    goodsList = goodsList ? goodsList.slice(0, 3) : []
+    // debugger
     return (
-      <View key={info.url} className='shop-item' onClick={this.handleClick}>
+      <View key={merchant.id} className='shop-item' onClick={this.handleClick}>
         <View className='shop-top'>
-          <Image src={info.picUrl} mode='aspectFill' className='shop-top-avator'></Image>
+          <Image src={merchant.iconUrl} mode='aspectFill' className='shop-top-avator'></Image>
           <View className='shop-top__title'>
             <View className='shop-top__title-info'>
               {/* <Text className='shop-top__title-info-tag'>新品特价</Text> */}
-              <Text className='shop-top__title-info-name'>{info.name}</Text>
+              <Text className='shop-top__title-info-name'>{merchant.name}</Text>
             </View>
-            <View className='shop-top__title-address'>上海市松江区文汇路樱花广场</View>
+            <View className='shop-top__title-address'>{merchant.address}</View>
           </View>
         </View>
         <View className='shop-content'>
-          <View className='shop-content__item'>
-            <Image src={info.picUrl} mode='aspectFill' className='shop-content__item-img'></Image>
-            <View className='shop-content__item-name'>香蕉玉米三明治</View>
-            <View className='shop-content__item-sale'>已售4</View>
-            <View className='shop-content__item-price'>$5.9</View>
-          </View>
-          <View className='shop-content__item'>
-            <Image src={info.picUrl} mode='aspectFill' className='shop-content__item-img'></Image>
-            <View className='shop-content__item-name'>香蕉玉米三明治</View>
-            <View className='shop-content__item-sale'>已售4</View>
-            <View className='shop-content__item-price'>$5.9</View>
-          </View>
-          <View className='shop-content__item'>
-            <Image src={info.picUrl} mode='aspectFill' className='shop-content__item-img'></Image>
-            <View className='shop-content__item-name'>香蕉玉米三明治</View>
-            <View className='shop-content__item-sale'>已售4</View>
-            <View className='shop-content__item-price'>$5.9</View>
-          </View>
+          {goodsList.length > 0 &&
+            goodsList.map((goods) => {
+              return (
+                <View key={goods.id} className='shop-content__item'>
+                  <Image
+                    src={goods.picUrl}
+                    mode='aspectFill'
+                    className='shop-content__item-img'
+                  ></Image>
+                  <View className='shop-content__item-name'>{goods.name}</View>
+                  <View className='shop-content__item-sale'>已售{goods.sales}</View>
+                  <View className='shop-content__item-price'>￥{goods.retailPrice}</View>
+                </View>
+              )
+            })}
         </View>
       </View>
     )

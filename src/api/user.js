@@ -3,7 +3,9 @@ import request from '@/utils/request.js'
 // export function login(data) {
 //   return request.post('/auth/login_by_weixin', data)
 // }
-export const WECHAT_LOGIN = (data) => request.post('auth/login_by_weixin', data)
+export const WECHAT_LOGIN = (data) => request.post('auth/login_by_weixin', data, { noToken: true })
+
+export const DECRYPT_PHONE = (data) => request.post('auth/decryptPhone', data)
 
 // // 获取用户手册/声明
 // const GET_AGREEMENT = (type) =>

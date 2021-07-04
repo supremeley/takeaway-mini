@@ -19,45 +19,51 @@
           "scene": null
         },
         {
-          "name": "pages/item/list/index",
-          "pathName": "pages/item/list/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pages/center/index",
-          "pathName": "pages/center/index",
-          "query": "",
-          "scene": null
-        },
-        {
           "name": "pages/order/detail/index",
           "pathName": "pages/order/detail/index",
-          "query": "id=1",
+          "query": "id=17",
           "scene": null
         },
         {
-          "name": "pages/order/list/index",
-          "pathName": "pages/order/list/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pages/event/index",
-          "pathName": "pages/event/index",
-          "query": "src=https://mp.weixin.qq.com/",
+          "name": "pages/item/detail/index",
+          "pathName": "pages/item/detail/index",
+          "query": "id=1001018",
           "scene": null
         },
         {
           "name": "pages/order/refund/index",
           "pathName": "pages/order/refund/index",
-          "query": "id=1",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/coupon/list/index",
+          "pathName": "pages/coupon/list/index",
+          "query": "",
           "scene": null
         },
         {
           "name": "pages/checkout/index/index",
           "pathName": "pages/checkout/index/index",
-          "query": "id=1001014",
+          "query": "id=1001018",
+          "scene": null
+        },
+        {
+          "name": "pages/coupon/center/index",
+          "pathName": "pages/coupon/center/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/checkout/index/index",
+          "pathName": "pages/checkout/index/index",
+          "query": "id=1001018",
+          "scene": null
+        },
+        {
+          "name": "pages/checkout/index/index",
+          "pathName": "pages/checkout/index/index",
+          "query": "id=1001006",
           "scene": null
         }
       ]

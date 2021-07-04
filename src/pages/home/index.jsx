@@ -3,16 +3,16 @@ import { Component } from 'react'
 import { View, Image, Swiper, SwiperItem, Picker, Button } from '@tarojs/components'
 import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
 import ShopItem from '@/components/shopItem'
+import Default from '@/components/default'
+import BottomText from '@/components/bottomText'
 
-import t1 from '@/assets/imgs/test1.png'
-import t2 from '@/assets/imgs/test2.png'
-// import navTe from '@/assets/imgs/nav-te.png'
 import headerBg from '@/assets/imgs/header-bg.png'
 import addressIcon from '@/assets/imgs/address-icon.png'
+import noticeIcon from '@/assets/imgs/notice-icon.png'
 
 import api from '@/api'
 
-// import scrollPage from '@/hoc/scrollPage'
+// import scrollPage from '@/hocs/scrollPage'
 
 import 'taro-ui/dist/style/components/modal.scss'
 import './index.scss'
@@ -20,43 +20,47 @@ import './index.scss'
 // @scrollPage
 class Home extends Component {
   state = {
-    explainShow: true,
+    explainShow: false,
+    explainType: null,
+    schoolId: '',
     banner1Data: [
-      {
-        appId: '',
-        appType: 'inApp',
-        img: t1,
-        name: '123',
-        navigateTo: '/pages/home/index'
-      },
-      {
-        appId: '',
-        appType: 'h5',
-        img: t1,
-        name: '123',
-        navigateTo: '/pages/home/index',
-        h5Path: 'www.baidu.com'
-      }
+      // {
+      //   appId: '',
+      //   appType: 'inApp',
+      //   img: t1,
+      //   name: '123',
+      //   navigateTo: '/pages/home/index'
+      // },
+      // {
+      //   appId: '',
+      //   appType: 'h5',
+      //   img: t1,
+      //   name: '123',
+      //   navigateTo: '/pages/home/index',
+      //   h5Path: 'www.baidu.com'
+      // }
     ],
     banner2Data: [
-      {
-        appId: 'wx26d93d4c8f8dd72a',
-        appType: 'outApp',
-        img: t2,
-        name: '123',
-        navigateTo: '',
-        appPath: '/pages/express/express.html?scene_name=代取快递'
-      }
+      // {
+      //   appId: 'wx26d93d4c8f8dd72a',
+      //   appType: 'outApp',
+      //   img: t2,
+      //   name: '123',
+      //   navigateTo: '',
+      //   appPath: '/pages/express/express.html?scene_name=代取快递'
+      // }
     ],
     banner1Show: true,
     banner2Show: true,
     alertData: {
-      bgColor: '#fff',
-      borderColor: '#000',
-      content: '测试文本',
-      showAlert: true,
-      textColor: '#000'
+      // bgColor: '#fff',
+      // borderColor: '#000',
+      content: '',
+      showAlert: true
+      // textColor: '#000'
     },
+    modalShow,
+    modalData,
     navList: [],
     shopList: [],
     areaRange: [[], [], []],
@@ -65,7 +69,20 @@ class Home extends Component {
   }
 
   async componentDidMount() {
-    this.fetchData()
+    const locInfo = Taro.getStorageSync('locInfo')
+
+    if (!locInfo) {
+      this.fetchData()
+
+      this.setState({ explainShow: true })
+    } else {
+      const selectorSchool = locInfo.school.label
+      const selectorFloor = locInfo.floor.label
+
+      this.setState({ selectorSchool, selectorFloor, schoolId: locInfo.school.value }, () => {
+        this.fetchData(locInfo)
+      })
+    }
   }
 
   onShareAppMessage = () => {
@@ -76,9 +93,29 @@ class Home extends Component {
     }
   }
 
-  fetchData = () => {
-    this.getAreaList(true)
-    this.getBrandList()
+  fetchData = async (locInfo) => {
+    await this.getHomeIndex()
+    await this.getHomeBanner()
+    await this.getAreaList(true, locInfo)
+    // await this.getBrandList()
+  }
+
+  bannerHandle = (banner) => {
+    // console.log(banner)
+    const { schoolId } = this.state
+
+    let bannerList = []
+
+    if (!schoolId) {
+      bannerList = banner.filter((item) => !item.schoolType)
+    } else {
+      bannerList = banner.filter((item) => {
+        // console.log(item.schoolList)
+        return !item.schoolType || (item.schoolList && item.schoolList.find((it) => it == schoolId))
+      })
+    }
+
+    return bannerList
   }
 
   onChange = (e) => {
@@ -89,6 +126,15 @@ class Home extends Component {
     const selectorSchool = areaRange[1][school].label
     const selectorFloor = areaRange[2][floor].label
     // console.log(selectorSchool)
+    const locInfo = {
+      area: areaRange[0][area],
+      school: areaRange[1][school],
+      floor: areaRange[2][floor]
+    }
+
+    // console.log(locInfo)
+    Taro.setStorageSync('locInfo', locInfo)
+
     this.setState(
       {
         explainShow: false,
@@ -97,7 +143,8 @@ class Home extends Component {
         schoolId: areaRange[1][school].value
       },
       () => {
-        this.getBrandList()
+        this.getHomeIndex()
+        this.getHomeBanner()
       }
     )
   }
@@ -133,13 +180,16 @@ class Home extends Component {
       })
     }
 
+    // console.log(type, url, id, path, h5Path)
     if (type === 'h5') {
       Taro.navigateTo({ url: `/pages/event/index?src=${h5Path}` })
     }
   }
 
   onJupmToList = () => {
-    Taro.navigateTo({ url: `/pages/item/list/index` })
+    const { schoolId } = this.state
+
+    Taro.navigateTo({ url: `/pages/item/list/index?=schoolId=${schoolId}` })
   }
 
   onJumpToDetail = (id) => {
@@ -154,7 +204,58 @@ class Home extends Component {
     this.setState({ explainShow: true })
   }
 
-  getAreaList = async (isFirst) => {
+  getHomeIndex = async () => {
+    const { schoolId } = this.state
+
+    const query = { schoolId }
+
+    const {
+      data: { brandGoodsList = [] }
+    } = await api.home.GET_HOME_INDEX(query)
+
+    const navList = brandGoodsList.map((item) => {
+      return {
+        ...item.merchant
+      }
+    })
+
+    this.setState({ shopList: brandGoodsList, navList })
+  }
+
+  getHomeBanner = async () => {
+    const { data } = await api.home.GET_HOME_BANNER()
+    // const { data } = await api.home.GET_HOME_INDEX()
+    // GET_HOME_INDEX
+
+    if (data) {
+      let { banner1Data, banner2Data, banner1Show, banner2Show, alertData, modalShow, modalData } =
+        JSON.parse(data)
+      // let res = data
+      // console.log(banner1Data, banner2Data)
+
+      this.setState({
+        banner1Data: this.bannerHandle(banner1Data),
+        banner2Data: this.bannerHandle(banner2Data),
+        banner1Show,
+        banner2Show,
+        modalShow,
+        modalData: this.bannerHandle(modalData),
+        alertData
+      })
+    }
+    // const navList = brandList.map((item) => {
+    //   return {
+    //     icon: item.picUrl,
+    //     id: item.id,
+    //     title: item.name
+    //   }
+    // })
+
+    // this.setState({ shopList: brandList, navList })
+  }
+
+  getAreaList = async (isFirst, locInfo) => {
+    // console.log(locInfo)
     const {
       data: { items }
     } = await api.home.GET_AREA_LIST()
@@ -166,15 +267,33 @@ class Home extends Component {
       }
     })
 
-    this.setState({ areaRange: [area, [], []] }, () => {
-      if (isFirst) this.getSchoolList(area[0].value, true)
-    })
+    if (area.length) {
+      let isCon = true
+
+      if (locInfo) {
+        const aId = locInfo.area.value
+
+        const res = area.find((item) => item.value === aId)
+
+        if (!res) {
+          this.setState({ explainShow: true, explainType: 'area' })
+
+          isCon = false
+        }
+      }
+
+      this.setState({ areaRange: [area, [], []] }, () => {
+        if (isFirst) {
+          this.getSchoolList(area[0].value, true, locInfo, isCon)
+        }
+      })
+    }
   }
 
-  getSchoolList = async (id, isFirst) => {
+  getSchoolList = async (id, isFirst, locInfo, isCon) => {
     const { areaRange } = this.state
 
-    const query = { regionId: id }
+    const query = { areaId: id }
 
     const {
       data: { items }
@@ -187,18 +306,34 @@ class Home extends Component {
       }
     })
 
-    // console.log(schools)
+    if (schools.length) {
+      if (locInfo && isCon) {
+        const sId = locInfo.school.value
 
-    const [area, school, floor] = areaRange
+        const res = schools.find((item) => item.value === sId)
 
-    // debugger
+        if (!res) {
+          this.setState({ explainShow: true, explainType: 'school' })
 
-    this.setState({ areaRange: [area, schools, floor] }, () => {
-      if (isFirst) this.getFloorList(schools[0].value)
-    })
+          isCon = false
+        }
+      }
+
+      const [area, school, floor] = areaRange
+
+      this.setState({ areaRange: [area, schools, floor] }, () => {
+        if (isFirst) {
+          this.getFloorList(schools[0].value, locInfo, isCon)
+
+          if (!this.state.schoolId) {
+            this.setState({ schoolId: schools[0].value })
+          }
+        }
+      })
+    }
   }
 
-  getFloorList = async (id) => {
+  getFloorList = async (id, locInfo, isCon) => {
     const { areaRange } = this.state
 
     const query = { schoolId: id }
@@ -216,7 +351,22 @@ class Home extends Component {
 
     const [area, school] = areaRange
 
+    if (locInfo && isCon) {
+      const fId = locInfo.floor.value
+
+      const res = floor.find((item) => item.value === fId)
+
+      if (!res) {
+        this.setState({ explainShow: true, explainType: 'floor' })
+      }
+    }
+
     this.setState({ areaRange: [area, school, floor] })
+    // if (floor.length) {
+    //   const [area, school] = areaRange
+
+    //   this.setState({ areaRange: [area, school, floor] })
+    // }
   }
 
   getBrandList = async () => {
@@ -242,6 +392,7 @@ class Home extends Component {
   render() {
     const {
       explainShow,
+      explainType,
       areaRange,
       selectorSchool,
       selectorFloor,
@@ -250,6 +401,8 @@ class Home extends Component {
       banner2Data,
       banner2Show,
       alertData,
+      modalShow,
+      modalData,
       navList,
       shopList
     } = this.state
@@ -296,32 +449,37 @@ class Home extends Component {
         )
       })
 
-    const Explain =
-      alertData && alertData.showAlert ? (
-        <View className='content-explain'>
-          <View className='content-explain__title'>通知公告</View>
-          <View
-            style={{ background: alertData.bgColor, color: alertData.textColor }}
-            className='content-explain__text'
-          >
-            <View className='marquee__text'>{alertData.content}</View>
-          </View>
+    const Explain = alertData && alertData.alertShow && (
+      <View className='content-explain'>
+        {/* <View className='content-explain__title'>通知公告</View> */}
+        <Image className='content-explain__icon' mode='aspectFill' src={noticeIcon}></Image>
+
+        <View
+          // style={{ background: alertData.bgColor, color: alertData.textColor }}
+          className='content-explain__text'
+        >
+          <View className='marquee__text'>{alertData.content}</View>
         </View>
-      ) : null
+      </View>
+    )
 
     const NavList =
-      navList &&
+      navList.length > 0 &&
       navList.map((item) => {
         return (
-          <View key={item.url} className='nav-item' onClick={this.onJumpToDetail}>
-            <Image className='nav-icon' src={item.icon}></Image>
-            <View className='nav-title'>{item.title}</View>
+          <View
+            key={item.url}
+            className='nav-item'
+            onClick={() => this.onJumpToDetail(item.merchant.id)}
+          >
+            <Image className='nav-icon' mode='aspectFill' src={item.iconUrl}></Image>
+            <View className='nav-title'>{item.name}</View>
           </View>
         )
       })
 
     const ShopList =
-      shopList &&
+      shopList.length > 0 &&
       shopList.map((item) => {
         return <ShopItem info={item} key={item.id} onClick={this.onJumpToDetail} />
       })
@@ -359,33 +517,44 @@ class Home extends Component {
           </View>
         </View>
         <View className='content'>
-          <Swiper
-            className='content-swiper'
-            indicatorColor='#999'
-            indicatorActiveColor='#333'
-            indicatorDots={false}
-            circular
-            autoplay
-          >
-            {SwiperList}
-          </Swiper>
+          {banner1Data.length > 0 && banner1Show && (
+            <Swiper
+              className='content-swiper'
+              indicatorColor='#999'
+              indicatorActiveColor='#333'
+              indicatorDots={false}
+              circular
+              autoplay
+            >
+              {SwiperList}
+            </Swiper>
+          )}
           <View className='nav-container'>{NavList}</View>
-          <Swiper
-            className='content-swiper swiper-second'
-            indicatorColor='#999'
-            indicatorActiveColor='#333'
-            indicatorDots={false}
-            circular
-            autoplay
-          >
-            {SwiperList2}
-          </Swiper>
+          {banner2Data.length > 0 && banner2Show && (
+            <Swiper
+              className='content-swiper swiper-second'
+              indicatorColor='#999'
+              indicatorActiveColor='#333'
+              indicatorDots={false}
+              circular
+              autoplay
+            >
+              {SwiperList2}
+            </Swiper>
+          )}
           {Explain}
-          <View className='list-container'>{ShopList}</View>
+          <View className='list-container'>
+            {ShopList}
+            {shopList.length > 0 && <BottomText />}
+            {!shopList.length && <Default msg='敬请期待' />}
+          </View>
           <AtModal isOpened={explainShow}>
             <AtModalHeader>提示</AtModalHeader>
             <AtModalContent>
-              您还没有选择所在区域，需要您选择区域后，才能为您提供最佳服务
+              {explainType === 'area' && '所在大学城暂停服务，是否选择新的大学城'}
+              {explainType === 'school' && '所在学校暂停服务，是否选择新的学校'}
+              {explainType === 'floor' && '所在楼宇暂停服务，是否选择新的楼宇'}
+              {!explainType && '您还没有选择所在大学城，需要您选择大学城后，才能为您提供最佳服务'}
             </AtModalContent>
             <AtModalAction>
               <Button onClick={this.closeExplainModal}>暂不选择</Button>
@@ -398,7 +567,7 @@ class Home extends Component {
                   onChange={this.onChange}
                   onColumnChange={this.onColumnChange}
                 >
-                  <View className='modal-btn'>选择区域</View>
+                  <View className='modal-btn'>选择大学城</View>
                 </Picker>
               </Button>
             </AtModalAction>

@@ -22,7 +22,7 @@ export default function withScrollPage(WrappedComponent) {
         size: 10,
         page: 1,
         hasNext: true,
-        loading: false,
+        isLoading: false,
         total: 0
       }
     }
@@ -30,9 +30,9 @@ export default function withScrollPage(WrappedComponent) {
     nextPage = async () => {
       const { pageParams } = this.state
 
-      if (!pageParams.hasNext || pageParams.loading) return
+      if (!pageParams.hasNext || pageParams.isLoading) return
 
-      pageParams.loading = true
+      pageParams.isLoading = true
 
       this.setState({
         pageParams
@@ -49,7 +49,7 @@ export default function withScrollPage(WrappedComponent) {
       const nextPageParams = {
         ...pageParams,
         page: pageParams.page + 1,
-        loading: false,
+        isLoading: false,
         total
       }
 

@@ -7,4 +7,5 @@ import * as user from './user'
 import * as goods from './goods'
 import * as common from './common'
 
-export default { common, cart, coupon, home, order, shop, user, goods }
+
+export default { common, cart, coupon, home, order, shop, user, goods, }

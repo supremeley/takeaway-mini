@@ -5,9 +5,7 @@ import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
 
 import api from '@/api'
-import withScrollPage from '@/hoc/scrollPage'
-
-import t1 from '@/assets/imgs/test1.png'
+import withScrollPage from '@/hocs/scrollPage'
 
 import './index.scss'
 
@@ -24,12 +22,38 @@ class OrderList extends Component {
       // { url: '', title: '已取消' }
     ],
     orderList: [
-      {
-        price: 1,
-        id: 1,
-        pic: t1,
-        title: '蔬菜'
-      }
+      // {
+      //   actualPrice: 17.5,
+      //   addTime: '2021-06-05 13:22:21',
+      //   address: '测试学校1 测试1 大厅',
+      //   consignee: '赵',
+      //   freightPrice: 1,
+      //   freightType: 0,
+      //   goodsList: [
+      //     {
+      //       addTime: '2021-06-05 13:22:21',
+      //       brandId: 1001016,
+      //       comment: 0,
+      //       deleted: false,
+      //       goodsId: 277,
+      //       goodsName: '大包子',
+      //       goodsSn: 'a1234',
+      //       id: 21,
+      //       number: 1,
+      //       orderId: 15,
+      //       picUrl:
+      //         'https://eating-1256365647.cos.ap-shanghai.myqcloud.com/sscdm0jwkz3br69jof98.JPG',
+      //       price: 7.5,
+      //       productId: 5255,
+      //       seckillReducePrice: 0,
+      //       settlementMoney: 0,
+      //       specifications: ['默认'],
+      //       updateTime: '2021-06-05 13:22:21',
+      //       userId: 204
+      //     }
+      //   ],
+      //   goodsPrice: 13.5
+      // }
     ]
   }
 
@@ -50,76 +74,18 @@ class OrderList extends Component {
     return { total }
   }
 
-  // nextPage = async () => {
-  //   const { pageParams } = this.state
-
-  //   if (!pageParams.hasNext || pageParams.loading) return
-
-  //   pageParams.loading = true
-
-  //   this.setState({
-  //     pageParams
-  //   })
-
-  //   const { size, page } = pageParams
-
-  //   const { total } = await this.fetch({ size, page })
-
-  //   if (!total || total < size) {
-  //     pageParams.hasNext = false
-  //   }
-
-  //   const nextPageParams = {
-  //     ...pageParams,
-  //     page: pageParams.page + 1,
-  //     loading: false,
-  //     total
-  //   }
-
-  //   this.setState({
-  //     pageParams: nextPageParams
-  //   })
-  // }
-
-  // resetPage(cb = () => {}) {
-  //   const { pageParams } = this.state
-
-  //   const resetPageParams = {
-  //     ...(pageParams || {}),
-  //     page: 0,
-  //     size: 10,
-  //     loading: false,
-  //     hasNext: true
-  //   }
-
-  //   this.setState({ pageParams: resetPageParams }, cb)
-  // }
-
-  // refreshList = async () => {
-  //   // const { status } = this.router
-  //   const { current, navList } = this.state
-  //   const tabIdx = navList.findIndex((tab) => tab.status === status)
-  //   let params = { curTabIdx: curTabIdx || tabIdx || 0, list: [] }
-  //   if (tabIdx === curTabIdx) {
-  //     delete params.curTabIdx
-  //   }
-  //   this.setState(params, () => {
-  //     this.resetPage(this.nextPage)
-  //   })
-  // }
-
   onJump = (id) => () => {
     Taro.navigateTo({ url: `/pages/order/detail/index?id=${id}` })
   }
 
-  handleClick = (index) => () => {
-    this.setState({ current: index }, () => {
+  checkTab = (index) => () => {
+    this.setState({ current: index, orderList: [] }, () => {
       this.resetPage(this.nextPage)
     })
   }
 
   getOrderList = async (params) => {
-    const { current, navList } = this.state
+    const { current, navList, orderList } = this.state
 
     const showType = navList[current].status
 
@@ -132,43 +98,68 @@ class OrderList extends Component {
       title: '加载中',
       icon: 'none'
     })
+    try {
+      const {
+        data: { data, count: total }
+      } = await api.order.GET_ORDER_LIST(query)
+      // console.log(data, count, 1000)
+      let nList = data.map((item) => {
+        let num = 0
+        const goodsInfo = item.goodsList.map((goods) => {
+          num += goods.number
+          return goods.goodsName
+        })
+        // console.log(goodsInfo)
+        return {
+          ...item,
+          goodsInfo: goodsInfo.join('+'),
+          goodsExplain: ` 等${num}件商品`
+        }
+      })
 
-    const {
-      data: { data, count: total }
-    } = await api.order.GET_ORDER_LIST(query)
-    // console.log(data, count, 1000)
-    let nList = data
+      nList = [...orderList, ...nList]
 
-    nList = [...this.state.orderList, ...nList]
+      Taro.hideLoading()
 
-    Taro.hideLoading()
+      this.setState({ orderList: nList, total })
 
-    this.setState({ orderList: nList, total })
-
-    return { total }
+      return { total }
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   render() {
     const { pageParams, total, current, navList, orderList } = this.state
 
+    // const {handleOption} = orderList
+
     const Order =
       orderList &&
       orderList.map((item) => {
+        const { name, iconUrl } = item.merchantVo
+
         return (
           <View className='order-item' key={item.id} onClick={this.onJump(item.id)}>
-            <Image src={item.pic} mode='aspectFill' className='order-item-img'></Image>
+            <Image src={iconUrl} mode='aspectFill' className='order-item-img'></Image>
             <View className='order-item__content'>
               <View className='order-item__header'>
-                <View className='order-item__header-name'>光明鲜奶屋</View>
-                <View className='order-item__header-status'>等待支付</View>
+                <View className='order-item__header-name'>{name}</View>
+                <View className='order-item__header-status'>{item.orderStatusText}</View>
               </View>
-              <View className='order-item__address'>2021-05-08 12:26</View>
+              <View className='order-item__address'>{item.addTime}</View>
               <View className='order-item__info'>
-                <View className='order-item__info-goods'>豆奶</View>
-                <View className='order-item__info-price'>$24.72</View>
+                <View className='order-item__info-goods'>
+                  <Text className='order-item__info-goods__detail'>{item.goodsInfo}</Text>
+                  <Text>{item.goodsExplain}</Text>
+                </View>
+                <View className='order-item__info-price'>￥{item.actualPrice}</View>
               </View>
               <View className='order-item__bottom'>
-                <View className='order-item__bottom-btn'>再来一单</View>
+                {item.handleOption.cancel && (
+                  <View className='order-item__bottom-btn cancel-btn'>取消订单</View>
+                )}
+                {/* <View className='order-item__bottom-btn'>再来一单</View> */}
                 {/* <View className='order-item__bottom-btn red-btn'>去支付</View>
                 <View className='order-item__bottom-btn cancel-btn'>取消订单</View>
                 <View className='order-item__bottom-btn red-btn'>退款</View> */}
@@ -184,7 +175,7 @@ class OrderList extends Component {
           {navList &&
             navList.map((item, index) => {
               return (
-                <View key={item.title} className='nav-item' onClick={this.handleClick(index)}>
+                <View key={item.title} className='nav-item' onClick={this.checkTab(index)}>
                   <Text className={`nav-item-text ${current === index ? 'active' : ''}`}>
                     {item.title}
                   </Text>

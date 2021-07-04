@@ -37,128 +37,6 @@ page {
 .content {
   background: #fff;
 }
-// .header {
-//   display: flex;
-//   align-items: center;
-//   border-bottom: 2px solid rgb(112, 112, 112, 0.3);
-//   padding: 20px;
-//   &__avatar {
-//     width: 80px;
-//     height: 80px;
-//     margin-right: 20px;
-//   }
-//   &__name {
-//     color: #ffbb00;
-//     font-weight: 600;
-//     font-size: 30px;
-//   }
-// }
-// .goods {
-//   &-content {
-//     padding: 20px;
-//     border-bottom: 2px solid rgb(112, 112, 112, 0.3);
-//   }
-//   &-item {
-//     display: flex;
-//     align-items: stretch;
-//     height: 160px;
-//     // padding: 24px;
-//     &:not(:last-child) {
-//       margin-bottom: 10px;
-//     }
-//   }
-//   &-img {
-//     width: 200px;
-//     height: 160px;
-//   }
-//   &-info {
-//     margin-left: 24px;
-//     height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: space-between;
-//     flex: 1;
-//     &__title {
-//       font-size: 28px;
-//       font-weight: 600;
-//       display: flex;
-//       justify-content: space-between;
-//       align-items: flex-start;
-//       &-price {
-//         font-weight: 500;
-//         flex-shrink: 0;
-//       }
-//     }
-//     &__detail {
-//       flex: 1;
-//       display: flex;
-//       justify-content: flex-end;
-//       align-items: flex-start;
-//       margin-top: 16px;
-//     }
-//     &__tag {
-//       // color: #c6c6c6;
-//       border-radius: 16px;
-//       font-size: 24px;
-//       border: 2px solid #000;
-//       line-height: 30px;
-//       text-align: center;
-//       min-width: 64px;
-//       margin-bottom: 16px;
-//       display: inline-block;
-//     }
-//     &__num {
-//       font-size: 24px;
-
-//       color: $global-text-gray-b;
-//     }
-//   }
-// }
-// .detail {
-//   &-container {
-//     background: #fff;
-//     margin-bottom: 20px;
-//     padding: 0 30px;
-//   }
-//   &-option {
-//     display: flex;
-//     justify-content: space-between;
-//     height: 90px;
-//     align-items: center;
-//     font-size: 28px;
-//     &:not(:last-child) {
-//       border-bottom: 2px solid rgb(112, 112, 112, 0.1);
-//     }
-//     &__item {
-//       &-title {
-//         color: $global-black;
-//       }
-//       &-num {
-//         color: $global-text-gray-b;
-//         display: flex;
-//         align-items: baseline;
-//         font-weight: 600;
-//       }
-//     }
-//   }
-// }
-// .total {
-//   display: flex;
-//   justify-content: flex-end;
-//   align-items: baseline;
-//   height: 90px;
-//   align-items: center;
-//   font-size: 28px;
-//   &__item {
-//     &-title {
-//       color: $global-black;
-//     }
-//     &-num {
-//       color: $global-text-gray-b;
-//       font-weight: 600;
-//     }
-//   }
-// }
 .shop {
   &-container {
     background: #fff;
@@ -173,6 +51,7 @@ page {
       width: 60px;
       height: 60px;
       flex-shrink: 0;
+      border-radius: 4px;
     }
     &__name {
       flex: 1;
@@ -196,6 +75,7 @@ page {
       align-items: center;
       justify-content: space-between;
       height: 50px;
+      @include text-overflow();
       .explain {
         color: $global-green;
       }
@@ -210,7 +90,7 @@ page {
         font-size: 24px;
         display: flex;
         align-items: center;
-
+        width: 440px;
         &__tag {
           margin-right: 10px;
           flex-shrink: 0;
@@ -220,13 +100,22 @@ page {
           height: 30px;
           border-radius: 4px;
         }
+        &__name {
+          @include text-overflow();
+        }
+        &__spe {
+          font-weight: 400;
+          color: $global-text-gray;
+          font-size: 24px;
+          margin-left: 10px;
+        }
       }
       .hava-num {
         flex-basis: 240px;
       }
       &-price {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         justify-content: space-between;
         flex-shrink: 0;
         color: $global-black;
@@ -234,10 +123,11 @@ page {
         font-weight: 600;
         line-height: 1;
         &__line {
-          color: $global-green;
+          color: $global-text-gray;
           font-size: 20px;
           font-weight: 400;
           text-decoration: line-through;
+          margin-left: 10px;
         }
         &__num {
           display: flex;
@@ -277,6 +167,9 @@ page {
         text-align: right;
       }
     }
+    .remark {
+      text-align: left;
+    }
   }
   .stronge {
     font-weight: 600;
@@ -298,6 +191,12 @@ page {
     align-items: center;
     &__price {
       color: $global-black;
+      // &-line {
+      //   margin-left: 10px;
+      //   font-size: 24px;
+      //   color: $global-text-gray;
+      //   text-decoration: line-through;
+      // }
     }
     &__explain {
       font-size: 36px;
@@ -353,87 +252,88 @@ page {
   }
   &-content {
     max-height: 600px;
-  }
-  &-list {
     background: $global-gray;
     padding: 20px;
-    &-item {
-      background: #fff;
-      border-radius: 10px;
-      padding: 0 20px;
-      margin-bottom: 20px;
-      position: relative;
-      &-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 0;
-        border-bottom: 2px dashed rgba(153, 153, 153, 0.2);
-        &__info {
-          flex: 1;
-          &-title {
-            color: $global-black;
-            font-size: 28px;
-            font-weight: 600;
+    box-sizing: border-box;
+    .list {
+      &-item {
+        background: #fff;
+        border-radius: 10px;
+        padding: 0 20px;
+        margin-bottom: 20px;
+        position: relative;
+        &-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 0;
+          border-bottom: 2px dashed rgba(153, 153, 153, 0.2);
+          &__info {
+            flex: 1;
+            &-title {
+              color: $global-black;
+              font-size: 28px;
+              font-weight: 600;
+            }
+            &-date {
+              color: $global-green;
+              font-size: 20px;
+            }
           }
-          &-date {
-            color: $global-green;
-            font-size: 20px;
+          &__price {
+            &-text {
+              color: $global-red;
+              font-size: 40px;
+              font-weight: 600;
+            }
+            &-explain {
+              font-size: 20px;
+              color: $global-black;
+            }
           }
         }
-        &__price {
-          &-text {
-            color: $global-red;
-            font-size: 40px;
-            font-weight: 600;
+        &-bottom {
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          &__title {
+            font-size: 24px;
+            color: $global-text-gray-b;
           }
-          &-explain {
-            font-size: 20px;
-            color: $global-black;
+          &__btn {
+            color: #fff;
+            background: $global-red;
+            line-height: 40px;
+            border-right: 20px;
+            border-radius: 20px;
+            font-size: 24px;
+            width: 140px;
+            text-align: center;
           }
         }
-      }
-      &-bottom {
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        &__title {
-          font-size: 24px;
-          color: $global-text-gray-b;
+        &-icon {
+          width: 120px;
+          height: 120px;
+          position: absolute;
+          bottom: 0;
+          right: 20px;
         }
-        &__btn {
-          color: #fff;
-          background: $global-red;
-          line-height: 40px;
-          border-right: 20px;
-          border-radius: 20px;
-          font-size: 24px;
-          width: 140px;
-          text-align: center;
-        }
-      }
-      &-icon {
-        width: 120px;
-        height: 120px;
-        position: absolute;
-        bottom: 0;
-        right: 20px;
-      }
-      .circle {
-        background: #f3f3f3;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        position: absolute;
-        bottom: 60px;
-        &-left {
-          left: 0;
-          transform: translate(-50%, 50%);
-        }
-        &-right {
-          right: 0;
-          transform: translate(50%, 50%);
+        .circle {
+          background: #f3f3f3;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          position: absolute;
+          bottom: 60px;
+          &-left {
+            left: 0;
+            transform: translate(-50%, 50%);
+          }
+          &-right {
+            right: 0;
+            transform: translate(50%, 50%);
+          }
         }
       }
     }

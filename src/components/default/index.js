@@ -6,18 +6,18 @@ import './index.scss'
 
 class Default extends Component {
   defaultProps = {
-    text: null
+    msg: null
   }
 
   state = {}
 
   render() {
-    const { text } = this.props
+    const { msg } = this.props
 
     return (
       <View className='default-container'>
         <Image src={DefaultIcon} className='default-icon' />
-        <View className='default-text'>{text || '暂无相关数据'}</View>
+        <View className='default-text'>{msg || '暂无相关数据'}</View>
       </View>
     )
   }

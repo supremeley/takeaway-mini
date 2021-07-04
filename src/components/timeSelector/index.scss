@@ -1,0 +1,30 @@
+.time-search {
+  display: flex;
+  align-items: stretch;
+  border-radius: 4px;
+  height: 60px;
+  width: 485px;
+  justify-content: space-between;
+  margin: auto;
+  &__date {
+    color: $global-text-gray-b;
+    font-size: 24px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-right-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    &-info {
+      width: 160px;
+    }
+  }
+
+  &__btn {
+    width: 120px;
+    text-align: center;
+    color: #fff;
+    line-height: 60px;
+    background: linear-gradient(#a1ffed, #4ed3cd);
+  }
+}

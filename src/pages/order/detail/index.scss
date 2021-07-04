@@ -33,6 +33,7 @@ page {
       width: 60px;
       height: 60px;
       flex-shrink: 0;
+      border-radius: 4px;
     }
     &__name {
       flex: 1;
@@ -70,9 +71,17 @@ page {
       }
       &-title {
         color: $global-text-gray-b;
+        width: 450px;
         font-size: 24px;
         display: flex;
         align-items: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        &__name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
         &__tag {
           margin-right: 10px;
           flex-shrink: 0;
@@ -81,6 +90,9 @@ page {
           line-height: 30px;
           height: 30px;
           border-radius: 4px;
+        }
+        &__spe {
+          margin-left: 10px;
         }
       }
       .hava-num {

@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist/",
   "projectname": "duck-mini",
   "description": "",
-  "appid": "wx6f412399c69ef2c8",
+  "appid": "wxa43fec021a178a44",
   "setting": {
     "urlCheck": false,
     "es6": false,
@@ -30,7 +30,6 @@
       "outputPath": ""
     },
     "enableEngineNative": false,
-    "bundle": false,
     "useIsolateContext": true,
     "useCompilerModule": true,
     "userConfirmedUseCompilerModuleSwitch": false,

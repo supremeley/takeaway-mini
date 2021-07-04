@@ -1,56 +1,51 @@
 import Taro from '@tarojs/taro'
 import api from '@/api/index'
 
-const getToken = (callback) => {
+const getToken = async () => {
   try {
     const value = Taro.getStorageSync('token')
+
     if (value) {
       return value
     } else {
-      // login(callback)
-      return ''
+      return await login()
     }
   } catch (e) {
     return ''
   }
 }
 
-const login = (callback) => {
-  Taro.login({
-    success: async (res) => {
-      const query = { code: res.code }
+const login = async (callback) => {
+  const { code } = await Taro.login()
 
-      const {
-        data: {
-          code,
-          data: { openId, userInfo, token }
-        }
-      } = await api.user.WECHAT_LOGIN(query)
+  const query = {
+    code,
+    userInfo: {},
+    isUpdate: false
+  }
 
-      if (code === 200) {
-        Taro.setStorageSync('openId', openId)
-        Taro.setStorageSync('token', token)
-        Taro.setStorageSync('userInfo', userInfo)
+  const {
+    errno,
+    data: { token, userInfo: user }
+  } = await api.user.WECHAT_LOGIN(query)
 
-        // if (!userInfo) {
-        //   Taro.navigateTo({ url: '/pages/login/index' })
-        // } else {
-        //   Taro.setStorageSync('token', token)
-        // }
-      }
 
-      callback && callback()
+  if (!errno) {
 
-      // if (extinfo && extinfo.tmplIds) {
-      //   callback && callback(extinfo)
-      // } else {
-      //   callback && callback()
-      // }
-    },
-    fail: (err) => {
-      console.log(err)
+    Taro.setStorageSync('userInfo', user)
+    Taro.setStorageSync('token', token)
+    Taro.setStorageSync('openid', user.weixinOpenid)
+    Taro.setStorageSync('userId', user.userId)
+
+    const isLogin = Object.keys(user).length && user.nickName && user.avatarUrl
+
+    if (!isLogin) {
+      Taro.navigateTo({ url: `/pages/login/index` })
+      return token
     }
-  })
+
+    return callback && callback()
+  }
 }
 
 const toast = (title, icon = 'none', duration = 2000) => {
