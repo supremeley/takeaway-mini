@@ -1,8 +1,10 @@
-import Taro from '@tarojs/taro'
+import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image, Text } from '@tarojs/components'
 import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
+
+import { connect } from 'react-redux'
 
 import api from '@/api'
 import withScrollPage from '@/hocs/scrollPage'
@@ -11,6 +13,10 @@ import CouponOut from '@/assets/imgs/coupon-out.png'
 
 import './index.scss'
 
+@connect(({ counter }) => ({
+  couponList: counter.couponList
+}))
+@withScrollPage
 class CouponList extends Component {
   state = {
     current: 0,
@@ -35,8 +41,21 @@ class CouponList extends Component {
     ]
   }
 
-  componentDidMount() {
-    this.nextPage()
+  componentDidShow() {
+    if (this.type !== 'gift') {
+      this.resetPage(this.nextPage)
+    } else {
+      const couponList = this.props.couponList.map((item) => {
+        return {
+          ...item
+          // typeDesc: this.handelType(item.goodsType),
+          // startTime: item.startTime.replace(/-/g, '/'),
+          // endTime: item.endTime.replace(/-/g, '/')
+        }
+      })
+
+      this.setState({ couponList })
+    }
   }
 
   // 下拉加载
@@ -110,8 +129,30 @@ class CouponList extends Component {
     return { total }
   }
 
+  get type() {
+    return this.route.params.type
+  }
+
+  get route() {
+    return getCurrentInstance().router
+  }
+
   render() {
     const { pageParams, total, current, navList, couponList } = this.state
+
+    const NavList =
+      navList &&
+      navList.map((item, index) => {
+        return (
+          <View
+            key={index}
+            className={`nav-item ${index === current ? 'active-item' : ''}`}
+            onClick={this.checkTab(index)}
+          >
+            {item.title}
+          </View>
+        )
+      })
 
     const Coupons =
       couponList.length > 0 &&
@@ -143,20 +184,7 @@ class CouponList extends Component {
 
     return (
       <View className='index'>
-        <View className='nav'>
-          {navList &&
-            navList.map((item, index) => {
-              return (
-                <View
-                  key={index}
-                  className={`nav-item ${index === current ? 'active-item' : ''}`}
-                  onClick={this.checkTab(index)}
-                >
-                  {item.title}
-                </View>
-              )
-            })}
-        </View>
+        {this.type !== 'gift' && <View className='nav'>{NavList}</View>}
         <View className='list-container'>{Coupons}</View>
         {total > 0 && !pageParams.isLoading && !pageParams.hasNext && <BottomText />}
         {!total && !pageParams.isLoading && !pageParams.hasNext && <Default />}
@@ -165,4 +193,4 @@ class CouponList extends Component {
   }
 }
 
-export default withScrollPage(CouponList)
+export default CouponList

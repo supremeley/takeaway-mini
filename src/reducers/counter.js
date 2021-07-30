@@ -1,20 +1,15 @@
-import { ADD, MINUS } from "../constants/counter";
+import { SET_COUPONLIST } from "@/constants/counter";
 
 const INITIAL_STATE = {
-  num: 0,
+  couponList: [],
 };
 
 export default function counter(state = INITIAL_STATE, action) {
   switch (action.type) {
-    case ADD:
+    case SET_COUPONLIST:
       return {
         ...state,
-        num: state.num + 1,
-      };
-    case MINUS:
-      return {
-        ...state,
-        num: state.num - 1,
+        couponList: action.list,
       };
     default:
       return state;

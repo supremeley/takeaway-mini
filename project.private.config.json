@@ -19,51 +19,21 @@
           "scene": null
         },
         {
-          "name": "pages/order/detail/index",
-          "pathName": "pages/order/detail/index",
-          "query": "id=17",
+          "name": "pages/balance/bill/index",
+          "pathName": "pages/balance/bill/index",
+          "query": "",
           "scene": null
         },
         {
           "name": "pages/item/detail/index",
           "pathName": "pages/item/detail/index",
-          "query": "id=1001018",
-          "scene": null
-        },
-        {
-          "name": "pages/order/refund/index",
-          "pathName": "pages/order/refund/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pages/coupon/list/index",
-          "pathName": "pages/coupon/list/index",
-          "query": "",
+          "query": "id=1001322",
           "scene": null
         },
         {
           "name": "pages/checkout/index/index",
           "pathName": "pages/checkout/index/index",
-          "query": "id=1001018",
-          "scene": null
-        },
-        {
-          "name": "pages/coupon/center/index",
-          "pathName": "pages/coupon/center/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pages/checkout/index/index",
-          "pathName": "pages/checkout/index/index",
-          "query": "id=1001018",
-          "scene": null
-        },
-        {
-          "name": "pages/checkout/index/index",
-          "pathName": "pages/checkout/index/index",
-          "query": "id=1001006",
+          "query": "id=1001322",
           "scene": null
         }
       ]

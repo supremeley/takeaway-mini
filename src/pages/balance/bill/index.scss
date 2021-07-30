@@ -1,0 +1,25 @@
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 160px;
+  background: #fff;
+  &:not(:last-child) {
+    border-bottom: 2px solid $global-line-gray;
+  }
+  &__left {
+    &-title {
+      font-size: 32px;
+      font-weight: 600;
+    }
+    &-date {
+      font-size: 24px;
+      color: $global-text-gray;
+    }
+  }
+  &__right {
+    font-size: 36px;
+    font-weight: 600;
+  }
+}

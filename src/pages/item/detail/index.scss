@@ -293,9 +293,23 @@
       color: $global-green;
     }
     &__price {
-      font-size: 30px;
+      // font-size: 30px;
+      // font-weight: 600;
+      // color: $global-red;
+      flex: 1;
       font-weight: 600;
+      font-size: 30px;
+      display: flex;
+      align-items: flex-end;
+      // justify-content: space-between;
       color: $global-red;
+      &-line {
+        font-size: 24px;
+        color: $global-text-gray;
+        text-decoration: line-through;
+        font-weight: 400;
+        margin-left: 20px;
+      }
     }
   }
   .footer {
@@ -411,7 +425,7 @@
   height: 120px;
   display: flex;
   color: $global-black;
-  padding-left: 20px;
+  // padding-left: 20px;
   color: $global-green;
   width: 100%;
   align-items: center;

@@ -1,6 +1,6 @@
 import request from '@/utils/request.js'
 
-export const GET_AREA_LIST = () => request.get('address/area')
+export const GET_AREA_LIST = () => request.get('address/allArea')
 
 export const GET_SCHOOL_LIST = (data) => request.post('address/school', data)
 

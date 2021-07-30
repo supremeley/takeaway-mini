@@ -13,13 +13,13 @@ class NumControl extends Component {
   state = {}
 
   minusHandle = () => {
-    const { onAddHandle } = this.props
-    onAddHandle && onAddHandle()
+    const { onMinusHandle } = this.props
+    onMinusHandle && onMinusHandle()
   }
 
   addHandle = () => {
-    const { onMinusHandle } = this.props
-    onMinusHandle && onMinusHandle()
+    const { onAddHandle } = this.props
+    onAddHandle && onAddHandle()
   }
 
   render() {

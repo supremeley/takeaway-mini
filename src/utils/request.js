@@ -5,16 +5,17 @@ import D from '@/common'
 class Fetch {
   constructor() {
     this.baseUrl = 'https://eating.hehezaisheng.com/wx/'
-    this.adminUrl = 'https://admin.hehezaisheng.com/admin/'
 
-    // this.baseUrl = 'http://shopwx.cn.utools.club/wx/'
-    // this.adminUrl = 'http://shopzz.cn.utools.club/admin/'
+    this.forumUrl = 'https://eating.hehezaisheng.com/wnh/'
+
+    this.adminUrl = 'https://admin.hehezaisheng.com/admin/'
 
     // this.baseUrl = 'http://tianhei.nat300.top/wx/'
     // this.adminUrl = 'http://thmm.nat300.top/admin/'
     // this.shopUrl = 'http://thmm.nat300.top/merchant/'
 
     this.token = ''
+
     this.header = {
       'Content-Type': 'multipart/form-data'
     }
@@ -39,6 +40,12 @@ class Fetch {
 
     if (type === 'base') {
       newUrl = this.baseUrl + newUrl
+      header = {
+        ...header,
+        'X-Dts-Token': this.token
+      }
+    } else if (type === 'forum') {
+      newUrl = this.forumUrl + newUrl
       header = {
         ...header,
         'X-Dts-Token': this.token

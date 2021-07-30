@@ -10,11 +10,8 @@ import './app.scss'
 const store = configStore()
 
 class App extends Component {
-  // onLoad() {}
-
   async componentDidMount() {
     this.handleUpdate()
-    // this.handleLogin()
   }
 
   handleUpdate = () => {
@@ -47,45 +44,6 @@ class App extends Component {
         content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
       })
     }
-  }
-
-  handleLogin = async () => {
-    // const weixinOpenid = Taro.getStorageSync('openid')
-    // const userInfo = Taro.getStorageSync('userInfo')
-
-    const { code } = await Taro.login()
-
-    // const isLogin = Object.keys(userInfo).length
-
-    // let usr = {}
-
-    // if (isLogin) {
-    //   usr = {
-    //     avatarUrl: userInfo.avatarUrl,
-    //     city: userInfo.city,
-    //     country: userInfo.country,
-    //     gender: userInfo.gender,
-    //     language: userInfo.language,
-    //     nickName: userInfo.nickName,
-    //     // phone: userInfo.phone,
-    //     province: userInfo.province
-    //   }
-    // }
-
-    const query = {
-      code,
-      userinfo: {}
-      // userInfo: usr
-    }
-
-    // if (isLogin) query.userInfo = usr
-
-    const {
-      data: { token, userInfo: user }
-    } = await api.user.WECHAT_LOGIN(query)
-
-    Taro.setStorageSync('userInfo', user)
-    Taro.setStorageSync('token', token)
   }
 
   componentDidShow() {}

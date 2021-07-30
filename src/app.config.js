@@ -1,38 +1,61 @@
 export default {
   pages: [
     'pages/home/index',
+    'pages/forum/index',
     'pages/center/index',
     'pages/login/index',
-    'pages/order/list/index',
-    'pages/order/detail/index',
-    'pages/order/refund/index',
     'pages/item/list/index',
     'pages/item/detail/index',
     'pages/checkout/index/index',
-    'pages/coupon/list/index',
-    'pages/event/index',
-    'pages/coupon/center/index',
-    'pages/integral/index',
-    //////////////////////
-    // 'pages/manager/order/list/index',
-    // 'pages/manager/order/detail/index',
-    // 'pages/manager/order/apply/index',
-    // 'pages/manager/center/index',
-    // 'pages/manager/finance/index/index',
-    // 'pages/manager/finance/record/index',
-    // 'pages/manager/finance/detail/index',
-    // 'pages/manager/statistics/index/index',
-    // 'pages/manager/statistics/revenue/index',
-    // 'pages/manager/statistics/goods/index',
-    // 'pages/manager/statistics/account/index',
-    // 'pages/manager/statistics/accountDetail/index',
-    // 'pages/manager/print/index/index',
-    // 'pages/manager/print/setting/index',
-    // // 'pages/manager/print/batch/index',
-    // // 'pages/manager/manager/index',
-    // 'pages/manager/member/index',
-    // // 'pages/manager/message/index',
-    // 'pages/manager/login/index'
+    // 'pages/event/index',
+    // 'pages/coupon/list/index',
+    // 'pages/coupon/center/index',
+    // 'pages/integral/index',
+    // 'pages/balance/index',
+    // 'pages/balance/bill/index',
+    // 'pages/order/list/index',
+    // 'pages/order/detail/index',
+    // 'pages/order/refund/index',
+
+  ],
+  subpackages: [
+    {
+      root: 'pages/balance',
+      pages: [
+        'detail/index',
+        'bill/index',
+      ]
+    },
+    {
+      root: 'pages/coupon',
+      pages: [
+        'list/index',
+        'center/index',
+      ]
+    },
+    {
+      root: 'pages/order',
+      pages: [
+        'list/index',
+        'detail/index',
+        'refund/index',
+      ]
+    },
+    {
+      root: 'pages/event',
+      pages: [
+        'web/index',
+        'setting/index',
+      ]
+    },
+    {
+      root: 'pages/prove',
+      pages: [
+        'school/index',
+        'guide/index',
+        'user/index',
+      ]
+    }
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -48,20 +71,20 @@ export default {
       {
         text: '首页',
         pagePath: 'pages/home/index',
-        iconPath: './assets/imgs/tar-home.png',
-        selectedIconPath: './assets/imgs/tar-home-active.png'
+        iconPath: './assets/imgs/tar-bar/tar-home.png',
+        selectedIconPath: './assets/imgs/tar-bar/tar-home-active.png'
       },
       {
-        text: '订单',
-        pagePath: 'pages/order/list/index',
-        iconPath: './assets/imgs/tar-order.png',
-        selectedIconPath: './assets/imgs/tar-order-active.png'
+        text: '论坛',
+        pagePath: 'pages/forum/index',
+        iconPath: './assets/imgs/tar-bar/tar-order.png',
+        selectedIconPath: './assets/imgs/tar-bar/tar-order-active.png'
       },
       {
         text: '我的',
         pagePath: 'pages/center/index',
-        iconPath: './assets/imgs/tar-center.png',
-        selectedIconPath: './assets/imgs/tar-center-active.png'
+        iconPath: './assets/imgs/tar-bar/tar-center.png',
+        selectedIconPath: './assets/imgs/tar-bar/tar-center-active.png'
       }
     ]
   }

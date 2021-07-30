@@ -13,9 +13,9 @@ import headerBg from '@/assets/imgs/header-bg.png'
 import CartIcon from '@/assets/imgs/cart.png'
 import CartActiveIcon from '@/assets/imgs/cart-active.png'
 
+import 'taro-ui/dist/style/components/icon.scss'
 import 'taro-ui/dist/style/components/float-layout.scss'
 import 'taro-ui/dist/style/components/curtain.scss'
-import 'taro-ui/dist/style/components/icon.scss'
 
 import Footer from '../components/footer'
 import NumControl from '../components/num-control'
@@ -94,9 +94,10 @@ class itemDetail extends Component {
   }
 
   onJumpToCheckout = () => {
-    const { rule } = this.state
+    const { rule, priceInfo } = this.state
+    const { totalPrice } = priceInfo
 
-    if ((this.total ? this.total.price : 0) >= rule.basePrice) {
+    if ((totalPrice || 0) >= rule.basePrice) {
       Taro.navigateTo({ url: `/pages/checkout/index/index?id=${this.id}` })
     }
   }
@@ -167,21 +168,39 @@ class itemDetail extends Component {
   }
 
   handelScroll = () => {
-    const { goodsList } = this.state
+    const { goodsList, currentIndex } = this.state
 
     const query = Taro.createSelectorQuery()
 
-    const selector = query.selectAll(`.content-goods__plate-title`).boundingClientRect()
+    const selector = query.selectAll(`.content-goods__plate`).boundingClientRect()
 
     selector.exec((res) => {
       // console.log(res, 'resres')
       const arr = res[0]
+      // console.log(res, 'resres')
 
-      const i = arr.findIndex((item) => {
-        return item.top <= 273 && item.top >= 0
-      })
+      // const i = arr.findIndex((item, index) => {
+      //   return item.top <= 273 && item.top >= 0 && index != currentIndex
+      // })
+      let i = 0
 
-      if (i >= 0) {
+      const cur = arr[currentIndex]
+
+      if (cur.top <= 273 && cur.bottom >= 273) {
+        i = currentIndex
+      }
+
+      if (cur.bottom < 273) {
+        i = currentIndex + 1
+      }
+
+      if (cur.top >= 273) {
+        i = currentIndex - 1
+      }
+
+      // console.log(i, 'i')
+
+      if (i != currentIndex) {
         const currentTitle = goodsList[i].name
 
         this.setState({ currentIndex: i, currentTitle, scrollIntoView: null })
@@ -202,8 +221,10 @@ class itemDetail extends Component {
       Taro.nextTick(() => {
         const q = Taro.createSelectorQuery()
         const selector = q.select(`.shop`).boundingClientRect()
-
+        // console.log(selector)
         selector.exec((res) => {
+          // console.log(res,'res')
+
           this.setState({ shopBottom: res[0].bottom })
         })
       })
@@ -218,7 +239,7 @@ class itemDetail extends Component {
     } = await api.goods.GET_GOODS_LIST(query)
 
     const nGoods = goodsList.reduce((vals, goods) => {
-      const res = vals.find((info) => info.categoryId === goods.categoryId)
+      const res = vals.find((info) => info.categoryId == goods.categoryId)
 
       const proRes = productNumList.find((info) => info.goodsId === goods.id)
 
@@ -242,7 +263,7 @@ class itemDetail extends Component {
       if (res) {
         res.goods.push(goodsItem)
       } else {
-        vals.push({ categoryId: goods.categoryId || null, goods: [goodsItem] })
+        vals.push({ categoryId: goods.categoryId, goods: [goodsItem] })
       }
       return vals
     }, [])
@@ -383,11 +404,11 @@ class itemDetail extends Component {
 
     const {
       data: {
+        freightPrice,
         actualCashBack: discountPrice,
         actualPrice: totalPrice,
         additionalFee: additionalPrice,
         extraAdditionalFee: extraAdditionalPrice,
-        freightPrice,
         goodsTotalPrice: goodsPrice,
         goodsTotalPrice1: goodsPrice1,
         packingFee: packagePrice,
@@ -525,14 +546,22 @@ class itemDetail extends Component {
 
     let { specificationList, productList, id } = goodsList[index].goods[idx]
 
+    let curInfo = goodsList[index].goods[idx]
+
     if (!specificationList && !productList) {
       const res = await this.getGoodsDetail(id)
 
       specificationList = res.specificationList
       productList = res.productList
 
-      goodsList[index].goods[idx].specificationList = res.specificationList
-      goodsList[index].goods[idx].productList = res.productList
+      // goodsList[index].goods[idx].specificationList = res.specificationList
+      // goodsList[index].goods[idx].productList = res.productList
+
+      curInfo = {
+        ...curInfo,
+        specificationList,
+        productList
+      }
     }
 
     specificationList = specificationList.map((item) => {
@@ -542,9 +571,9 @@ class itemDetail extends Component {
       }
     })
 
-    // this.handleProductList(productList, cartList)
+    goodsList[index].goods[idx] = curInfo
 
-    const curInfo = goodsList[index].goods[idx]
+    // this.handleProductList(productList, cartList)
 
     // console.log(curInfo)
 
@@ -618,7 +647,7 @@ class itemDetail extends Component {
       return item.productId === res.id
     })
 
-    // console.log(cartList, res, curCart, 'curProduct')
+    console.log(cartList, res, curCart, 'curProduct')
 
     if (curCart) {
       const cur = {
@@ -646,7 +675,7 @@ class itemDetail extends Component {
       number += item.number
       packingFee += item.packingFee
     })
-    // console.log({ price, number, packingFee })
+    console.log({ price, number, packingFee })
     if (price && number) {
       return { price, number, packingFee }
     }
@@ -755,8 +784,8 @@ class itemDetail extends Component {
             <View className='float-option__right'>
               <NumControl
                 num={item.number}
-                onAddHandle={this.handleUpdateCartInList(index, 'minus')}
-                onMinusHandle={this.handleUpdateCartInList(index, 'add')}
+                onAddHandle={this.handleUpdateCartInList(index, 'add')}
+                onMinusHandle={this.handleUpdateCartInList(index, 'minus')}
               />
             </View>
           </View>
@@ -793,16 +822,18 @@ class itemDetail extends Component {
                       <View className='content-goods__item-info__price'>
                         <View>
                           <Text>￥{goods.price}</Text>
-                          <Text className='content-goods__item-info__price-line'>
-                            ￥{goods.linePrice}
-                          </Text>
+                          {linePrice && (
+                            <Text className='content-goods__item-info__price-line'>
+                              ￥{goods.linePrice}
+                            </Text>
+                          )}
                         </View>
                         <View className='content-goods__item-opt-text'>
                           {goods.productNum == 1 ? (
                             <NumControl
                               num={goods.number}
-                              onAddHandle={this.handleUpdateCartInGoods(index, idx, 'minus')}
-                              onMinusHandle={this.handleUpdateCartInGoods(index, idx, 'add')}
+                              onAddHandle={this.handleUpdateCartInGoods(index, idx, 'add')}
+                              onMinusHandle={this.handleUpdateCartInGoods(index, idx, 'minus')}
                             />
                           ) : (
                             <View className='content-goods__item-opt-choose'>选规格</View>
@@ -843,6 +874,15 @@ class itemDetail extends Component {
           </View>
         </View>
         <View className='content'>
+          {/* {goodsList.length > 1 && (
+            <ScrollView
+              scrollY
+              style={{ height: `calc(100vh - ${shopBottom + 85}px)` }}
+              className='content-aside'
+            >
+              {AsideList}
+            </ScrollView>
+          )} */}
           <ScrollView
             scrollY
             style={{ height: `calc(100vh - ${shopBottom + 85}px)` }}
@@ -898,14 +938,14 @@ class itemDetail extends Component {
                   {this.curProduct && (
                     <View className='content-goods__item-info__price'>
                       <View>
-                        ￥{curInfo.price}
-                        {addPrice > 0 && <Text>+{addPrice}</Text>}
+                        ￥{this.curProduct.price}
+                        {/* {addPrice > 0 && <Text>+{addPrice}</Text>} */}
                       </View>
                       {this.curProduct.goodsNum > 0 && (
                         <NumControl
                           num={this.curProduct.goodsNum}
-                          onAddHandle={this.handleUpdateCartInModal('minus')}
-                          onMinusHandle={this.handleUpdateCartInModal('add')}
+                          onAddHandle={this.handleUpdateCartInModal('add')}
+                          onMinusHandle={this.handleUpdateCartInModal('minus')}
                         />
                       )}
                     </View>
@@ -947,9 +987,13 @@ class itemDetail extends Component {
                 <View className='sku-goods__name'>{curInfo.name}</View>
                 <View className='sku-goods__desc'>{curInfo.brief}</View>
                 {this.curProduct && (
-                  <View className='sku-goods__price'>￥{this.curProduct.price}</View>
+                  <View className='sku-goods__price'>
+                    ￥{this.curProduct.price}
+                    {curInfo.linePrice > 0 && (
+                      <View className='sku-goods__price-line'>{curInfo.linePrice}</View>
+                    )}
+                  </View>
                 )}
-                {/* <View className='sku-goods__sale'>已售2298</View> */}
               </View>
               {this.curProduct && (
                 <View className='footer'>
@@ -968,8 +1012,8 @@ class itemDetail extends Component {
                   {this.curProduct.goodsNum > 0 ? (
                     <NumControl
                       num={this.curProduct.goodsNum}
-                      onAddHandle={this.handleUpdateCartInModal('minus')}
-                      onMinusHandle={this.handleUpdateCartInModal('add')}
+                      onAddHandle={this.handleUpdateCartInModal('add')}
+                      onMinusHandle={this.handleUpdateCartInModal('minus')}
                     />
                   ) : (
                     <View className='footer-btn active-btn' onClick={this.handleAddCart}>

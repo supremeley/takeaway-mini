@@ -36,8 +36,8 @@ class Footer extends Component {
       this.props
 
     // if (!info) return null
-    // console.log(total, basePrice)
-    const canPay = total && basePrice && total.price >= basePrice
+    // console.log(totalPrice, basePrice,'t')
+    const canPay = total && basePrice && totalPrice >= basePrice
 
     return (
       <View className={`${!isfloatLayout ? 'page-footer' : ''} footer`}>
@@ -62,7 +62,7 @@ class Footer extends Component {
           </>
         )}
         <View className={`footer-btn ${canPay ? 'active-btn' : ''}`} onClick={this.handleJump}>
-          {canPay ? '去结算' : `￥${basePrice}元起送`}
+          {canPay ? '去结算' : `￥${basePrice || 0}元起送`}
         </View>
       </View>
     )

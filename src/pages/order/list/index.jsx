@@ -98,6 +98,7 @@ class OrderList extends Component {
       title: '加载中',
       icon: 'none'
     })
+    
     try {
       const {
         data: { data, count: total }

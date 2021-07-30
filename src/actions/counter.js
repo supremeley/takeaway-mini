@@ -1,24 +1,12 @@
 import {
-  ADD,
-  MINUS
-} from '../constants/counter'
+  SET_COUPONLIST,
+} from '@/constants/counter'
 
-export const add = () => {
+export const setCouponlist = (list) => {
   return {
-    type: ADD
-  }
-}
-export const minus = () => {
-  return {
-    type: MINUS
+    type: SET_COUPONLIST,
+    list
   }
 }
 
-// 异步的action
-export function asyncAdd () {
-  return dispatch => {
-    setTimeout(() => {
-      dispatch(add())
-    }, 2000)
-  }
-}
+

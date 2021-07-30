@@ -4,22 +4,32 @@ import { View, Image, Text, Input, ScrollView } from '@tarojs/components'
 import { AtFloatLayout } from 'taro-ui'
 import BottomText from '@/components/bottomText'
 
+import api from '@/api'
 import D from '@/common'
 import debounce from 'lodash/debounce'
-import api from '@/api'
+
 import withScrollPage from '@/hocs/scrollPage'
 
+import WechatIcon from '@/assets/imgs/wechat-icon.png'
+import BalanceIcon from '@/assets/imgs/balance-icon.png'
+
 import 'taro-ui/dist/style/components/float-layout.scss'
-import 'taro-ui/dist/style/components/icon.scss'
 import './index.scss'
 
 class Checkout extends Component {
   state = {
+    balance: 0,
     currentSchool: '',
     currentFloor: '',
     couponShow: false,
     couponList: [],
     currentCoupon: null,
+    payTypeShow: false,
+    currentPayType: {
+      title: '微信',
+      type: 'wechat',
+      icon: WechatIcon
+    },
     total: 0,
     info: null,
     rule: null,
@@ -35,6 +45,7 @@ class Checkout extends Component {
       packagePrice: 0
     },
     sendTime: '',
+    additionalFeeName: '',
     form: {
       // message: '测试',
       // userName: '赵',
@@ -44,22 +55,40 @@ class Checkout extends Component {
       userName: '',
       mobile: '',
       address: ''
-    }
+    },
+    payOption: [
+      {
+        title: '余额',
+        type: 'balance',
+        icon: BalanceIcon
+      },
+      {
+        title: '微信',
+        type: 'wechat',
+        icon: WechatIcon
+      }
+    ]
   }
 
-  componentDidMount() {
+  componentDidShow() {
     this.fetchData()
-    this.nextPage()
+    this.resetPage(this.nextPage)
 
     const locInfo = Taro.getStorageSync('locInfo')
+    const orderUser = Taro.getStorageSync('orderUser')
 
-    if (!locInfo) {
-      // this.setState({ explainShow: true })
-    } else {
+    if (locInfo) {
       const currentSchool = locInfo.school.label
       const currentFloor = locInfo.floor.label
 
       this.setState({ currentSchool, currentFloor })
+    }
+
+    if (orderUser) {
+      const { userName, mobile, address } = orderUser
+      const { form } = this.state
+
+      this.setState({ form: { ...form, userName, mobile, address } })
     }
   }
 
@@ -90,6 +119,7 @@ class Checkout extends Component {
   fetchData = async () => {
     await this.getShopData()
     await this.fetchCheckout()
+    this.getUserBalance()
   }
 
   fetch = async (params) => {
@@ -123,6 +153,25 @@ class Checkout extends Component {
     this.setState({ currentCoupon: couponList[index], couponShow: false }, () =>
       this.fetchCheckout()
     )
+  }
+
+  openPayTypeShow = () => {
+    const { balance } = this.state
+
+    if (!balance) {
+      D.toast('暂无可用余额')
+      return
+    }
+
+    this.setState({ payTypeShow: true })
+  }
+
+  closePayTypeShow = () => {
+    this.setState({ payTypeShow: false })
+  }
+
+  onSelectPayType = (info) => () => {
+    this.setState({ currentPayType: info, payTypeShow: false })
   }
 
   changeInp = (e, key) => {
@@ -182,6 +231,14 @@ class Checkout extends Component {
     return { total }
   }
 
+  getUserBalance = async () => {
+    const {
+      data: { remainAmount }
+    } = await api.user.GET_USER_BALANCE()
+
+    this.setState({ balance: remainAmount })
+  }
+
   fetchCheckout = async () => {
     let { currentCoupon } = this.state
 
@@ -198,7 +255,8 @@ class Checkout extends Component {
         packingFee: packagePrice,
         deliveryTime,
         freightPrice,
-        isNew
+        isNew,
+        additionalFeeName
       }
     } = await api.cart.CHECKOUT_BY_CART(query)
 
@@ -220,7 +278,7 @@ class Checkout extends Component {
       sendTime = `${date} ${startTime}-${endTime}`
     }
 
-    this.setState({ cartList, priceInfo, sendTime, isNew })
+    this.setState({ cartList, priceInfo, sendTime, isNew, additionalFeeName })
   }
 
   fetchVali = () => {
@@ -243,6 +301,8 @@ class Checkout extends Component {
       return false
     }
 
+    Taro.setStorageSync('orderUser', { userName, mobile, address })
+
     return true
   }
 
@@ -251,7 +311,7 @@ class Checkout extends Component {
       return
     }
 
-    let { form, currentCoupon } = this.state
+    let { form, currentCoupon, currentPayType } = this.state
 
     const locInfo = Taro.getStorageSync('locInfo')
 
@@ -264,7 +324,8 @@ class Checkout extends Component {
       brandId: this.id,
       schoolName: locInfo.school.label,
       buildingId: locInfo.floor.value,
-      buildingNo: locInfo.floor.label
+      buildingNo: locInfo.floor.label,
+      payType: currentPayType.type === 'wechat' ? 2 : 1
     }
 
     const {
@@ -283,9 +344,15 @@ class Checkout extends Component {
     }
 
     try {
-      const res = await Taro.requestPayment(payQuery)
+      const { errMsg } = await Taro.requestPayment(payQuery)
 
-      console.log(res)
+      if (errMsg === 'requestPayment:ok') {
+        D.toast('支付成功')
+
+        setTimeout(() => {
+          Taro.switchTab({ url: '/page/order/list/index' })
+        }, 1000)
+      }
     } catch (e) {}
   }
 
@@ -311,8 +378,12 @@ class Checkout extends Component {
       couponShow,
       couponList,
       currentCoupon,
+      payTypeShow,
+      payOption,
+      currentPayType,
       currentSchool,
-      currentFloor
+      currentFloor,
+      additionalFeeName
     } = this.state
 
     if (!info) return null
@@ -393,7 +464,63 @@ class Checkout extends Component {
       })
 
     return (
-      <View className='index'>
+      <View className='checkout'>
+        <View className='explain'>公益：每次下单吃饭鸭公益捐赠0.1元</View>
+        <View className='plate'>
+          <View className='plate-title'>外卖到寝</View>
+          {/* <View className='plate'> */}
+          <View className='plate-option'>
+            <Text className='plate-option__title'>期望送达时间</Text>
+            <View className='plate-option__info'>
+              <View className='plate-option__info-text'>{sendTime}</View>
+              {/* <View className='at-icon at-icon-chevron-right'></View> */}
+            </View>
+          </View>
+          <View className='plate-option'>
+            <Text className='plate-option__title'>所在楼宇</Text>
+            <View className='plate-option__info'>{currentFloor}</View>
+          </View>
+          <View className='plate-option'>
+            <Text className='plate-option__title'>楼层寝室号</Text>
+            <Input
+              value={form.address}
+              className='plate-option__info opt-inp'
+              onInput={(e) => this.changeInp(e, 'address')}
+            />
+          </View>
+          <View className='plate-option'>
+            <Text className='plate-option__title'>收货人姓名</Text>
+            <Input
+              value={form.userName}
+              className='plate-option__info opt-inp'
+              onInput={(e) => this.changeInp(e, 'userName')}
+            />
+          </View>
+          <View className='plate-option'>
+            <Text className='plate-option__title'>联系电话</Text>
+            <Input
+              value={form.mobile}
+              className='plate-option__info opt-inp'
+              onInput={(e) => this.changeInp(e, 'mobile')}
+            />
+          </View>
+          <View className='plate-option'>
+            <View className='plate-option__title'>备注</View>
+            <Input
+              value={form.message}
+              placeholder='请输入备注'
+              className='plate-option__info opt-inp'
+              onInput={(e) => this.changeInp(e, 'message')}
+            />
+          </View>
+          <View className='plate-option'>
+            <View className='plate-option__title'>支付方式</View>
+            <View className='plate-option__info' onClick={this.openPayTypeShow}>
+              <View className='plate-option__info-text'>{currentPayType.title}</View>
+              <View className='at-icon at-icon-chevron-right'></View>
+            </View>
+          </View>
+        </View>
         <View className='shop-container'>
           <View className='shop-header'>
             <Image src={iconUrl} mode='aspectFill' className='shop-header__avatar'></Image>
@@ -415,14 +542,16 @@ class Checkout extends Component {
               </View>
               <View className='shop-plate__item-price'>
                 ￥{freightPrice || 0}
-                <Text className='shop-plate__item-price__line'>￥{lineFreight}</Text>
+                {lineFreight && (
+                  <Text className='shop-plate__item-price__line'>￥{lineFreight}</Text>
+                )}
               </View>
             </View>
             {additionalPrice + extraAdditionalPrice > 0 && (
               <View className='shop-plate__item'>
                 <View className='shop-plate__item-title'>
                   <Text className='shop-plate__item-title__tag red-d-tag'>附加</Text>
-                  附加费
+                  {additionalFeeName || '附加费'}
                 </View>
                 <View className='shop-plate__item-price'>
                   ￥{additionalPrice + extraAdditionalPrice}
@@ -480,64 +609,13 @@ class Checkout extends Component {
             </View>
           </View>
         </View>
-        <View className='plate'>
-          <View className='plate-option'>
-            <Text className='plate-option__item-title'>期望送达时间</Text>
-            <View className='plate-option__item-num'>{sendTime}</View>
-          </View>
-        </View>
-        <View className='plate'>
-          <View className='plate-title'>收货地址</View>
-          <View className='plate-option'>
-            <Text className='plate-option__item-title'>所在楼宇</Text>
-            <View className='plate-option__item-num stronge'>{currentFloor}</View>
-          </View>
-          <View className='plate-option'>
-            <Text className='plate-option__item-title '>楼层寝室号</Text>
-            <Input
-              value={form.address}
-              className='plate-option__item-inp'
-              onInput={(e) => this.changeInp(e, 'address')}
-            />
-          </View>
-        </View>
-        <View className='plate'>
-          <View className='plate-title'>用户信息</View>
-          <View className='plate-option'>
-            <Text className='plate-option__item-title'>收货人姓名</Text>
-            <Input
-              value={form.userName}
-              className='plate-option__item-inp'
-              onInput={(e) => this.changeInp(e, 'userName')}
-            />
-          </View>
-          <View className='plate-option'>
-            <Text className='plate-option__item-title'>联系电话</Text>
-            <Input
-              value={form.mobile}
-              className='plate-option__item-inp'
-              onInput={(e) => this.changeInp(e, 'mobile')}
-            />
-          </View>
-        </View>
-        <View className='plate'>
-          <View className='plate-title'>备注</View>
-          <View className='plate-option'>
-            <Input
-              value={form.message}
-              placeholder='请输入备注'
-              className='plate-option__item-inp remark'
-              onInput={(e) => this.changeInp(e, 'message')}
-            />
-          </View>
-        </View>
         <View className='footer'>
           <View className='footer-info'>
             <View className='footer-info__price'>实付金额</View>
             <View className='footer-info__explain'>￥{tootalPrice}</View>
           </View>
           <View className='footer-btn active-btn' onClick={this.handleSubmit}>
-            去结算
+            提交订单
           </View>
         </View>
         <AtFloatLayout isOpened={couponShow} onClose={this.closeCouponShow}>
@@ -551,6 +629,27 @@ class Checkout extends Component {
           <View className='float-title' onClick={this.unuseCoupon}>
             不使用优惠券
           </View>
+        </AtFloatLayout>
+        <AtFloatLayout isOpened={payTypeShow} onClose={this.closePayTypeShow}>
+          <View className='float-title'>选择支付方式</View>
+          {payOption &&
+            payOption.map((item) => {
+              return (
+                <View key={item.title} className='float-opt' onClick={this.onSelectPayType(item)}>
+                  <View className='float-opt__left'>
+                    <Image src={item.icon} mode='aspectFill' className='float-opt__left-icon' />
+                    <View className='float-opt__left-title'>{item.title}</View>
+                  </View>
+                  <View
+                    className={`float-opt__right ${
+                      currentPayType.type === item.type ? 'active-check' : ''
+                    }`}
+                  >
+                    <View className='at-icon at-icon-check'></View>
+                  </View>
+                </View>
+              )
+            })}
         </AtFloatLayout>
       </View>
     )

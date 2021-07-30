@@ -19,7 +19,7 @@ export default function withScrollPage(WrappedComponent) {
     state = {
       ...this.state,
       pageParams: {
-        size: 10,
+        limit: 10,
         page: 1,
         hasNext: true,
         isLoading: false,
@@ -38,11 +38,11 @@ export default function withScrollPage(WrappedComponent) {
         pageParams
       })
 
-      const { size, page } = pageParams
+      const { limit, page } = pageParams
 
-      const { total } = await this.fetch({ size, page })
+      const { total } = await this.fetch({ limit, page })
 
-      if (!total || total < size) {
+      if (!total || total < limit) {
         pageParams.hasNext = false
       }
 
@@ -64,7 +64,7 @@ export default function withScrollPage(WrappedComponent) {
       const resetPageParams = {
         ...(pageParams || {}),
         page: 0,
-        size: 10,
+        limit: 10,
         isLoading: false,
         hasNext: true
       }

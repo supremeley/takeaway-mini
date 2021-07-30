@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image, Swiper, SwiperItem, Picker, Button } from '@tarojs/components'
-import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
+import { AtModal, AtCurtain, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
 import ShopItem from '@/components/shopItem'
 import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
@@ -12,8 +12,8 @@ import noticeIcon from '@/assets/imgs/notice-icon.png'
 
 import api from '@/api'
 
-// import scrollPage from '@/hocs/scrollPage'
-
+import 'taro-ui/dist/style/components/icon.scss'
+import 'taro-ui/dist/style/components/curtain.scss'
 import 'taro-ui/dist/style/components/modal.scss'
 import './index.scss'
 
@@ -59,8 +59,8 @@ class Home extends Component {
       showAlert: true
       // textColor: '#000'
     },
-    modalShow,
-    modalData,
+    modalShow: false,
+    modalData: [],
     navList: [],
     shopList: [],
     areaRange: [[], [], []],
@@ -88,7 +88,7 @@ class Home extends Component {
   onShareAppMessage = () => {
     return {
       title: '吃饭鸭',
-      path: '/home/index',
+      path: '/pages/home/index',
       imageUrl: ''
     }
   }
@@ -100,7 +100,7 @@ class Home extends Component {
     // await this.getBrandList()
   }
 
-  bannerHandle = (banner) => {
+  bannerHandle = (banner, type) => {
     // console.log(banner)
     const { schoolId } = this.state
 
@@ -114,6 +114,10 @@ class Home extends Component {
         return !item.schoolType || (item.schoolList && item.schoolList.find((it) => it == schoolId))
       })
     }
+
+    bannerList = bannerList.map((item, index) => {
+      return { ...item, isShow: type === 'popup' && !index }
+    })
 
     return bannerList
   }
@@ -204,6 +208,19 @@ class Home extends Component {
     this.setState({ explainShow: true })
   }
 
+  closeModal = (index) => () => {
+    let { modalData } = this.state
+    let nMD = modalData.concat()
+
+    nMD[index].isShow = false
+
+    if (index !== modalData.length - 1) {
+      nMD[index + 1].isShow = true
+    }
+
+    this.setState({ modalData: nMD })
+  }
+
   getHomeIndex = async () => {
     const { schoolId } = this.state
 
@@ -218,7 +235,7 @@ class Home extends Component {
         ...item.merchant
       }
     })
-
+    // debugger
     this.setState({ shopList: brandGoodsList, navList })
   }
 
@@ -232,17 +249,20 @@ class Home extends Component {
         JSON.parse(data)
       // let res = data
       // console.log(banner1Data, banner2Data)
-
+      // console.log(alertData)
       this.setState({
         banner1Data: this.bannerHandle(banner1Data),
         banner2Data: this.bannerHandle(banner2Data),
         banner1Show,
         banner2Show,
         modalShow,
-        modalData: this.bannerHandle(modalData),
+        modalData: this.bannerHandle(modalData, 'popup'),
         alertData
       })
     }
+
+    // console.log(this.bannerHandle(modalData, 'popup'))
+
     // const navList = brandList.map((item) => {
     //   return {
     //     icon: item.picUrl,
@@ -336,7 +356,7 @@ class Home extends Component {
   getFloorList = async (id, locInfo, isCon) => {
     const { areaRange } = this.state
 
-    const query = { schoolId: id }
+    const query = { schoolId: id, page: 1, limit: 9999 }
 
     const {
       data: { items }
@@ -449,7 +469,7 @@ class Home extends Component {
         )
       })
 
-    const Explain = alertData && alertData.alertShow && (
+    const Explain = alertData && alertData.showAlert && (
       <View className='content-explain'>
         {/* <View className='content-explain__title'>通知公告</View> */}
         <Image className='content-explain__icon' mode='aspectFill' src={noticeIcon}></Image>
@@ -467,11 +487,7 @@ class Home extends Component {
       navList.length > 0 &&
       navList.map((item) => {
         return (
-          <View
-            key={item.url}
-            className='nav-item'
-            onClick={() => this.onJumpToDetail(item.merchant.id)}
-          >
+          <View key={item.url} className='nav-item' onClick={() => this.onJumpToDetail(item.id)}>
             <Image className='nav-icon' mode='aspectFill' src={item.iconUrl}></Image>
             <View className='nav-title'>{item.name}</View>
           </View>
@@ -548,31 +564,51 @@ class Home extends Component {
             {shopList.length > 0 && <BottomText />}
             {!shopList.length && <Default msg='敬请期待' />}
           </View>
-          <AtModal isOpened={explainShow}>
-            <AtModalHeader>提示</AtModalHeader>
-            <AtModalContent>
-              {explainType === 'area' && '所在大学城暂停服务，是否选择新的大学城'}
-              {explainType === 'school' && '所在学校暂停服务，是否选择新的学校'}
-              {explainType === 'floor' && '所在楼宇暂停服务，是否选择新的楼宇'}
-              {!explainType && '您还没有选择所在大学城，需要您选择大学城后，才能为您提供最佳服务'}
-            </AtModalContent>
-            <AtModalAction>
-              <Button onClick={this.closeExplainModal}>暂不选择</Button>
-              <Button>
-                <Picker
-                  mode='multiSelector'
-                  rangeKey='label'
-                  range={areaRange}
-                  // value={}
-                  onChange={this.onChange}
-                  onColumnChange={this.onColumnChange}
-                >
-                  <View className='modal-btn'>选择大学城</View>
-                </Picker>
-              </Button>
-            </AtModalAction>
-          </AtModal>
         </View>
+        <AtModal isOpened={explainShow}>
+          <AtModalHeader>提示</AtModalHeader>
+          <AtModalContent>
+            {explainType === 'area' && '所在大学城暂停服务，是否选择新的大学城'}
+            {explainType === 'school' && '所在学校暂停服务，是否选择新的学校'}
+            {explainType === 'floor' && '所在楼宇暂停服务，是否选择新的楼宇'}
+            {!explainType && '您还没有选择所在大学城，需要您选择大学城后，才能为您提供最佳服务'}
+          </AtModalContent>
+          <AtModalAction>
+            <Button onClick={this.closeExplainModal}>暂不选择</Button>
+            <Button>
+              <Picker
+                mode='multiSelector'
+                rangeKey='label'
+                range={areaRange}
+                // value={}
+                onChange={this.onChange}
+                onColumnChange={this.onColumnChange}
+              >
+                <View className='modal-btn'>选择大学城</View>
+              </Picker>
+            </Button>
+          </AtModalAction>
+        </AtModal>
+        {modalShow &&
+          modalData.length > 0 &&
+          modalData.map((item, index) => {
+            return (
+              <AtCurtain key={item.url} isOpened={item.isShow} onClose={this.closeModal(index)}>
+                <View
+                  className='modal'
+                  onClick={this.onJump(
+                    item.appType,
+                    item.navigateTo,
+                    item.appId,
+                    item.appPath,
+                    item.h5Path
+                  )}
+                >
+                  <Image src={item.img} mode='widthFix' className='modal-img'></Image>
+                </View>
+              </AtCurtain>
+            )
+          })}
       </View>
     )
   }
