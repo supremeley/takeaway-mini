@@ -26,6 +26,8 @@ class Bill extends Component {
         return '提现（线下结算）'
       case 3:
         return '充值'
+      case 4:
+        return '抵扣'
       default:
         return ''
     }
@@ -78,7 +80,10 @@ class Bill extends Component {
               <View className='list-item__left-title'>{this.handleStatus(item.type)}</View>
               <View className='list-item__left-date'>{item.addTime}</View>
             </View>
-            <View className='list-item__right'>+{item.amount}</View>
+            <View className='list-item__right'>
+              {item.type == 4 ? '-' : '+'}
+              {item.amount}
+            </View>
           </View>
         )
       })

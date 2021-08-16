@@ -1,2 +1,5 @@
 export const SET_COUPONLIST = 'SET_COUPONLIST'
 
+export const SET_PROVE_INFO = 'SET_PROVE_INFO'
+
+export const SET_POSTS_INFO = 'SET_POSTS_INFO'

@@ -37,7 +37,7 @@ class Footer extends Component {
 
     // if (!info) return null
     // console.log(totalPrice, basePrice,'t')
-    const canPay = total && basePrice && totalPrice >= basePrice
+    const canPay = total && basePrice && totalPrice - freightPrice >= basePrice
 
     return (
       <View className={`${!isfloatLayout ? 'page-footer' : ''} footer`}>

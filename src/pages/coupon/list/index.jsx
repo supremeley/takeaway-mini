@@ -1,15 +1,14 @@
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Image, Text } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
+import CouponItem from '@/components/couponItem'
 
 import { connect } from 'react-redux'
 
 import api from '@/api'
 import withScrollPage from '@/hocs/scrollPage'
-
-import CouponOut from '@/assets/imgs/coupon-out.png'
 
 import './index.scss'
 
@@ -24,7 +23,7 @@ class CouponList extends Component {
     navList: [
       { title: '未使用', status: 0 },
       // { title: '已使用', status: 2 },
-      { title: '已过期', status: 1 }
+      { title: '已失效', status: 1 }
     ],
     couponList: [
       // {
@@ -157,29 +156,7 @@ class CouponList extends Component {
     const Coupons =
       couponList.length > 0 &&
       couponList.map((item) => {
-        return (
-          <View key={item.id} className='list-item'>
-            <View className='circle circle-left'></View>
-            <View className='circle circle-right'></View>
-            <View className='list-item-top'>
-              <View className='list-item-top__info'>
-                <View className='list-item-top__info-title'>{item.name}</View>
-                <View className='list-item-top__info-date'>
-                  {item.startTime}-{item.endTime}
-                </View>
-              </View>
-              <View className='list-item-top__price'>
-                <View className='list-item-top__price-text'>￥{item.discount}</View>
-                <View className='list-item-top__price-explain'>满{item.min}可用</View>
-              </View>
-            </View>
-            <View className='list-item-bottom'>
-              <Text className='list-item-bottom__title'>{item.typeDesc}</Text>
-              {/* <View className='list-item-bottom__btn'>去使用</View> */}
-            </View>
-            {current === 1 && <Image src={CouponOut} className='list-item-icon' />}
-          </View>
-        )
+        return <CouponItem key={item.id} info={item} showCouponOut={current === 1} />
       })
 
     return (

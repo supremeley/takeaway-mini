@@ -1,0 +1,50 @@
+.chat {
+  padding: 40px 24px 160px;
+  .title {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    padding: 0 40px;
+  }
+  .list {
+    // background: #fff;
+    &-item {
+      display: flex;
+      align-items: center;
+      // justify-content: space-between;
+      // height: 120px;
+      padding-left: 24px;
+      position: relative;
+      &:not(:last-child) {
+        margin-bottom: 30px;
+      }
+      &__avatar {
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+        margin-right: 40px;
+        border-radius: 50%;
+        align-self: flex-start;
+      }
+      &__info {
+        background: #fff;
+        border-radius: 0 30px 30px 30px;
+        font-size: 24px;
+        padding: 16px;
+        word-break: break-all;
+        max-width: 432px;
+      }
+    }
+    .user-item {
+      flex-direction: row-reverse;
+      .list-item__avatar {
+        margin-left: 40px;
+        margin-right: 0;
+      }
+      .list-item__info {
+        background: $global-green;
+        color: #fff;
+      }
+    }
+  }
+}

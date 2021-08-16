@@ -1,0 +1,191 @@
+.posts-item {
+  position: relative;
+  padding: 24px 24px;
+  &:not(:last-child) {
+    border-bottom: 6px solid $global-gray;
+  }
+  .posts {
+    &-opt {
+      position: absolute;
+      top: 32px;
+      right: 16px;
+      &__icon {
+        width: 18px;
+        height: 30px;
+      }
+      &__content {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 130px;
+        // height: 34px;
+        background: #ffffff;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        &-item {
+          line-height: 70px;
+          text-align: center;
+        }
+      }
+    }
+    &-tag {
+      background: $global-red;
+      color: #fff;
+      top: 0;
+      right: 60px;
+      position: absolute;
+      width: 80px;
+      text-align: center;
+      font-size: 24px;
+      border-radius: 0 0 10px 10px;
+    }
+    &-user {
+      display: flex;
+      align-items: center;
+      &__avatar {
+        width: 80px;
+        height: 80px;
+        margin-right: 8px;
+        border-radius: 50%;
+      }
+      &__info {
+        &-title {
+          height: 20;
+          display: flex;
+          align-items: center;
+          &__name {
+            margin-right: 12px;
+          }
+          &__date {
+            font-size: 24px;
+            color: $global-text-gray;
+          }
+        }
+        &-tag {
+          display: flex;
+          align-items: center;
+          &__text {
+            background: $global-green;
+            color: #fff;
+            font-size: 20px;
+            line-height: 34px;
+            padding: 0 24px;
+            border-radius: 4px;
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+    &-content {
+      padding: 20px 0;
+    }
+    &-album {
+      display: flex;
+      // justify-content: space-between;
+      align-content: flex-start;
+      flex-wrap: wrap;
+      &__img {
+        width: 100%;
+        height: 400px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+      }
+    }
+    &-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      // height: 90px;
+      margin-top: 16px;
+      &__info {
+        display: flex;
+        align-items: center;
+        color: $global-text-gray;
+        &:not(:first-child) {
+          margin-left: 45px;
+        }
+        &-icon {
+          width: 28px;
+          height: 28px;
+          margin-right: 10px;
+        }
+      }
+      &__right {
+        display: flex;
+        align-items: center;
+        .item-bottom__info {
+          font-size: 24px;
+        }
+      }
+    }
+    &-commit {
+      padding: 24px;
+      background: #f4f8fb;
+      border-radius: 16px;
+      margin-top: 32px;
+      &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        &:not(:last-child) {
+          margin-bottom: 20px;
+        }
+        &-avatar {
+          width: 50px;
+          height: 50px;
+          margin-right: 12px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        &-info {
+          flex: 1;
+          &__title {
+            font-size: 20px;
+            color: $global-text-gray;
+          }
+          &__content {
+            margin: 8px 0;
+          }
+          &__detail {
+            display: flex;
+            align-items: center;
+            &-name {
+              font-size: 20px;
+              color: $global-text-gray;
+            }
+            &-tag {
+              background: $global-green;
+              color: #fff;
+              font-size: 12px;
+              line-height: 16px;
+              width: 24px;
+              text-align: center;
+              margin-right: 10px;
+            }
+            &-detail {
+              font-size: 24px;
+            }
+          }
+        }
+        &-icon {
+          width: 36px;
+          height: 36px;
+        }
+      }
+      &__more {
+        text-align: center;
+        font-size: 24px;
+        color: $global-text-gray;
+      }
+    }
+  }
+  .more-album {
+    .posts-album__img {
+      width: 220px;
+      height: 220px;
+      &:not(:nth-of-type(3n)) {
+        margin-right: calc((100% - 660px) / 2);
+      }
+    }
+  }
+}

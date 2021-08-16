@@ -112,7 +112,7 @@ class Login extends Component {
     const { phone } = this.state
 
     return (
-      <View className='index'>
+      <View className='login'>
         <View className='header'>
           <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
           <View className='header-container'>

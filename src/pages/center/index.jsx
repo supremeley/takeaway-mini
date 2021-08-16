@@ -2,11 +2,12 @@ import Taro from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image } from '@tarojs/components'
 
-import api from '@/api'
+// import api from '@/api'
 
 import headerBg from '@/assets/imgs/header-bg.png'
-import balanceIcon from '@/assets/imgs/center/balance.png'
+import balanceIcon from '@/assets/imgs/balance-icon.png'
 import integralIcon from '@/assets/imgs/center/integral.png'
+import MallIcon from '@/assets/imgs/center/mall.png'
 
 import orderIcon from '@/assets/imgs/center/first-order.png'
 import couponIcon from '@/assets/imgs/center/first-coupon.png'
@@ -27,8 +28,8 @@ import kfcIcon from '@/assets/imgs/center/wei-kfc.png'
 
 import jiMineIcon from '@/assets/imgs/center/ji-mine.png'
 import jiBalanceIcon from '@/assets/imgs/center/ji-balance.png'
-import liuIcon from '@/assets/imgs/center/ji-liu.png'
-import zhiIcon from '@/assets/imgs/center/ji-zhi.png'
+// import liuIcon from '@/assets/imgs/center/ji-liu.png'
+// import zhiIcon from '@/assets/imgs/center/ji-zhi.png'
 import aboutIcon from '@/assets/imgs/center/ji-about.png'
 
 import otherJoinIcon from '@/assets/imgs/center/other-join.png'
@@ -41,7 +42,24 @@ class Center extends Component {
   state = {
     userInfo: { nickName: '', avatarUrl: '' },
     isLogin: false,
-    balance: 0,
+    // balance: 0,
+    titleList: [
+      {
+        icon: balanceIcon,
+        title: '余额',
+        url: '/pages/balance/detail/index'
+      },
+      {
+        icon: integralIcon,
+        title: '积分',
+        url: ''
+      },
+      {
+        icon: MallIcon,
+        title: '优选商城',
+        url: ''
+      }
+    ],
     menuList: [
       {
         title: '吃饭鸭',
@@ -73,28 +91,28 @@ class Center extends Component {
         children: [
           {
             icon: mineIcon,
-            title: '我的主页',
-            url: '/pages/order/index'
+            title: '主页',
+            url: '/pages/wnh/mine/index?id=mine'
           },
           {
             icon: commentIcon,
-            title: '评论',
-            url: '/pages/coupon/list/index'
+            title: '评论/点赞',
+            url: '/pages/wnh/comment/index'
           },
           {
             icon: likeIcon,
-            title: '点赞',
-            url: '/pages/coupon/list/index'
+            title: '私聊',
+            url: '/pages/wnh/person/index'
           },
           {
             icon: followIcon,
-            title: '关注',
-            url: '/pages/coupon/list/index'
+            title: '关注/粉丝',
+            url: '/pages/wnh/comment/index'
           },
           {
             icon: fansIcon,
-            title: '粉丝',
-            url: '/pages/coupon/list/index'
+            title: '官方号入驻',
+            url: '/pages/wnh/list/index'
           }
         ]
       },
@@ -133,22 +151,12 @@ class Center extends Component {
         children: [
           {
             icon: jiMineIcon,
-            title: '我的捐赠',
+            title: '我的爱心',
             url: '/pages/order/index'
           },
           {
             icon: jiBalanceIcon,
-            title: '基金会余额',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: liuIcon,
-            title: '基金流向',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: zhiIcon,
-            title: '志愿者',
+            title: '本校爱心',
             url: '/pages/coupon/list/index'
           },
           {
@@ -163,12 +171,12 @@ class Center extends Component {
         children: [
           {
             icon: otherJoinIcon,
-            title: '商务合作',
+            title: '合作',
             url: '/pages/order/index'
           },
           {
             icon: guanIcon,
-            title: '官方号入驻',
+            title: '新手引导',
             url: '/pages/coupon/list/index'
           },
           {
@@ -182,7 +190,7 @@ class Center extends Component {
   }
 
   componentDidShow() {
-    this.fetchData()
+    // this.fetchData()
 
     const userInfo = Taro.getStorageSync('userInfo')
     // console.log(userInfo)
@@ -192,7 +200,7 @@ class Center extends Component {
   }
 
   fetchData = () => {
-    this.getUserBalance()
+    // this.getUserBalance()
   }
 
   onJump = (url) => () => {
@@ -207,27 +215,27 @@ class Center extends Component {
     }
   }
 
-  onJumpToBalance = () => {
-    Taro.navigateTo({ url: `/pages/balance/detail/index` })
-  }
+  // onJumpToBalance = () => {
+  //   Taro.navigateTo({ url: `/pages/balance/detail/index` })
+  // }
 
-  getUserBalance = async () => {
-    const {
-      data: { remainAmount }
-    } = await api.user.GET_USER_BALANCE()
+  // getUserBalance = async () => {
+  //   const {
+  //     data: { remainAmount }
+  //   } = await api.user.GET_USER_BALANCE()
 
-    this.setState({ balance: remainAmount })
-  }
+  //   this.setState({ balance: remainAmount })
+  // }
 
   render() {
-    const { userInfo, isLogin, balance, menuList } = this.state
+    const { userInfo, isLogin, titleList, menuList } = this.state
 
     const { nickName, avatarUrl } = userInfo
 
     return (
-      <View className='index'>
+      <View className='center'>
         <View className='header'>
-          <Image src={headerBg} mode='widthFix' className='header-bg'></Image>
+          <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
           <View className='header-container'>
             <View className='header-title'>我的</View>
             <View className='header-info'>
@@ -241,21 +249,16 @@ class Center extends Component {
             </View>
           </View>
         </View>
-        <View className='content-container'>
-          <View className='content-item'>
-            <View className='content-item-info'>
-              <View className='content-item-info-title'>积分</View>
-              <View className='content-item-info-num'>0</View>
-            </View>
-            <Image src={integralIcon} mode='widthFix' className='content-item-icon'></Image>
-          </View>
-          <View className='content-item' onClick={this.onJumpToBalance}>
-            <View className='content-item-info'>
-              <View className='content-item-info-title'>余额</View>
-              <View className='content-item-info-num'>{balance || 0}</View>
-            </View>
-            <Image src={balanceIcon} mode='widthFix' className='content-item-icon'></Image>
-          </View>
+        <View className='content'>
+          {titleList &&
+            titleList.map((item) => {
+              return (
+                <View key={item.url} className='content-item' onClick={this.onJump(item.url)}>
+                  <Image src={item.icon} mode='aspectFill' className='content-item__icon'></Image>
+                  <View className='content-item__text'>{item.title}</View>
+                </View>
+              )
+            })}
         </View>
         {menuList &&
           menuList.map((item) => {
@@ -267,7 +270,11 @@ class Center extends Component {
                     item.children.map((info) => {
                       return (
                         <View key={info.url} className='menu-item' onClick={this.onJump(info.url)}>
-                          <Image src={info.icon} mode='widthFix' className='menu-item-icon'></Image>
+                          <Image
+                            src={info.icon}
+                            mode='aspectFit'
+                            className='menu-item-icon'
+                          ></Image>
                           <View className='menu-item-title'>{info.title}</View>
                         </View>
                       )

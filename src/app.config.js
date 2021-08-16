@@ -1,24 +1,20 @@
 export default {
   pages: [
-    'pages/home/index',
     'pages/forum/index',
+    'pages/home/index',
     'pages/center/index',
     'pages/login/index',
-    'pages/item/list/index',
-    'pages/item/detail/index',
     'pages/checkout/index/index',
-    // 'pages/event/index',
-    // 'pages/coupon/list/index',
-    // 'pages/coupon/center/index',
     // 'pages/integral/index',
-    // 'pages/balance/index',
-    // 'pages/balance/bill/index',
-    // 'pages/order/list/index',
-    // 'pages/order/detail/index',
-    // 'pages/order/refund/index',
-
   ],
   subpackages: [
+    {
+      root: 'pages/item',
+      pages: [
+        'list/index',
+        'detail/index',
+      ]
+    },
     {
       root: 'pages/balance',
       pages: [
@@ -55,6 +51,22 @@ export default {
         'guide/index',
         'user/index',
       ]
+    },
+    {
+      root: 'pages/wnh',
+      pages: [
+        'agreement/index',
+        'search/index',
+        'mine/index',
+        'mine/editor/index',
+        'posts/index',
+        'release/index',
+        'gift/index',
+        'comment/index',
+        'person/index',
+        'vote/index',
+        'chat/index',
+      ]
     }
   ],
   window: {
@@ -69,23 +81,28 @@ export default {
     color: '#999',
     list: [
       {
-        text: '首页',
-        pagePath: 'pages/home/index',
-        iconPath: './assets/imgs/tar-bar/tar-home.png',
-        selectedIconPath: './assets/imgs/tar-bar/tar-home-active.png'
+        text: '万能盒',
+        pagePath: 'pages/forum/index',
+        iconPath: './assets/imgs/tab-bar/forum.png',
+        selectedIconPath: './assets/imgs/tab-bar/forum-active.png'
       },
       {
-        text: '论坛',
-        pagePath: 'pages/forum/index',
-        iconPath: './assets/imgs/tar-bar/tar-order.png',
-        selectedIconPath: './assets/imgs/tar-bar/tar-order-active.png'
+        text: '吃饭鸭',
+        pagePath: 'pages/home/index',
+        iconPath: './assets/imgs/tab-bar/home.png',
+        selectedIconPath: './assets/imgs/tab-bar/home-active.png'
       },
       {
         text: '我的',
         pagePath: 'pages/center/index',
-        iconPath: './assets/imgs/tar-bar/tar-center.png',
-        selectedIconPath: './assets/imgs/tar-bar/tar-center-active.png'
+        iconPath: './assets/imgs/tab-bar/center.png',
+        selectedIconPath: './assets/imgs/tab-bar/center-active.png'
       }
     ]
+  },
+  permission: {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    }
   }
 }

@@ -8,6 +8,9 @@ import D from '@/common'
 import debounce from 'lodash/debounce'
 
 import 'taro-ui/dist/style/components/modal.scss'
+
+import OrderBtn from '../components/button'
+
 import './index.scss'
 
 class OrderDetail extends Component {
@@ -20,6 +23,10 @@ class OrderDetail extends Component {
     currentReason: 0,
     shopInfo: {},
     canPay: true,
+    optType: 'cancle',
+    modalShow: false,
+    modalTitle: '取消订单',
+    modalContent: '是否确认取消该订单',
     reasonOption: [{ title: '我不想买了' }, { title: '信息填写错误，重新下单' }]
   }
 
@@ -36,6 +43,10 @@ class OrderDetail extends Component {
 
   onJumpToRefund = () => {
     Taro.navigateTo({ url: `/pages/order/refund/index?id=${this.id}` })
+  }
+
+  modalClose = () => {
+    this.setState({ modalShow: false })
   }
 
   openCancel = () => {
@@ -72,11 +83,79 @@ class OrderDetail extends Component {
     Taro.setClipboardData({ data })
   }
 
+  handleOrder = (type) => {
+    // e.showType
+
+    const { info } = this.state
+
+    // console.log(type, info)
+
+    switch (type) {
+      case 'cancle':
+        this.setState({
+          modalShow: true,
+          modalTitle: '取消订单',
+          modalContent: '是否确认取消该订单',
+          optId: info.id,
+          optType: type
+        })
+        break
+      case 'applyAfterService':
+        this.setState({
+          modalShow: true,
+          modalTitle: '退款',
+          modalContent: '是否确认取消该订单',
+          optId: info.id,
+          optType: type
+        })
+        break
+      case 'refund':
+        this.onJumpToRefund(info.id)
+        break
+      case 'pay':
+        this.handleSubmit()
+        break
+      default:
+        return
+    }
+  }
+
+  handleCancleOrder = async () => {
+    const { optId, optType } = this.state
+
+    const query = {
+      orderId: optId
+    }
+
+    let resApi
+
+    if (optType === 'cancle') {
+      resApi = api.order.ORDER_CANCEL
+    }
+
+    if (optType === 'applyAfterService') {
+      resApi = api.order.ORDER_REFUND
+    }
+
+    const { errno, errmsg } = await resApi(query)
+
+    if (!errno) {
+      D.toast(errmsg)
+      this.setState({ modalShow: false })
+      this.getOrderDetail()
+    }
+  }
+
   getOrderDetail = async () => {
     const query = { orderId: this.id }
 
     const {
-      data: { orderDetailFee: priceInfo, orderGoods: goodsList, orderInfo: info, brand: shopInfo }
+      data: {
+        orderDetailFee: priceInfo = {},
+        orderGoods: goodsList,
+        orderInfo: info,
+        brand: shopInfo = {}
+      }
     } = await api.order.GET_ORDER_DETAIL(query)
 
     this.setState({ info, priceInfo, goodsList, shopInfo })
@@ -133,7 +212,10 @@ class OrderDetail extends Component {
       goodsList,
       priceInfo,
       currentReason,
-      reasonOption
+      reasonOption,
+      modalShow,
+      modalTitle,
+      modalContent
     } = this.state
 
     if (!info) return null
@@ -263,10 +345,10 @@ class OrderDetail extends Component {
                 <View className='at-icon at-icon-phone'></View>
                 <View className='shop-plate__item-opt-text'>联系商家</View>
               </View>
-              <View className='shop-plate__item-opt' onClick={this.openManager}>
+              {/* <View className='shop-plate__item-opt' onClick={this.openManager}>
                 <View className='at-icon at-icon-message'></View>
                 <View className='shop-plate__item-opt-text'>联系楼长</View>
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
@@ -307,22 +389,7 @@ class OrderDetail extends Component {
           </View>
         </View>
         <View className='footer'>
-          {handleOption.cancel && (
-            <View className='footer-btn cancel-btn' onClick={this.openCancel}>
-              取消订单
-            </View>
-          )}
-          {handleOption.refund && (
-            <View className='footer-btn red-btn' onClick={this.onJumpToRefund}>
-              退款
-            </View>
-          )}
-          {handleOption.pay && (
-            <View className='footer-btn red-btn' onClick={this.handleSubmit}>
-              立即支付
-            </View>
-          )}
-          {handleOption.rebuy && <View className='footer-btn'>再来一单</View>}
+          <OrderBtn type={handleOption} onHandleClick={this.handleOrder} />
         </View>
         <AtModal isOpened={cancelShow}>
           <AtModalHeader>请选择取消订单的理由</AtModalHeader>
@@ -375,6 +442,16 @@ class OrderDetail extends Component {
             <Button onClick={this.closeManager}>取消</Button>
           </AtModalAction>
         </AtModal>
+        <AtModal
+          cancelText='取消'
+          confirmText='确认'
+          isOpened={modalShow}
+          title={modalTitle}
+          content={modalContent}
+          onClose={this.modalClose}
+          onCancel={this.modalClose}
+          onConfirm={this.handleCancleOrder}
+        ></AtModal>
       </View>
     )
   }

@@ -1,4 +1,8 @@
 export default {
-  navigationBarTitleText: '我的',
-  navigationStyle: 'custom'
+  navigationBarTitleText: '',
+  navigationStyle: 'custom',
+  navigationBarBackgroundColor: '#ffffff',
+  backgroundColorBottom: '#ffffff',
+  enablePullDownRefresh: true,
+  enableShareAppMessage: true
 }

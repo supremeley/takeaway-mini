@@ -15,8 +15,10 @@ page {
     }
     &__content {
       flex: 1;
+      overflow: hidden;
       &-info {
         color: $global-black;
+        @include text-overflow();
         text {
           font-size: 24px;
         }
@@ -75,7 +77,7 @@ page {
       transform: translate(-50%, -50%);
     }
   }
-  .cative-circle {
+  .active-circle {
     &::after {
       background: $global-green;
     }

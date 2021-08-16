@@ -27,9 +27,14 @@ class ShopItem extends Component {
     goodsList = goodsList ? goodsList.slice(0, 3) : []
     // debugger
     return (
-      <View key={merchant.id} className='shop-item' onClick={this.handleClick}>
+      <View className='shop-item' onClick={this.handleClick}>
         <View className='shop-top'>
-          <Image src={merchant.iconUrl} mode='aspectFill' className='shop-top-avator'></Image>
+          <Image
+            lazyLoad
+            src={merchant.iconUrl}
+            mode='aspectFill'
+            className='shop-top-avator'
+          ></Image>
           <View className='shop-top__title'>
             <View className='shop-top__title-info'>
               {/* <Text className='shop-top__title-info-tag'>新品特价</Text> */}
@@ -44,6 +49,7 @@ class ShopItem extends Component {
               return (
                 <View key={goods.id} className='shop-content__item'>
                   <Image
+                    lazyLoad
                     src={goods.picUrl}
                     mode='aspectFill'
                     className='shop-content__item-img'

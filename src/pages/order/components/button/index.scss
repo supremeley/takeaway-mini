@@ -1,0 +1,20 @@
+.order-btn {
+  color: $global-green;
+  border: 2px solid $global-green;
+  text-align: center;
+  border-radius: 4px;
+  line-height: 36px;
+  min-width: 135px;
+  box-sizing: border-box;
+  font-size: 24px;
+  padding: 0 20px;
+  margin-left: 20px;
+}
+.red-btn {
+  border-color: $global-red;
+  color: $global-red;
+}
+.cancel-btn {
+  border-color: $global-text-gray;
+  color: $global-text-gray;
+}

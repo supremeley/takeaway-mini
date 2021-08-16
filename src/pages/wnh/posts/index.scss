@@ -1,0 +1,283 @@
+page {
+  background: #fff !important;
+  padding-bottom: 120px;
+}
+.posts {
+  // position: relative;
+  // &:not(:last-child) {
+  //   margin-bottom: 24px;
+  // }
+  &-tag {
+    background: $global-red;
+    color: #fff;
+    top: 0;
+    right: 60px;
+    position: absolute;
+    width: 80px;
+    text-align: center;
+    font-size: 24px;
+    border-radius: 0 0 10px 10px;
+  }
+  &-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &__avatar {
+      width: 80px;
+      height: 80px;
+      margin-right: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    &__info {
+      flex: 1;
+      &-title {
+        height: 20;
+        display: flex;
+        align-items: center;
+        &__name {
+          margin-right: 12px;
+        }
+        &__date {
+          font-size: 24px;
+          color: $global-text-gray;
+        }
+      }
+      &-tag {
+        display: flex;
+        align-items: center;
+        &__text {
+          background: $global-green;
+          color: #fff;
+          font-size: 20px;
+          line-height: 34px;
+          padding: 0 24px;
+          border-radius: 4px;
+          margin-right: 10px;
+        }
+      }
+    }
+    &__btn {
+      flex-shrink: 0;
+      width: 90px;
+      line-height: 45px;
+      background: $global-green;
+      border-radius: 22.5px;
+      color: #fff;
+      font-size: 24px;
+      text-align: center;
+    }
+  }
+  &-content {
+    padding: 20px 0;
+  }
+  &-album {
+    display: flex;
+    // justify-content: space-between;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    &__img {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+    }
+  }
+  .more-album {
+    .posts-album__img {
+      width: 220px;
+      height: 220px;
+      margin-bottom: 20px;
+      &:not(:nth-of-type(3n)) {
+        margin-right: calc((100% - 660px) / 2);
+      }
+    }
+  }
+  &-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 90px;
+    position: relative;
+    &__opt {
+      position: absolute;
+      top: 45%;
+      left: 16px;
+      width: 130px;
+      background: #ffffff;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      &-icon {
+        width: 18px;
+        height: 30px;
+      }
+      &-item {
+        line-height: 70px;
+        text-align: center;
+      }
+    }
+
+    &__info {
+      display: flex;
+      align-items: center;
+      color: $global-text-gray;
+      &:not(:first-child) {
+        margin-left: 30px;
+      }
+      &-icon {
+        width: 28px;
+        height: 28px;
+        margin-right: 10px;
+      }
+    }
+    &__right {
+      display: flex;
+      align-items: center;
+      .item-bottom__info {
+        font-size: 24px;
+      }
+    }
+  }
+  &-commit {
+    margin: 24px;
+    // background: #f4f8fb;
+    // border-radius: 16px;
+    // &:not(:last-child) {
+    //   border-bottom: 2px solid $global-line-gray;
+    // }
+    &__title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 24px;
+      color: $global-text-gray;
+      height: 72px;
+    }
+    &__item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 0;
+      &:not(:last-child) {
+        // margin-bottom: 20px;
+        border-bottom: 2px solid #f4f8fb;
+      }
+      &-avatar {
+        width: 80px;
+        height: 80px;
+        margin-right: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      &-info {
+        flex: 1;
+        &__title {
+          color: $global-yellow;
+        }
+        &__content {
+          font-size: 24px;
+          margin: 8px 0 36px;
+          color: $global-text-gray;
+        }
+        &__detail {
+          display: flex;
+          align-items: center;
+          // font-size: 20px;
+          // &-name {
+          //   color: $global-text-gray;
+          // }
+          &-detail {
+            margin-left: 12px;
+          }
+        }
+      }
+      &-like {
+        display: flex;
+        align-items: center;
+        width: 54px;
+      }
+      &-icon {
+        width: 36px;
+        height: 36px;
+        margin-right: 6px;
+        flex-shrink: 0;
+      }
+      &-num {
+        font-size: 24px;
+        color: $global-text-gray;
+      }
+    }
+    &__more {
+      text-align: center;
+      font-size: 24px;
+      color: $global-text-gray;
+    }
+  }
+  .content {
+    margin: 0 24px;
+    border-bottom: 2px solid $global-line-gray;
+  }
+  .plate {
+    margin: 0 24px;
+    &-title {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &__name {
+        font-weight: 600;
+      }
+      &__more {
+        display: flex;
+        align-items: baseline;
+        &-item {
+          font-size: 24px;
+          margin-right: 10px;
+        }
+      }
+    }
+    &-content {
+      display: flex;
+      align-items: center;
+      &__item {
+        overflow: hidden;
+        flex: 0 0 100px;
+        text-align: center;
+        &:not(:last-child) {
+          margin-right: calc((100% - 500px) / 4);
+        }
+        &-avatar {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          margin-bottom: 12px;
+        }
+        &-info {
+          display: flex;
+          align-items: center;
+          font-size: 20px;
+          overflow: hidden;
+        }
+        &-icon {
+          width: 32px;
+          height: 26px;
+          margin-right: 8px;
+          flex-shrink: 0;
+        }
+        &-name {
+          @include text-overflow();
+        }
+        &-btn {
+          font-size: 20px;
+          border: 2px solid $global-green;
+          line-height: 24px;
+          border-radius: 12px;
+          width: 72px;
+          text-align: center;
+          color: $global-green;
+          display: inline-block;
+          margin: 0 auto;
+        }
+      }
+    }
+  }
+}

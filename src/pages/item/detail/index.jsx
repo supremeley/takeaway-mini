@@ -52,7 +52,7 @@ class itemDetail extends Component {
 
     return {
       title: info.name || '吃饭鸭',
-      path: '/home/index',
+      path: `/item/detail/index?id=${this.id}`,
       imageUrl: ''
     }
   }
@@ -95,9 +95,9 @@ class itemDetail extends Component {
 
   onJumpToCheckout = () => {
     const { rule, priceInfo } = this.state
-    const { totalPrice } = priceInfo
+    const { totalPrice, freightPrice } = priceInfo
 
-    if ((totalPrice || 0) >= rule.basePrice) {
+    if ((totalPrice - freightPrice || 0) >= rule.basePrice) {
       Taro.navigateTo({ url: `/pages/checkout/index/index?id=${this.id}` })
     }
   }
@@ -218,6 +218,7 @@ class itemDetail extends Component {
     const explainShow = !!brand.welcomeMessage
 
     this.setState({ info: brand, rule: brokerageMerchantVo, cashBackList, explainShow }, () => {
+      // setTimeout(() => {
       Taro.nextTick(() => {
         const q = Taro.createSelectorQuery()
         const selector = q.select(`.shop`).boundingClientRect()
@@ -228,6 +229,7 @@ class itemDetail extends Component {
           this.setState({ shopBottom: res[0].bottom })
         })
       })
+      // }, 500)
     })
   }
 
@@ -850,7 +852,7 @@ class itemDetail extends Component {
       })
 
     return (
-      <View className='index'>
+      <View className='item-detail'>
         <View className='header'>
           <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
           <View className='header-container'>

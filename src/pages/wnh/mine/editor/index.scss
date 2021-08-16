@@ -1,0 +1,30 @@
+page {
+  background: #fff !important;
+}
+.editor {
+  padding: 24px;
+  &-title {
+    font-size: 24px;
+    color: $global-text-gray;
+    margin-bottom: 24px;
+  }
+  &-text {
+    background: #f4f8fb;
+    padding: 40px 36px;
+    height: 336px;
+    &-pla {
+      font-size: 28px;
+      color: #8b8b8d;
+    }
+  }
+}
+.page-btn {
+  background: $global-green;
+  color: #fff;
+  width: 700px;
+  border-radius: 45px;
+  height: 90px;
+  line-height: 90px;
+  font-size: 36px;
+  margin-top: 240px;
+}

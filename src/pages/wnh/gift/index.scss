@@ -1,0 +1,103 @@
+.gift {
+  .title {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    padding: 0 40px;
+  }
+  .list {
+    background: #fff;
+    &-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 140px;
+      padding: 24px;
+      &:not(:last-child) {
+        border-bottom: 2px solid $global-line-gray;
+      }
+      &__icon {
+        width: 45px;
+        height: 35px;
+        flex-shrink: 0;
+      }
+      &__avatar {
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+        margin: 0 18px;
+        border-radius: 50%;
+      }
+      &__info {
+        flex: 1;
+        &-name {
+          font-size: 32px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+        &-desc {
+          font-size: 24px;
+          color: $global-text-gray;
+        }
+      }
+      &__btn {
+        width: 100px;
+        height: 50px;
+        border-radius: 25px;
+        border: 2px solid $global-green;
+        text-align: center;
+        color: $global-green;
+        line-height: 46px;
+      }
+      &__emj {
+        margin-left: 32px;
+        width: 60px;
+        height: 60px;
+      }
+    }
+  }
+  .footer-item {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 140px;
+    padding: 24px;
+    background: linear-gradient(90deg, #68d8da 0%, #31aeb1 100%);
+    &__avatar {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      margin: 0 18px;
+      border-radius: 50%;
+    }
+    &__info {
+      flex: 1;
+      color: #fff;
+      &-name {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      &-desc {
+        font-size: 24px;
+      }
+    }
+    &__btn {
+      width: 120px;
+      height: 50px;
+      border-radius: 25px;
+      // border: 2px solid $global-green;
+      text-align: center;
+      color: $global-green;
+      line-height: 46px;
+      background: #fff;
+    }
+  }
+}
+.green {
+  color: $global-green;
+}

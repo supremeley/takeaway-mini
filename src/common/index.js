@@ -4,13 +4,14 @@ import api from '@/api/index'
 const getToken = async () => {
   try {
     const value = Taro.getStorageSync('token')
-
+    // console.log(value, 'value')
     if (value) {
       return value
     } else {
       return await login()
     }
   } catch (e) {
+    console.log(e, 'e')
     return ''
   }
 }
@@ -44,7 +45,7 @@ const login = async (callback) => {
       return token
     }
 
-    return callback && callback()
+    return callback && callback() || token
   }
 }
 
@@ -56,4 +57,44 @@ const toast = (title, icon = 'none', duration = 2000) => {
   })
 }
 
-export default { getToken, login, toast }
+const formatTimer = (time, fommat) => {
+  const date = new Date(time)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+  const second = date.getSeconds()
+
+  switch (fommat) {
+    case 'y-m-d h-m-s':
+      return `${year}-${addZero(month)}-${addZero(
+        day
+      )} ${addZero(hour)}:${addZero(minute)}:${addZero(
+        second
+      )}`
+    case 'y-m-d':
+      return `${year}-${addZero(month)}-${addZero(day)}`
+    case 'm-d h-m':
+      return `${addZero(month)}-${addZero(
+        day
+      )} ${addZero(hour)}:${addZero(minute)}`
+    case 'y-m-d h-m':
+      return `${year}-${addZero(month)}-${addZero(
+        day
+      )} ${addZero(hour)}:${addZero(minute)}`
+    default:
+      return `${year}-${addZero(month)}-${addZero(
+        day
+      )} ${addZero(hour)}:${addZero(minute)}:${addZero(
+        second
+      )}`
+  }
+}
+
+const addZero = (num) => {
+  if (num < 10) return `0${num}`
+  return num
+}
+
+export default { getToken, login, toast, formatTimer, addZero }

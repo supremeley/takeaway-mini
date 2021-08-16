@@ -186,7 +186,7 @@ class Home extends Component {
 
     // console.log(type, url, id, path, h5Path)
     if (type === 'h5') {
-      Taro.navigateTo({ url: `/pages/event/index?src=${h5Path}` })
+      Taro.navigateTo({ url: `/pages/event/web/index?src=${h5Path}` })
     }
   }
 
@@ -280,12 +280,14 @@ class Home extends Component {
       data: { items }
     } = await api.home.GET_AREA_LIST()
 
-    const area = items.map((item) => {
-      return {
-        value: item.id,
-        label: item.areaName
-      }
-    })
+    const area = items
+      .filter((item) => !item.deleted)
+      .map((item) => {
+        return {
+          value: item.id,
+          label: item.areaName
+        }
+      })
 
     if (area.length) {
       let isCon = true
@@ -319,12 +321,14 @@ class Home extends Component {
       data: { items }
     } = await api.home.GET_SCHOOL_LIST(query)
 
-    const schools = items.map((item) => {
-      return {
-        value: item.id,
-        label: item.schoolName
-      }
-    })
+    const schools = items
+      .filter((item) => !item.deleted)
+      .map((item) => {
+        return {
+          value: item.id,
+          label: item.schoolName
+        }
+      })
 
     if (schools.length) {
       if (locInfo && isCon) {
@@ -362,12 +366,14 @@ class Home extends Component {
       data: { items }
     } = await api.home.GET_FLOOR_LIST(query)
 
-    const floor = items.map((item) => {
-      return {
-        value: item.id,
-        label: item.buildingNo
-      }
-    })
+    const floor = items
+      .filter((item) => !item.deleted)
+      .map((item) => {
+        return {
+          value: item.id,
+          label: item.buildingNo
+        }
+      })
 
     const [area, school] = areaRange
 
@@ -469,7 +475,7 @@ class Home extends Component {
         )
       })
 
-    const Explain = alertData && alertData.showAlert && (
+    const Explain = alertData && alertData.showAlert && alertData.content && (
       <View className='content-explain'>
         {/* <View className='content-explain__title'>通知公告</View> */}
         <Image className='content-explain__icon' mode='aspectFill' src={noticeIcon}></Image>
@@ -501,9 +507,9 @@ class Home extends Component {
       })
 
     return (
-      <View className='index'>
+      <View className='home'>
         <View className='header'>
-          <Image src={headerBg} mode='widthFix' className='header-bg'></Image>
+          <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
           <View className='header-container'>
             <View className='header-title'>吃饭鸭</View>
             <Picker

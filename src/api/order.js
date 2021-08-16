@@ -14,4 +14,7 @@ export const ORDER_CANCEL = (data) => request.post('order/cancel', data)
 
 export const ORDER_REFUND = (data) => request.post('order/refund', data)
 
+export const ORDER_REFUND_APPLY = (data) => request.post('order/refundApply', data)
+
+export const GET_REFUND_ORDER_DETAIL = (data) => request.get('order/preOrderRefund', data)
 

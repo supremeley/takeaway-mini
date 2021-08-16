@@ -1,284 +1,155 @@
 import Taro from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Image } from '@tarojs/components'
+import { View, Text, Image, Button } from '@tarojs/components'
 
 import api from '@/api'
+import D from '@/common'
 
-import headerBg from '@/assets/imgs/header-bg.png'
-import balanceIcon from '@/assets/imgs/center/balance.png'
-import integralIcon from '@/assets/imgs/center/integral.png'
+import { connect } from 'react-redux'
 
-import orderIcon from '@/assets/imgs/center/first-order.png'
-import couponIcon from '@/assets/imgs/center/first-coupon.png'
-import exchangeIcon from '@/assets/imgs/center/first-exchange.png'
-import joinIcon from '@/assets/imgs/center/first-join.png'
+import Upload1 from '@/assets/imgs/prove/upload1.png'
+import Upload2 from '@/assets/imgs/prove/upload2.png'
+import Title2 from '@/assets/imgs/prove/title-2.png'
 
-import mineIcon from '@/assets/imgs/center/wan-mine.png'
-import commentIcon from '@/assets/imgs/center/wan-comment.png'
-import likeIcon from '@/assets/imgs/center/wan-like.png'
-import followIcon from '@/assets/imgs/center/wan-follow.png'
-import fansIcon from '@/assets/imgs/center/wan-fans.png'
+import 'taro-ui/dist/style/components/icon.scss'
 
-import yiIcon from '@/assets/imgs/center/wei-yi.png'
-import formIcon from '@/assets/imgs/center/wei-form.png'
-import chenIcon from '@/assets/imgs/center/wei-chen.png'
-import waiIcon from '@/assets/imgs/center/wei-wai.png'
-import kfcIcon from '@/assets/imgs/center/wei-kfc.png'
-
-import jiMineIcon from '@/assets/imgs/center/ji-mine.png'
-import jiBalanceIcon from '@/assets/imgs/center/ji-balance.png'
-import liuIcon from '@/assets/imgs/center/ji-liu.png'
-import zhiIcon from '@/assets/imgs/center/ji-zhi.png'
-import aboutIcon from '@/assets/imgs/center/ji-about.png'
-
-import otherJoinIcon from '@/assets/imgs/center/other-join.png'
-import guanIcon from '@/assets/imgs/center/other-guan.png'
-import settingIcon from '@/assets/imgs/center/other-setting.png'
+import ProveHeader from '../components/header'
 
 import './index.scss'
 
-class Center extends Component {
+@connect(({ counter }) => ({
+  proveInfo: counter.proveInfo
+}))
+class ProveUser extends Component {
   state = {
-    userInfo: { nickName: '', avatarUrl: '' },
-    isLogin: false,
-    balance: 0,
-    menuList: [
+    certificates: '',
+    explainList: [
       {
-        title: '吃饭鸭',
-        children: [
-          {
-            icon: orderIcon,
-            title: '我的订单',
-            url: '/pages/order/list/index?status=0'
-          },
-          {
-            icon: couponIcon,
-            title: '优惠券',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: exchangeIcon,
-            title: '积分兑换',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: joinIcon,
-            title: '成为楼长',
-            url: '/pages/coupon/list/index'
-          }
-        ]
-      },
-      {
-        title: '万能盒',
-        children: [
-          {
-            icon: mineIcon,
-            title: '我的主页',
-            url: '/pages/order/index'
-          },
-          {
-            icon: commentIcon,
-            title: '评论',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: likeIcon,
-            title: '点赞',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: followIcon,
-            title: '关注',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: fansIcon,
-            title: '粉丝',
-            url: '/pages/coupon/list/index'
-          }
-        ]
-      },
-      {
-        title: '微服务',
-        children: [
-          {
-            icon: yiIcon,
-            title: '充一卡通',
-            url: '/pages/order/index'
-          },
-          {
-            icon: formIcon,
-            title: '课表查询',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: chenIcon,
-            title: '成绩查询',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: waiIcon,
-            title: '外卖神券',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: kfcIcon,
-            title: 'KFC六折',
-            url: '/pages/coupon/list/index'
-          }
-        ]
-      },
-      {
-        title: '流浪宝贝',
-        children: [
-          {
-            icon: jiMineIcon,
-            title: '我的捐赠',
-            url: '/pages/order/index'
-          },
-          {
-            icon: jiBalanceIcon,
-            title: '基金会余额',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: liuIcon,
-            title: '基金流向',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: zhiIcon,
-            title: '志愿者',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: aboutIcon,
-            title: '关于我们',
-            url: '/pages/coupon/list/index'
-          }
-        ]
-      },
-      {
-        title: '其他服务',
-        children: [
-          {
-            icon: otherJoinIcon,
-            title: '商务合作',
-            url: '/pages/order/index'
-          },
-          {
-            icon: guanIcon,
-            title: '官方号入驻',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: settingIcon,
-            title: '设置',
-            url: '/pages/coupon/list/index'
-          }
+        title: '说明',
+        info: [
+          '请在本页面提交一张手持 山西传媒大学 的录取通知书/学生证/校园卡/学位证/毕业证的正面照片。',
+          '万能盒是定位于高校学生群体的半私密社区，社区内部需要统一的身份认同。'
         ]
       }
     ]
   }
 
-  componentDidShow() {
-    this.fetchData()
-
-    const userInfo = Taro.getStorageSync('userInfo')
-    // console.log(userInfo)
-    const isLogin = Object.keys(userInfo).length && userInfo.nickName && userInfo.avatarUrl
-
-    this.setState({ userInfo, isLogin })
-  }
-
-  fetchData = () => {
-    this.getUserBalance()
-  }
-
-  onJump = (url) => () => {
-    Taro.navigateTo({ url })
-  }
-
-  onJumpToLogin = () => {
-    const { isLogin } = this.state
-
-    if (!isLogin) {
-      Taro.navigateTo({ url: `/pages/login/index` })
+  handleSumbit = () => {
+    if (this.fetchVali()) {
+      this.fetchSubmit()
     }
   }
 
-  onJumpToBalance = () => {
-    Taro.navigateTo({ url: `/pages/balance/index` })
+  upLoadImg = async () => {
+    const res = await Taro.chooseImage({ count: 1 })
+
+    // console.log(res)
+
+    try {
+      const {url} = await api.common.UPLOAD_IMG(res.tempFilePaths[0])
+
+      // console.log(a)
+
+      D.toast('上传成功')
+
+      this.setState({ certificates: url })
+    } catch (e) {
+      console.log(e)
+      D.toast('上传失败')
+    }
   }
 
-  getUserBalance = async () => {
-    const {
-      data: { remainAmount }
-    } = await api.user.GET_USER_BALANCE()
+  fetchVali = () => {
+    let { certificates } = this.state
 
-    this.setState({ balance: remainAmount })
+    if (!certificates) {
+      D.toast('请上传录取通知书/学生证/毕业证照片')
+      return false
+    }
+
+    return true
+  }
+
+  fetchSubmit = async () => {
+    let {
+      proveInfo: { auSchool, ruxueTime, identity }
+    } = this.props
+
+    let { certificates } = this.state
+
+    const userId = Taro.getStorageSync('userId')
+
+    const query = {
+      auSchool,
+      ruxueTime,
+      identity: 1,
+      certificates,
+      userId
+    }
+
+    const { data } = await api.prove.SUMBIT_PROVER(query)
   }
 
   render() {
-    const { userInfo, isLogin, balance, menuList } = this.state
+    const { certificates, explainList } = this.state
 
-    const { nickName, avatarUrl } = userInfo
+    const ExplainList = explainList.map((item) => {
+      return (
+        <View key={item.title} className='content-reasons__plate'>
+          <View className='content-reasons__plate-title'>
+            <Image src={Title2} className='content-reasons__plate-title__icon' />
+            {item.title}
+          </View>
+          <View className='content-reasons__plate-info'>
+            {item.info &&
+              item.info.map((info) => {
+                return (
+                  <View key={info} className='content-reasons__plate-info__text'>
+                    {info}
+                  </View>
+                )
+              })}
+          </View>
+        </View>
+      )
+    })
 
     return (
-      <View className='index'>
-        <View className='header'>
-          <Image src={headerBg} mode='widthFix' className='header-bg'></Image>
-          <View className='header-container'>
-            <View className='header-title'>我的</View>
-            <View className='header-info'>
-              <View onClick={this.onJumpToLogin}>
-                <View className='header-info__floor'>{isLogin ? nickName : '请登录'}</View>
-                <View className='header-info__school'>今天也要记得吃饭鸭</View>
+      <View className='prove'>
+        <ProveHeader />
+        <View className='content'>
+          <View className='content-title'>请拍摄手持录取通知书/学生证/学位证/毕业证照片</View>
+          <View className='content-explain'>资料仅用于校园实名身份认证，我们将严格保密</View>
+          <View className='content-upload'>
+            <View className='content-upload__item'>
+              <View className='content-upload__item-con'>
+                <Image src={Upload1} className='content-upload__item-icon' />
               </View>
-              {avatarUrl && (
-                <Image src={avatarUrl} mode='aspectFill' className='header-info__avatar'></Image>
-              )}
+              <View className='content-upload__item-text'>示例</View>
             </View>
-          </View>
-        </View>
-        <View className='content-container'>
-          <View className='content-item'>
-            <View className='content-item-info'>
-              <View className='content-item-info-title'>积分</View>
-              <View className='content-item-info-num'>0</View>
-            </View>
-            <Image src={integralIcon} mode='widthFix' className='content-item-icon'></Image>
-          </View>
-          <View className='content-item' onClick={this.onJumpToBalance}>
-            <View className='content-item-info'>
-              <View className='content-item-info-title'>余额</View>
-              <View className='content-item-info-num'>{balance || 0}</View>
-            </View>
-            <Image src={balanceIcon} mode='widthFix' className='content-item-icon'></Image>
-          </View>
-        </View>
-        {menuList &&
-          menuList.map((item) => {
-            return (
-              <View key={item.title} className='menu'>
-                <View className='menu-title'>{item.title}</View>
-                <View className='menu-container'>
-                  {item.children &&
-                    item.children.map((info) => {
-                      return (
-                        <View key={info.url} className='menu-item' onClick={this.onJump(info.url)}>
-                          <Image src={info.icon} mode='widthFix' className='menu-item-icon'></Image>
-                          <View className='menu-item-title'>{info.title}</View>
-                        </View>
-                      )
-                    })}
-                </View>
+            <View className='content-upload__item second' onClick={this.upLoadImg}>
+              <View className='content-upload__item-con'>
+                {certificates ? (
+                  <Image
+                    src={certificates}
+                    mode='aspectFill'
+                    className='content-upload__item-img'
+                  />
+                ) : (
+                  <Image src={Upload2} className='content-upload__item-icon' />
+                )}
               </View>
-            )
-          })}
+              <View className='content-upload__item-text'>点击拍摄手持证件照片</View>
+            </View>
+          </View>
+          <View className='content-reasons'>{ExplainList}</View>
+        </View>
+        <Button className='page-btn' onClick={this.handleSumbit}>
+          提交
+        </Button>
       </View>
     )
   }
 }
 
-export default Center
+export default ProveUser

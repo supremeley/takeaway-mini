@@ -3,6 +3,7 @@ import { Component } from 'react'
 import { View, Image, Text, Input, ScrollView } from '@tarojs/components'
 import { AtFloatLayout } from 'taro-ui'
 import BottomText from '@/components/bottomText'
+import CouponItem from '@/components/couponItem'
 
 import api from '@/api'
 import D from '@/common'
@@ -147,12 +148,8 @@ class Checkout extends Component {
     this.setState({ currentCoupon: null, couponShow: false }, () => this.fetchCheckout())
   }
 
-  onSelectCoupon = (index) => () => {
-    const { couponList } = this.state
-
-    this.setState({ currentCoupon: couponList[index], couponShow: false }, () =>
-      this.fetchCheckout()
-    )
+  onSelectCoupon = (info) => {
+    this.setState({ currentCoupon: info, couponShow: false }, () => this.fetchCheckout())
   }
 
   openPayTypeShow = () => {
@@ -242,7 +239,7 @@ class Checkout extends Component {
   fetchCheckout = async () => {
     let { currentCoupon } = this.state
 
-    const query = { couponId: currentCoupon ? currentCoupon.id : 0, brandId: this.id, cartId: 0 }
+    const query = { couponId: currentCoupon ? currentCoupon.id : -1, brandId: this.id, cartId: 0 }
 
     const {
       data: {
@@ -320,7 +317,7 @@ class Checkout extends Component {
     const query = {
       ...form,
       cartId: 0,
-      couponId: currentCoupon ? currentCoupon.id : 0,
+      couponId: currentCoupon ? currentCoupon.id : -1,
       brandId: this.id,
       schoolName: locInfo.school.label,
       buildingId: locInfo.floor.value,
@@ -329,31 +326,39 @@ class Checkout extends Component {
     }
 
     const {
-      data: { orderId }
+      data: { orderId, needPay }
     } = await api.order.SUBMIT_ORDER(query)
 
-    const { data: payParams } = await api.order.SUBMIT_PREPAY({ orderId })
+    if (needPay) {
+      const { data: payParams } = await api.order.SUBMIT_PREPAY({ orderId })
 
-    // console.log(payParams)
-    const payQuery = {
-      nonceStr: payParams.nonceStr,
-      package: payParams.packageValue,
-      paySign: payParams.paySign,
-      timeStamp: payParams.timeStamp,
-      signType: payParams.signType
-    }
-
-    try {
-      const { errMsg } = await Taro.requestPayment(payQuery)
-
-      if (errMsg === 'requestPayment:ok') {
-        D.toast('支付成功')
-
-        setTimeout(() => {
-          Taro.switchTab({ url: '/page/order/list/index' })
-        }, 1000)
+      // console.log(payParams)
+      const payQuery = {
+        nonceStr: payParams.nonceStr,
+        package: payParams.packageValue,
+        paySign: payParams.paySign,
+        timeStamp: payParams.timeStamp,
+        signType: payParams.signType
       }
-    } catch (e) {}
+
+      try {
+        const { errMsg } = await Taro.requestPayment(payQuery)
+
+        if (errMsg === 'requestPayment:ok') {
+          D.toast('支付成功')
+
+          setTimeout(() => {
+            Taro.navigateTo({ url: '/pages/order/list/index' })
+          }, 1000)
+        }
+      } catch (e) {}
+    } else {
+      D.toast('支付成功')
+
+      setTimeout(() => {
+        Taro.navigateTo({ url: `/pages/order/detail/index?id=${orderId}` })
+      }, 1000)
+    }
   }
 
   get id() {
@@ -440,27 +445,7 @@ class Checkout extends Component {
     const CouponList =
       couponList.length > 0 &&
       couponList.map((item, index) => {
-        return (
-          <View key={item.id} className='list-item' onClick={this.onSelectCoupon(index)}>
-            <View className='circle circle-left'></View>
-            <View className='circle circle-right'></View>
-            <View className='list-item-top'>
-              <View className='list-item-top__info'>
-                <View className='list-item-top__info-title'>{item.name}</View>
-                <View className='list-item-top__info-date'>
-                  {item.startTime}-{item.endTime}
-                </View>
-              </View>
-              <View className='list-item-top__price'>
-                <View className='list-item-top__price-text'>￥{item.discount}</View>
-                <View className='list-item-top__price-explain'>满{item.min}可用</View>
-              </View>
-            </View>
-            <View className='list-item-bottom'>
-              <Text className='list-item-bottom__title'>{item.typeDesc}</Text>
-            </View>
-          </View>
-        )
+        return <CouponItem key={item.id} info={item} onHandleClick={this.onSelectCoupon} />
       })
 
     return (
@@ -587,7 +572,7 @@ class Checkout extends Component {
             </View>
             {currentCoupon && (
               <View className='shop-plate__item'>
-                <View className='shop-plate__item-title explain'>{currentCoupon.name}</View>
+                <View className='shop-plate__item-title info'>{currentCoupon.name}</View>
                 <View className='shop-plate__item-price' onClick={this.openCouponShow}>
                   ￥{currentCoupon.discount}
                   <View className='at-icon at-icon-chevron-right'></View>
