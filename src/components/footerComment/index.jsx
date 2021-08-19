@@ -44,6 +44,7 @@ class FooterComment extends Component {
           className='comment-footer__inp'
           onInput={this.handleChange}
           onBlur={this.handleBlur}
+          maxlength={500}
         />
         <Button className='comment-footer__btn' onClick={this.handleSubmit}>
           发送

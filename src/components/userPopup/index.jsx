@@ -44,26 +44,42 @@ class GiftPopup extends Component {
       <AtFloatLayout isOpened={show} onClose={this.handleClose}>
         <View className='user-float'>
           <View className='user-float-top'>
+            <View className='user-float-top__right'>
+              <Image
+                src={curUser.avatar}
+                mode='aspectFill'
+                className='user-float-top__right-avatar'
+              />
+            </View>
             <View className='user-float-top__user'>
-              <View className='user-float-top__user-info'>
-                <View className='user-float-top__user-info__name'>{curUser.nickname}</View>
-              </View>
+              <View className='user-float-top__user-name'>{curUser.nickname}</View>
               <View className='user-float-top__user-school'>{curUser.schoolName}</View>
             </View>
-            <View className='user-float-top__right'>
-              <Image src={curUser.avatar} mode='aspectFill' className='user-float-top__right-avatar' />
-              <View className='user-float-top__right-btn'>+关注</View>
-            </View>
+
+            {/* <View className='user-float-top__user'> */}
+            {/* <View className='user-float-top__user-info'>
+                <View className='user-float-top__user-info__btn'>+关注</View>
+              </View> */}
+            {/* </View> */}
           </View>
           <View className='user-float-bottom'>
-            <Button className='user-float-bottom__btn' onClick={this.handleJumpToPerson(curUser.userId)}>
+            <Button
+              className='user-float-bottom__btn green-btn'
+              onClick={this.handleJumpToPerson(curUser.userId)}
+            >
+              +关注
+            </Button>
+            <Button
+              className='user-float-bottom__btn'
+              onClick={this.handleJumpToPerson(curUser.userId)}
+            >
               个人主页
             </Button>
             <Button
-              className='user-float-bottom__btn long-btn'
+              className='user-float-bottom__btn'
               onClick={this.handleJumpToChat(curUser.userId)}
             >
-              发起私聊
+              私聊
             </Button>
           </View>
         </View>

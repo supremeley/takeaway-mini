@@ -1,8 +1,10 @@
 export default {
   navigationBarTitleText: '',
   navigationStyle: 'custom',
-  navigationBarBackgroundColor: '#ffffff',
+  navigationBarBackgroundColor: '#000000',
   backgroundColorBottom: '#ffffff',
   enablePullDownRefresh: true,
-  enableShareAppMessage: true
+  enableShareAppMessage: true,
+  backgroundColorTop: '#ffffff',
+  navigationBarTextStyle: 'black'
 }

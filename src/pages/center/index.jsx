@@ -3,8 +3,8 @@ import { Component } from 'react'
 import { View, Image } from '@tarojs/components'
 
 // import api from '@/api'
+import addressIcon from '@/assets/imgs/address-icon.png'
 
-import headerBg from '@/assets/imgs/header-bg.png'
 import balanceIcon from '@/assets/imgs/balance-icon.png'
 import integralIcon from '@/assets/imgs/center/integral.png'
 import MallIcon from '@/assets/imgs/center/mall.png'
@@ -40,6 +40,8 @@ import './index.scss'
 
 class Center extends Component {
   state = {
+    safeTop: 0,
+    schoolName: Taro.getStorageSync('schoolName'),
     userInfo: { nickName: '', avatarUrl: '' },
     isLogin: false,
     // balance: 0,
@@ -51,18 +53,21 @@ class Center extends Component {
       },
       {
         icon: integralIcon,
-        title: '积分',
+        title: '盒盒币',
         url: ''
       },
       {
         icon: MallIcon,
         title: '优选商城',
-        url: ''
+        url: '',
+        type: 'outApp',
+        id: 'wx4fb572b4acc3f929',
+        path: '/views/home/index'
       }
     ],
     menuList: [
       {
-        title: '吃饭鸭',
+        title: '早餐到寝',
         children: [
           {
             icon: orderIcon,
@@ -76,7 +81,7 @@ class Center extends Component {
           },
           {
             icon: exchangeIcon,
-            title: '积分兑换',
+            title: '盒盒币兑换',
             url: '/pages/coupon/list/index'
           },
           {
@@ -87,7 +92,7 @@ class Center extends Component {
         ]
       },
       {
-        title: '万能盒',
+        title: '校内论坛',
         children: [
           {
             icon: mineIcon,
@@ -189,11 +194,15 @@ class Center extends Component {
     ]
   }
 
-  componentDidShow() {
-    // this.fetchData()
+  async componentDidMount() {
+    const info = await Taro.getMenuButtonBoundingClientRect()
 
+    this.setState({ safeTop: info.top })
+  }
+
+  componentDidShow() {
     const userInfo = Taro.getStorageSync('userInfo')
-    // console.log(userInfo)
+
     const isLogin = Object.keys(userInfo).length && userInfo.nickName && userInfo.avatarUrl
 
     this.setState({ userInfo, isLogin })
@@ -203,9 +212,28 @@ class Center extends Component {
     // this.getUserBalance()
   }
 
-  onJump = (url) => () => {
-    Taro.navigateTo({ url })
-  }
+  onJump =
+    (type = 'inApp', url, id, path, h5Path) =>
+    () => {
+      if (type === 'inApp') {
+        Taro.navigateTo({ url })
+      }
+
+      if (type === 'outApp') {
+        Taro.navigateToMiniProgram({
+          appId: id,
+          path,
+          extraData: {},
+          envVersion: 'release',
+          success: () => {}
+        })
+      }
+
+      // console.log(type, url, id, path, h5Path)
+      if (type === 'h5') {
+        Taro.navigateTo({ url: `/pages/event/web/index?src=${h5Path}` })
+      }
+    }
 
   onJumpToLogin = () => {
     const { isLogin } = this.state
@@ -215,37 +243,43 @@ class Center extends Component {
     }
   }
 
-  // onJumpToBalance = () => {
-  //   Taro.navigateTo({ url: `/pages/balance/detail/index` })
-  // }
+  onJumpToProve = () => {
+    const { schoolName } = this.state
 
-  // getUserBalance = async () => {
-  //   const {
-  //     data: { remainAmount }
-  //   } = await api.user.GET_USER_BALANCE()
+    if (schoolName) {
+      return
+    }
 
-  //   this.setState({ balance: remainAmount })
-  // }
+    Taro.navigateTo({ url: `/pages/prove/school/index` })
+  }
 
   render() {
-    const { userInfo, isLogin, titleList, menuList } = this.state
+    const { schoolName, safeTop, userInfo, isLogin, titleList, menuList } = this.state
 
     const { nickName, avatarUrl } = userInfo
 
     return (
       <View className='center'>
         <View className='header'>
-          <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
-          <View className='header-container'>
-            <View className='header-title'>我的</View>
+          <View className='header-bg'></View>
+          {/* <Image src={headerBg} mode='widthFix' className='header-bg'></Image> */}
+          <View style={{ top: safeTop + 'px' }} className='header-container'>
+            <View className='header-title'>盒盒超级大学</View>
             <View className='header-info'>
-              <View onClick={this.onJumpToLogin}>
-                <View className='header-info__floor'>{isLogin ? nickName : '请登录'}</View>
-                <View className='header-info__school'>今天也要记得吃饭鸭</View>
-              </View>
               {avatarUrl && (
                 <Image src={avatarUrl} mode='aspectFill' className='header-info__avatar'></Image>
               )}
+              <View onClick={this.onJumpToLogin} className='header-info-detail'>
+                <View className='header-info__floor'>{isLogin ? nickName : '请登录'}</View>
+                <View className='header-info__school'>
+                  <Image
+                    src={addressIcon}
+                    mode='aspectFill'
+                    className='header-info__school-icon'
+                  ></Image>
+                  <View onClick={this.onJumpToProve}>{schoolName || '点击认证（游客）'}</View>
+                </View>
+              </View>
             </View>
           </View>
         </View>
@@ -253,36 +287,56 @@ class Center extends Component {
           {titleList &&
             titleList.map((item) => {
               return (
-                <View key={item.url} className='content-item' onClick={this.onJump(item.url)}>
+                <View
+                  key={item.url}
+                  className='content-item'
+                  onClick={this.onJump(item.type, item.url, item.id, item.path, item.h5Path)}
+                >
                   <Image src={item.icon} mode='aspectFill' className='content-item__icon'></Image>
                   <View className='content-item__text'>{item.title}</View>
                 </View>
               )
             })}
         </View>
-        {menuList &&
-          menuList.map((item) => {
-            return (
-              <View key={item.title} className='menu'>
-                <View className='menu-title'>{item.title}</View>
-                <View className='menu-container'>
-                  {item.children &&
-                    item.children.map((info) => {
-                      return (
-                        <View key={info.url} className='menu-item' onClick={this.onJump(info.url)}>
-                          <Image
-                            src={info.icon}
-                            mode='aspectFit'
-                            className='menu-item-icon'
-                          ></Image>
-                          <View className='menu-item-title'>{info.title}</View>
-                        </View>
-                      )
-                    })}
+        <View className='menu'>
+          {menuList &&
+            menuList.map((item) => {
+              return (
+                <View key={item.title} className='menu-list'>
+                  <View className='menu-title'>{item.title}</View>
+                  <View className='menu-container'>
+                    {item.children &&
+                      item.children.map((info) => {
+                        return (
+                          <View
+                            key={info.url}
+                            className='menu-item'
+                            onClick={this.onJump(
+                              info.type,
+                              info.url,
+                              info.id,
+                              info.path,
+                              info.h5Path
+                            )}
+                          >
+                            <Image
+                              src={info.icon}
+                              mode='aspectFit'
+                              className='menu-item-icon'
+                            ></Image>
+                            <View className='menu-item-title'>{info.title}</View>
+                          </View>
+                        )
+                      })}
+                  </View>
                 </View>
-              </View>
-            )
-          })}
+              )
+            })}
+        </View>
+        <View className='center-explain'>
+          <View>盒盒超级大学™</View>
+          <View>中国高校领先的校园生活服务平台</View>
+        </View>
       </View>
     )
   }

@@ -11,9 +11,15 @@ export const REPROT_POSTS = (data) => request.post('wnh/report/uploadReportInfo'
   }
 })
 
+// school
+
+export const GET_SCHOOL_POSTS_LIST = (data) => request.get('wnh/hot/listAll', data, { type: 'forum' })
+
+
 // hot
 
 export const GET_HOT_LIST = (data) => request.get('wnh/hot/hotlistAll', data, { type: 'forum' })
+
 
 export const GET_HOT_POSTS_DETAIL = (data) => request.get('wnh/hot/selonePost', data, { type: 'forum' })
 

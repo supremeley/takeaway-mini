@@ -1,14 +1,17 @@
 .posts-item {
   position: relative;
-  padding: 24px 24px;
-  &:not(:last-child) {
-    border-bottom: 6px solid $global-gray;
-  }
+  padding: 24px 36px 48px;
+  // &:not(:last-child) {
+  //   border-bottom: 6px solid $global-gray;
+  // }
   .posts {
+    &-top {
+      display: flex;
+    }
     &-opt {
       position: absolute;
-      top: 32px;
-      right: 16px;
+      top: 40px;
+      right: 32px;
       &__icon {
         width: 18px;
         height: 30px;
@@ -39,25 +42,30 @@
       font-size: 24px;
       border-radius: 0 0 10px 10px;
     }
+    &-avatar {
+      width: 85px;
+      height: 85px;
+      margin-right: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    &-right {
+      flex: 1;
+    }
     &-user {
       display: flex;
       align-items: center;
-      &__avatar {
-        width: 80px;
-        height: 80px;
-        margin-right: 8px;
-        border-radius: 50%;
-      }
       &__info {
         &-title {
-          height: 20;
           display: flex;
           align-items: center;
+          margin-bottom: 6px;
           &__name {
-            margin-right: 12px;
+            font-size: 28px;
+            margin-right: 16px;
           }
           &__date {
-            font-size: 24px;
+            font-size: 26px;
             color: $global-text-gray;
           }
         }
@@ -65,19 +73,22 @@
           display: flex;
           align-items: center;
           &__text {
-            background: $global-green;
-            color: #fff;
-            font-size: 20px;
-            line-height: 34px;
-            padding: 0 24px;
-            border-radius: 4px;
+            // background: $global-green;
+            color: $global-green;
+            font-size: 32px;
+            line-height: 54px;
+            padding: 0 12px;
+            border-radius: 16px;
             margin-right: 10px;
+            // margin
           }
         }
       }
     }
     &-content {
-      padding: 20px 0;
+      padding: 12px 0 24px;
+      font-size: 32px;
+      line-height: 54px;
     }
     &-album {
       display: flex;
@@ -85,15 +96,25 @@
       align-content: flex-start;
       flex-wrap: wrap;
       &__img {
-        width: 100%;
+        width: 480px;
         height: 400px;
         border-radius: 12px;
         margin-bottom: 16px;
       }
     }
+    &-address {
+      padding-left: 100px;
+      display: flex;
+      align-items: center;
+      &__icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 10px;
+      }
+    }
     &-bottom {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       // height: 90px;
       margin-top: 16px;
@@ -102,11 +123,11 @@
         align-items: center;
         color: $global-text-gray;
         &:not(:first-child) {
-          margin-left: 45px;
+          margin-left: 50px;
         }
         &-icon {
-          width: 28px;
-          height: 28px;
+          width: 36px;
+          height: 36px;
           margin-right: 10px;
         }
       }
@@ -119,6 +140,7 @@
       }
     }
     &-commit {
+      margin-left: 100px;
       padding: 24px;
       background: #f4f8fb;
       border-radius: 16px;
@@ -131,26 +153,45 @@
           margin-bottom: 20px;
         }
         &-avatar {
-          width: 50px;
-          height: 50px;
-          margin-right: 12px;
+          width: 60px;
+          height: 60px;
           border-radius: 50%;
           flex-shrink: 0;
         }
         &-info {
           flex: 1;
+          margin: 0 20px;
           &__title {
-            font-size: 20px;
+            font-size: 24px;
             color: $global-text-gray;
+            display: flex;
+            align-items: center;
+            &-data {
+              margin-left: 12px;
+            }
+            &-father {
+              background: red;
+              color: #fff;
+              // width: 64px;
+              line-height: 20px;
+              text-align: center;
+              font-size: 16px;
+              margin-left: 12px;
+              padding: 0 6px;
+            }
           }
           &__content {
             margin: 8px 0;
+            word-break: break-all;
+            // white-space: wrap;
           }
           &__detail {
-            display: flex;
-            align-items: center;
+            &-top {
+              display: flex;
+              align-items: center;
+            }
             &-name {
-              font-size: 20px;
+              font-size: 24px;
               color: $global-text-gray;
             }
             &-tag {
@@ -164,12 +205,30 @@
             }
             &-detail {
               font-size: 24px;
+              padding-left: 60px;
+            }
+            &-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              flex-shrink: 0;
+              margin-right: 12px;
             }
           }
+        }
+        &-like {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
         }
         &-icon {
           width: 36px;
           height: 36px;
+          margin-bottom: 6px;
+        }
+        &-num {
+          color: $global-text-gray;
         }
       }
       &__more {
@@ -181,10 +240,11 @@
   }
   .more-album {
     .posts-album__img {
-      width: 220px;
-      height: 220px;
+      width: 180px;
+      height: 180px;
       &:not(:nth-of-type(3n)) {
-        margin-right: calc((100% - 660px) / 2);
+        margin-right: calc((100% - 540px) / 2);
+        // margin-right: 16px;
       }
     }
   }

@@ -7,6 +7,10 @@ import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
 import GiftPopup from '@/components/giftPopup'
 import UserPopup from '@/components/userPopup'
+import FooterComment from '@/components/footerComment'
+import ForumPopup from '@/components/forumPopup'
+
+import { popupOpt } from '@/constants/forum'
 
 import api from '@/api'
 import D from '@/common'
@@ -15,9 +19,11 @@ import withScrollPage from '@/hocs/scrollPage'
 import { connect } from 'react-redux'
 import { setPostsInfo } from '@/actions/counter'
 
-import ProveIcon from '@/assets/imgs/balance-icon.png'
+import ProveIcon from '@/assets/imgs/prove/popop.png'
 import SearchIcon from '@/assets/imgs/forum/search.png'
+import MessageIcon from '@/assets/imgs/forum/message.png'
 import ReleaseIcon from '@/assets/imgs/forum/release.png'
+// import MessageIcon from '@/assets/imgs/forum/search.png'
 
 import 'taro-ui/dist/style/components/icon.scss'
 import 'taro-ui/dist/style/components/curtain.scss'
@@ -35,6 +41,7 @@ import './index.scss'
 @withScrollPage
 class Forum extends Component {
   state = {
+    safeTop: 0,
     userId: Taro.getStorageSync('userId'),
     showGift: false,
     showUser: false,
@@ -47,26 +54,25 @@ class Forum extends Component {
     curNav: 0,
     navOpt: [
       {
-        type: 'school',
-        name: '本校'
+        type: 'hot',
+        name: '全国'
       },
       {
-        type: 'hot',
-        name: '热门'
+        type: 'school',
+        name: '本校'
       },
       {
         type: 'tree',
         name: '树洞'
       }
     ],
-    curTag: null,
+    curTag: 0,
     tagList: [
-      // {
-      //  id: 1
-      //  pointNum: 0
-      //  tagName: "吐槽"
-      //  type: 0
-      // },
+      {
+        id: 0,
+        pointNum: 0,
+        tagName: '全部'
+      }
     ],
     total: 0,
     postsList: [],
@@ -77,13 +83,25 @@ class Forum extends Component {
     giftGif: '',
     showGiftGif: false,
     schoolId: '',
-    showOptIndex: null
+    showOptIndex: null,
+    eStart: 0,
+    commentContext: '',
+    inpFocus: false,
+    placeholder: '',
+    commentQuery: null,
+    showPopup: false,
+    popupType: 'normal',
+    curComment: null,
+    curPostsIndex: null
   }
 
   componentDidMount() {
+    const info = Taro.getMenuButtonBoundingClientRect()
+
+    this.setState({ safeTop: info.top })
+
     this.fetchData()
     this.getLocation()
-    // this.nextPage()
   }
 
   // 下拉加载
@@ -119,9 +137,138 @@ class Forum extends Component {
     return { total }
   }
 
+  onChangeInp = (e) => {
+    this.setState({ commentContext: e.detail.value })
+  }
+
+  handleTouchStart = (e) => {
+    // console.log(e)
+
+    this.setState({ eStart: e.changedTouches[0].clientX })
+  }
+
+  handleTouchEnd = (e) => {
+    const { eStart, curNav, navOpt } = this.state
+
+    // if (!showEffect) {
+    //   return
+    // }
+
+    const eEnd = e.changedTouches[0].clientX
+
+    let cs
+    // console.log(eEnd, eStart)
+    if (eEnd > eStart + 115) {
+      cs = curNav ? curNav - 1 : navOpt.length - 1
+    }
+
+    if (eEnd < eStart - 115) {
+      cs = curNav !== navOpt.length - 1 ? curNav + 1 : 0
+    }
+
+    if (!cs && cs !== 0) {
+      return
+    }
+
+    this.setState({ curNav: cs, curTag: 0, postsList: [] }, () => {
+      this.resetPage(this.nextPage)
+      this.getTaglist()
+    })
+  }
+
+  handleBlur = (e) => {
+    // this.setState({ commentQuery: null, placeholder: '', inpFocus: false })
+  }
+
+  handleSelect = (info, index) => {
+    console.log(info, index)
+
+    const { curPosts } = this.state
+
+    switch (info.type) {
+      case 'reply':
+        this.handleReply()
+        break
+    }
+  }
+
+  // handleReply = () => {
+  //   const { curComment } = this.state
+  //   console.log(curComment)
+
+  //   // const commentQuery = {
+  //   //   id: curComment.id,
+  //   //   type: 2
+  //   // }
+
+  //   let placeholder = '回复:' + curComment.nickname
+
+  //   this.setState({
+  //     // commentQuery,
+  //     placeholder,
+  //     inpFocus: true,
+  //     commentContext: '',
+  //     showPopup: false
+  //   })
+  // }
+
+  handleReply = () => {
+    const { curComment, curPosts } = this.state
+    console.log(curComment, curPosts)
+
+    // const commentQuery = {
+    //   id: curComment.id,
+    //   type: 2
+    // }
+
+    let placeholder
+
+    if (curPosts) {
+      placeholder = '评论:' + (curPosts.nickname || '#' + curPosts.userId)
+    }
+
+    if (curComment) {
+      placeholder = '回复:' + curComment.nickname
+    }
+
+    this.setState({
+      // commentQuery,
+      placeholder,
+      inpFocus: true,
+      commentContext: '',
+      showPopup: false
+    })
+  }
+
+  handleComment = (e) => {
+    console.log(e)
+
+    this.setState({ curComment: e })
+
+    this.openPopup()
+  }
+
+  handleCommentPosts = (e, index) => () => {
+    console.log(e)
+
+    this.setState({ curPosts: e, curPostsIndex: index }, () => {
+      this.handleReply()
+    })
+
+    // this.openPopup()
+  }
+
+  handleCommentChild = (e) => {
+    const { navOpt, curNav } = this.state
+
+    const type = navOpt[curNav].type
+
+    Taro.navigateTo({ url: `/pages/wnh/posts/index?id=${e.postId}&type=${type}` })
+  }
+
   onSelectNav = (index) => () => {
     // this.setState({ curNav: index })
-    this.setState({ curNav: index, curTag: null, postsList: [] }, () => {
+    this.setState({ curNav: index, curTag: 0, postsList: [] }, () => {
       this.resetPage(this.nextPage)
       this.getTaglist()
     })
@@ -159,6 +306,14 @@ class Forum extends Component {
     this.setState({ showGiftGif: false })
   }
 
+  openPopup = () => {
+    this.setState({ showPopup: true })
+  }
+
+  closePopup = () => {
+    this.setState({ showPopup: false })
+  }
+
   handleAgree = () => {
     this.setState({ isAgree: !this.state.isAgree })
   }
@@ -168,7 +323,7 @@ class Forum extends Component {
 
     const type = navOpt[curNav].type
 
-    this.props.setPostsInfo(info)
+    // this.props.setPostsInfo(info)
 
     Taro.navigateTo({ url: `/pages/wnh/posts/index?id=${info.postId}&type=${type}` })
   }
@@ -195,6 +350,10 @@ class Forum extends Component {
     const type = navOpt[curNav].type
 
     Taro.navigateTo({ url: `/pages/wnh/release/index?type=${type}` })
+  }
+
+  onJupmToMessage = () => {
+    Taro.navigateTo({ url: `/pages/wnh/person/index` })
   }
 
   onJumpToProve = () => {
@@ -248,6 +407,13 @@ class Forum extends Component {
   }
 
   openUser = (info) => () => {
+    const { userId } = this.state
+
+    if (userId == info.userId) {
+      Taro.navigateTo({ url: `/pages/wnh/mine/index?id=mine` })
+      return
+    }
+
     this.setState({ curUser: info, showUser: true })
   }
 
@@ -335,7 +501,7 @@ class Forum extends Component {
       const { data } = await resApi(query)
 
       let pl = postsList.concat()
-
+      // debugger
       if (comment.isFabulous == 6) {
         pl[index].commentList[idx].fabulous--
         pl[index].commentList[idx].isFabulous = 0
@@ -371,6 +537,96 @@ class Forum extends Component {
     } catch (e) {}
   }
 
+  fetchComment = async () => {
+    const {
+      navOpt,
+      curNav,
+      curPosts,
+      commentQuery,
+      curPostsIndex,
+      postsList,
+      userId,
+      commentContext,
+      curComment
+    } = this.state
+
+    if (!commentContext) {
+      D.toast('请输入评论内容')
+      return
+    }
+
+    let resApi,
+      query = {
+        senderId: userId,
+        // postId: curComment.postId,
+        context: commentContext
+        // type: 2
+      }
+
+    if (curPosts) {
+      query.postId = curPosts.postId
+    }
+
+    if (curComment) {
+      query.postId = curComment.postId
+    }
+
+    if (commentQuery) {
+      query = {
+        ...query,
+        ...commentQuery
+      }
+    }
+
+    const type = navOpt[curNav].type
+
+    switch (type) {
+      case 'tree':
+        resApi = api.forum.COMMENT_TREE_POSTS
+        break
+      case 'hot':
+      case 'school':
+      default:
+        resApi = api.forum.COMMENT_HOT_POSTS
+        break
+    }
+
+    try {
+      const { data } = await resApi(query)
+
+      Taro.stopPullDownRefresh()
+
+      D.toast(data)
+
+      this.setState(
+        {
+          commentQuery: null,
+          curComment: null,
+          commentContext: '',
+          placeholder: '',
+          inpFocus: false
+        },
+        () => {
+          let pl = postsList.concat()
+
+          if (pl[curPostsIndex].commentList.length < 3) {
+            pl[curPostsIndex].commentList.push({
+              avatar: Taro.getStorageSync('userInfo').avatar,
+              context: commentContext
+            })
+
+            this.setState({ postsList: pl })
+          }
+          // this.setState({ postsList: [] }, () => {
+          //   this.resetPage(this.nextPage)
+          // })
+        }
+      )
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   getLocation = async () => {
     const { latitude, longitude } = await Taro.getLocation()
 
@@ -385,7 +641,7 @@ class Forum extends Component {
     }
 
     const {
-      data: { role, schoolId }
+      data: { role, schoolId, schoolName }
     } = await api.prove.CHECK_PROVER(query)
 
     // role 0-默认 10-校园管理员 20-论坛管理员
@@ -414,6 +670,7 @@ class Forum extends Component {
       const schoolIds = Taro.getStorageSync('schoolId')
 
       Taro.setStorageSync('schoolId', schoolIds)
+      Taro.setStorageSync('schoolName', schoolName)
 
       this.setState({ schoolId }, () => {
         this.nextPage()
@@ -432,13 +689,22 @@ class Forum extends Component {
 
     const { data } = await api.forum.GET_TAG_LIST(query)
 
-    const tagList = data.map((item) => {
+    let tl = data.map((item) => {
       return {
         ...item
       }
     })
 
-    this.setState({ tagList })
+    tl = [
+      {
+        id: 0,
+        pointNum: 0,
+        tagName: '全部'
+      },
+      ...tl
+    ]
+
+    this.setState({ tagList: tl })
   }
 
   getPostsList = async (params) => {
@@ -458,7 +724,7 @@ class Forum extends Component {
 
     switch (type) {
       case 'school':
-        resApi = api.forum.GET_HOT_LIST
+        resApi = api.forum.GET_SCHOOL_POSTS_LIST
 
         query.schoolId = schoolId || schoolIds || 0
 
@@ -477,7 +743,7 @@ class Forum extends Component {
         break
     }
 
-    if (tag) {
+    if (tag && tag.id) {
       query.tag = tag.id
     }
 
@@ -507,7 +773,7 @@ class Forum extends Component {
           content = context
         }
 
-        let commentList = await this.getCommentList(item.postId)
+        let commentList = await this.getCommentList(item.postId, item.userId)
 
         const info = {
           ...item,
@@ -523,7 +789,7 @@ class Forum extends Component {
       nList = await Promise.all(nList)
 
       nList = [...postsList, ...nList]
-
+      // debugger
       Taro.hideLoading()
 
       Taro.stopPullDownRefresh()
@@ -535,7 +801,8 @@ class Forum extends Component {
     }
   }
 
-  getCommentList = async (postId) => {
+  getCommentList = async (postId, pId) => {
+    // console.log(pId)
     const { userId, navOpt, curNav } = this.state
 
     const type = navOpt[curNav].type
@@ -578,6 +845,7 @@ class Forum extends Component {
 
         return {
           ...item,
+          isFather: pId === item.senderId,
           commentDate,
           children: children.slice(0, 3)
         }
@@ -603,6 +871,7 @@ class Forum extends Component {
 
   render() {
     const {
+      safeTop,
       showGift,
       showUser,
       isAgree,
@@ -623,7 +892,12 @@ class Forum extends Component {
       curGift,
       giftGif,
       showGiftGif,
-      curUser
+      curUser,
+      commentContext,
+      inpFocus,
+      placeholder,
+      showPopup,
+      popupType
     } = this.state
 
     const Nav =
@@ -678,7 +952,7 @@ class Forum extends Component {
           <Posts
             key={item.postId}
             info={item}
-            showAddress={curNav === 1}
+            showAddress={curNav === 0}
             showOpt={showOptIndex === index}
             onHandleLike={this.fetchLike(item, index)}
             onHandleLikeComment={(idx) => this.fetchLikeComment(item, index, idx)}
@@ -687,25 +961,27 @@ class Forum extends Component {
             onHandleShowOpt={this.onChangeOptIndex(index)}
             onHandleGift={this.openGift(item)}
             onHandleShowUser={this.openUser(item)}
+            onHandleComment={this.handleComment}
+            onHandleCommentChild={this.handleCommentChild}
+            onHandleCommentPosts={this.handleCommentPosts(item, index)}
           />
         )
       })
 
     return (
-      <View className='forum'>
-        <View className='header'>
-          <View className='header-container'>
-            <View className='header-title'>万能盒</View>
-          </View>
-        </View>
-        <View className='nav'>
-          {Nav}
+      <View className='forum' onTouchStart={this.handleTouchStart} onTouchEnd={this.handleTouchEnd}>
+        <View style={{ height: safeTop + 'px' }} className='header'></View>
+        <View style={{ top: safeTop + 'px' }} className='nav'>
           <View className='nav-search' onClick={this.onJupmToSearch}>
-            <Image src={SearchIcon} className='nav-search__icon' />
-            搜索
+            <Image src={SearchIcon} mode='aspectFit' className='nav-search__icon' />
           </View>
+          <View className='nav-release' onClick={this.onJupmToMessage}>
+            <Image src={MessageIcon} mode='aspectFit' className='nav-release__icon' />
+            <View className='circle'></View>
+          </View>
+          {Nav}
         </View>
-        <View className='screen'>
+        <View style={{ top: safeTop + 33 + 'px' }} className='screen'>
           <View className='screen-list'>{Screen}</View>
           <View className='screen-search' onClick={this.openScreenPopup}>
             筛选
@@ -726,14 +1002,15 @@ class Forum extends Component {
           {total > 0 && !pageParams.isLoading && !pageParams.hasNext && <BottomText />}
           {!total && !pageParams.isLoading && !pageParams.hasNext && <Default />}
         </View>
-        {curNav !== 1 && (
+        <View className='release-btn'>
           <Image
             src={ReleaseIcon}
             mode='aspectFill'
-            className='release-btn'
+            className='release-btn__icon'
             onClick={this.onJupmToRelease}
           />
-        )}
+          {/* <View className='circle'></View> */}
+        </View>
         <AtModal isOpened={showFirstModal} onClose={this.closeFirstProveModal}>
           <View className='first-modal'>
             <View className='modal-title'>温馨提示</View>
@@ -769,7 +1046,7 @@ class Forum extends Component {
           onClose={this.closeNotProveModal}
         >
           <View className='prove-container'>
-            <Image src={ProveIcon} className='prove-icon' />
+            <Image src={ProveIcon} mode='aspectFit' className='prove-icon' />
             <View className='prove-title'>提示</View>
             <View className='prove-explain'>身份认证未通过审核，请修改后重新提交</View>
             <View className='prove-btn'>
@@ -788,7 +1065,7 @@ class Forum extends Component {
           onClose={this.closeProveModal}
         >
           <View className='prove-container'>
-            <Image src={ProveIcon} className='prove-icon' />
+            <Image src={ProveIcon} mode='aspectFit' className='prove-icon' />
             <View className='prove-title'>需要认证</View>
             <View className='prove-explain'>
               需要校园身份认证并授权手机号后， 才能拥有发帖、评论等权限。
@@ -809,7 +1086,7 @@ class Forum extends Component {
           onClose={this.closeIsProveModal}
         >
           <View className='prove-container'>
-            <Image src={ProveIcon} className='prove-icon' />
+            <Image src={ProveIcon} mode='aspectFit' className='prove-icon' />
             <View className='prove-title'>成功完成校园认证</View>
             <View className='prove-explain'>您已成为万能盒的认证用户</View>
             <View className='prove-btn'>
@@ -837,6 +1114,24 @@ class Forum extends Component {
         <AtCurtain isOpened={showGiftGif} onClose={this.closeGiftGif}>
           <Image src={giftGif} mode='widthFix' className='gift-gif' />
         </AtCurtain>
+        {inpFocus && (
+          <FooterComment
+            show={inpFocus}
+            focus={inpFocus}
+            content={commentContext}
+            placeholder={placeholder}
+            onChange={this.onChangeInp}
+            onSubmit={this.fetchComment}
+            onBlur={this.handleBlur}
+          />
+        )}
+
+        <ForumPopup
+          showPopup={showPopup}
+          type={popupType}
+          onSelect={this.handleSelect}
+          onClose={this.closePopup}
+        />
       </View>
     )
   }

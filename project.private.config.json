@@ -101,6 +101,18 @@
           "pathName": "pages/wnh/mine/index",
           "query": "id=mine",
           "scene": null
+        },
+        {
+          "name": "pages/center/index",
+          "pathName": "pages/center/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/wnh/posts/index",
+          "pathName": "pages/wnh/posts/index",
+          "query": "id=c0a13aaa94074042b738abd3329067db&type=hot",
+          "scene": null
         }
       ]
     }

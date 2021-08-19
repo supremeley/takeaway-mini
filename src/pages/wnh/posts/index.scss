@@ -23,9 +23,9 @@ page {
     align-items: center;
     justify-content: space-between;
     &__avatar {
-      width: 80px;
-      height: 80px;
-      margin-right: 8px;
+      width: 90px;
+      height: 90px;
+      margin-right: 12px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -37,9 +37,10 @@ page {
         align-items: center;
         &__name {
           margin-right: 12px;
+          font-size: 32px;
         }
         &__date {
-          font-size: 24px;
+          font-size: 28px;
           color: $global-text-gray;
         }
       }
@@ -47,13 +48,11 @@ page {
         display: flex;
         align-items: center;
         &__text {
-          background: $global-green;
-          color: #fff;
-          font-size: 20px;
-          line-height: 34px;
           padding: 0 24px;
-          border-radius: 4px;
           margin-right: 10px;
+          font-size: 32px;
+          line-height: 54px;
+          color: $global-green;
         }
       }
     }
@@ -67,9 +66,14 @@ page {
       font-size: 24px;
       text-align: center;
     }
+    &__opt{
+      
+    }
   }
   &-content {
     padding: 20px 0;
+    font-size: 32px;
+    line-height: 54px;
   }
   &-album {
     display: flex;
@@ -213,8 +217,9 @@ page {
     }
   }
   .content {
-    margin: 0 24px;
+    // margin: 0 24px;
     border-bottom: 2px solid $global-line-gray;
+    padding: 24px;
   }
   .plate {
     margin: 0 24px;

@@ -2,20 +2,21 @@
   padding: 24px;
   &-top {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    // justify-content: space-between;
     margin-bottom: 24px;
+
     &__user {
-      &-info {
-        display: flex;
-        align-items: center;
-        &__name {
-          font-weight: 600;
-        }
+      padding: 0 32px;
+      &-name {
+        font-weight: 600;
+        font-size: 32px;
+        flex: 1;
+        margin-bottom: 18px;
       }
       &-school {
         color: #8b8b8d;
-        font-size: 20px;
+        font-size: 32px;
       }
     }
     &__right {
@@ -29,7 +30,7 @@
         width: 120px;
         border-radius: 50%;
         border: 2px solid $global-green;
-        // margin-top: -60px;
+        // margin-right: -60px;
         margin-bottom: 12px;
       }
       &-btn {
@@ -47,14 +48,14 @@
     justify-content: space-between;
     &__btn {
       width: 220px;
-      height: 70px;
+      height: 80px;
       border: 2px solid $global-green;
-      border-radius: 35px;
+      border-radius: 40px;
       color: $global-green;
-      line-height: 66px;
+      line-height: 76px;
       background: #fff;
       padding: 0;
-      margin: 0;
+      margin: 0 12px;
       font-size: 28px;
       ::after {
         border: none;
@@ -64,6 +65,10 @@
       background: $global-green;
       color: #fff;
       width: 430px;
+    }
+    .green-btn {
+      background: $global-green;
+      color: #fff;
     }
   }
 }

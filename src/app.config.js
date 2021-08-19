@@ -81,16 +81,22 @@ export default {
     color: '#999',
     list: [
       {
-        text: '万能盒',
+        text: '论坛',
         pagePath: 'pages/forum/index',
         iconPath: './assets/imgs/tab-bar/forum.png',
         selectedIconPath: './assets/imgs/tab-bar/forum-active.png'
       },
       {
-        text: '吃饭鸭',
+        text: '早餐',
         pagePath: 'pages/home/index',
         iconPath: './assets/imgs/tab-bar/home.png',
         selectedIconPath: './assets/imgs/tab-bar/home-active.png'
+      },
+      {
+        text: '跑腿',
+        pagePath: 'pages/center/index',
+        iconPath: './assets/imgs/tab-bar/test.png',
+        selectedIconPath: './assets/imgs/tab-bar/test-active.png'
       },
       {
         text: '我的',

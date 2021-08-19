@@ -97,4 +97,25 @@ const addZero = (num) => {
   return num
 }
 
-export default { getToken, login, toast, formatTimer, addZero }
+const onJump = (type, url, id, path, h5Path) => {
+  if (type === 'inApp') {
+    Taro.navigateTo({ url })
+  }
+
+  if (type === 'outApp') {
+    Taro.navigateToMiniProgram({
+      appId: id,
+      path,
+      extraData: {},
+      envVersion: 'release',
+      success: () => { }
+    })
+  }
+
+  // console.log(type, url, id, path, h5Path)
+  if (type === 'h5') {
+    Taro.navigateTo({ url: `/pages/event/web/index?src=${h5Path}` })
+  }
+}
+
+export default { getToken, login, toast, formatTimer, addZero, onJump }

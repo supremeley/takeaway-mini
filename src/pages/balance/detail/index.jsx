@@ -135,7 +135,7 @@ class Balance extends Component {
           </View>
           <View className='header-more' onClick={this.onJumpToBill}>
             资金明细
-            <View className=' -chevron-right'></View>
+            <View className='at-icon at-icon-chevron-right'></View>
           </View>
         </View>
         <View className='plate first-plate'>
@@ -164,7 +164,7 @@ class Balance extends Component {
           {rechargeOpt.length > 0 && (
             <View className='plate-coupon' onClick={this.onJumpToCoupon}>
               {rechargeOpt[currentOpt].couponNum}张优惠券
-              <View className=' -chevron-right'></View>
+              <View className='at-icon at-icon-chevron-right'></View>
             </View>
           )}
           {/* <View className='plate-option'>

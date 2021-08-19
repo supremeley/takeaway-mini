@@ -3,6 +3,7 @@ import { Component } from 'react'
 import { View, Image, Text } from '@tarojs/components'
 
 import GiftIcon from '@/assets/imgs/forum/gift.png'
+import GiftIcons from '@/assets/imgs/forum/gifts.png'
 import UnlikeIcon from '@/assets/imgs/forum/unlike.png'
 import LikeIcon from '@/assets/imgs/forum/like.png'
 import AddressIcon from '@/assets/imgs/forum/address.png'
@@ -22,10 +23,12 @@ class PostsItem extends Component {
     onHandleLike: () => {},
     onHandleLikeComment: () => {},
     onHandleMoreComment: () => {},
-    // onHandleJump: () => {},
     onHandleShowOpt: () => {},
     onHandleShowUser: () => {},
-    onHandleGift: () => {}
+    onHandleGift: () => {},
+    onHandleComment: () => {},
+    onHandleCommentChild: () => {},
+    onHandleCommentPosts: () => {}
   }
 
   state = {}
@@ -82,6 +85,30 @@ class PostsItem extends Component {
     onHandleGift && onHandleGift()
   }
 
+  onHandleCommentPosts = (e, info) => {
+    e.stopPropagation()
+
+    const { onHandleCommentPosts } = this.props
+
+    onHandleCommentPosts && onHandleCommentPosts(info)
+  }
+
+  onHandleComment = (e, info) => {
+    e.stopPropagation()
+
+    const { onHandleComment } = this.props
+
+    onHandleComment && onHandleComment(info)
+  }
+
+  onHandleCommentChild = (e, info) => {
+    e.stopPropagation()
+
+    const { onHandleCommentChild } = this.props
+
+    onHandleCommentChild && onHandleCommentChild(info)
+  }
+
   onHandleMoreComment = (e) => {
     // e.stopPropagation()
     // const { onHandleMoreComment } = this.props
@@ -127,7 +154,9 @@ class PostsItem extends Component {
       tagName,
       imgList,
       content,
-      commentList
+      commentList,
+      userId,
+      appreciateCount
     } = info
 
     return (
@@ -148,56 +177,61 @@ class PostsItem extends Component {
           )}
         </View>
         {/* <View className='posts-tag'>置顶</View> */}
-        <View className='posts-user'>
+        <View className='posts-top'>
           <Image
             src={avatar}
             mode='aspectFill'
-            className='posts-user__avatar'
+            className='posts-avatar'
             onClick={this.onHandleShowUser}
           />
-          <View className='posts-user__info'>
-            <View className='posts-user__info-title'>
-              <Text className='posts-user__info-title__name'>{nickname}</Text>
-              <Text className='posts-user__info-title__date'>{sendTimeDate}</Text>
+          <View className='posts-right'>
+            <View className='posts-user'>
+              <View className='posts-user__info'>
+                <View className='posts-user__info-title'>
+                  <Text className='posts-user__info-title__name'>{nickname || '#' + userId}</Text>
+                  <Text className='posts-user__info-title__date'>{sendTimeDate}</Text>
+                </View>
+                {/* <View className='posts-user__info-tag'>
+                </View> */}
+              </View>
             </View>
-            <View className='posts-user__info-tag'>
-              <Text className='posts-user__info-tag__text'>{tagName}</Text>
+            <View className='posts-content'>
+              <Text className='posts-user__info-tag__text'>#{tagName}#</Text>
+              {content || context}
             </View>
+            {imgList && imgList.length > 0 && (
+              <View className={`posts-album ${imgList.length > 1 ? 'more-album' : ''}`}>
+                {imgList.map((item, index) => {
+                  return (
+                    <Image
+                      lazyLoad
+                      src={item}
+                      key={item}
+                      mode='aspectFill'
+                      className='posts-album__img'
+                      onClick={(e) => this.previewImg(e, index)}
+                    />
+                  )
+                })}
+              </View>
+            )}
           </View>
         </View>
-        <View className='posts-content'>{content || context}</View>
-        {imgList && imgList.length > 0 && (
-          <View className={`posts-album ${imgList.length > 1 ? 'more-album' : ''}`}>
-            {imgList.map((item, index) => {
-              return (
-                <Image
-                  lazyLoad
-                  src={item}
-                  key={item}
-                  mode={imgList.length > 1 ? 'aspectFill' : 'heightFix'}
-                  className='posts-album__img'
-                  onClick={(e) => this.previewImg(e, index)}
-                />
-              )
-            })}
+        {showAddress && (
+          <View className='posts-address'>
+            <Image src={AddressIcon} mode='aspectFit' className='posts-address__icon' />
+            {schoolName}
           </View>
         )}
         <View className='posts-bottom'>
-          {showAddress ? (
-            <View className='posts-bottom__info green'>
-              <Image src={AddressIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              {schoolName}
-            </View>
-          ) : (
-            <View className='posts-bottom__info'>
-              <Image src={ShareIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              分享
-            </View>
-          )}
           <View className='posts-bottom__right'>
             <View className='posts-bottom__info' onClick={this.onHandleGift}>
-              <Image src={GiftIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              赞赏
+              <Image
+                src={appreciateCount > 0 ? GiftIcons : GiftIcon}
+                mode='aspectFit'
+                className='posts-bottom__info-icon'
+              />
+              {appreciateCount || 0}
             </View>
             <View className='posts-bottom__info' onClick={this.onHandleLike}>
               <Image
@@ -208,8 +242,16 @@ class PostsItem extends Component {
               {fabulous}
             </View>
             <View className='posts-bottom__info'>
-              <Image src={CommitIcon} mode='aspectFit' className='posts-bottom__info-icon' />
+              <Image
+                src={CommitIcon}
+                mode='aspectFit'
+                className='posts-bottom__info-icon'
+                onClick={this.onHandleCommentPosts}
+              />
               {comment}
+            </View>
+            <View className='posts-bottom__info'>
+              <Image src={ShareIcon} mode='aspectFit' className='posts-bottom__info-icon' />
             </View>
           </View>
         </View>
@@ -217,7 +259,11 @@ class PostsItem extends Component {
           <View className='posts-commit'>
             {commentList.map((item, index) => {
               return (
-                <View key={item.id} className='posts-commit__item'>
+                <View
+                  key={item.id}
+                  className='posts-commit__item'
+                  onClick={(e) => this.onHandleComment(e, item)}
+                >
                   <Image
                     src={item.avatar}
                     mode='aspectFill'
@@ -225,30 +271,49 @@ class PostsItem extends Component {
                   />
                   <View className='posts-commit__item-info'>
                     <View className='posts-commit__item-info__title'>
-                      {item.nickname}.{item.commentDate}
+                      {item.nickname || '#' + item.senderId}
+                      {item.isFather && (
+                        <Text className='posts-commit__item-info__title-father'>作者</Text>
+                      )}
+                      <Text className='posts-commit__item-info__title-data'>
+                        {item.commentDate}
+                      </Text>
                     </View>
                     <View className='posts-commit__item-info__content'>{item.context}</View>
                     {item.children.length > 0 &&
                       item.children.map((it) => {
                         return (
-                          <View key={it.id} className='posts-commit__item-info__detail'>
-                            {/* <Text className='posts-commit__item-info__detail-tag'>楼主</Text> */}
-                            <Text className='posts-commit__item-info__detail-name'>
-                              {it.nickname}：
-                            </Text>
-                            <Text className='posts-commit__item-info__detail-detail'>
+                          <View
+                            key={it.id}
+                            className='posts-commit__item-info__detail'
+                            onClick={(e) => this.onHandleCommentChild(e, it)}
+                          >
+                            <View className='posts-commit__item-info__detail-top'>
+                              <Image
+                                src={it.avatar}
+                                mode='aspectFill'
+                                className='posts-commit__item-info__detail-avatar'
+                              />
+                              <Text className='posts-commit__item-info__detail-name'>
+                                {it.nickname || '#' + it.senderId}：
+                              </Text>
+                            </View>
+                            <View className='posts-commit__item-info__detail-detail'>
                               {it.context}
-                            </Text>
+                            </View>
                           </View>
                         )
                       })}
                   </View>
-                  <Image
-                    src={item.isFabulous == 6 ? LikeIcon : UnlikeIcon}
-                    mode='aspectFit'
-                    className='posts-commit__item-icon'
-                    onClick={(e) => this.onHandleLikeComment(e, index)}
-                  />
+                  <View className='posts-commit__item-like'>
+                    <Image
+                      src={item.isFabulous == 6 ? LikeIcon : UnlikeIcon}
+                      mode='aspectFit'
+                      className='posts-commit__item-icon'
+                      onClick={(e) => this.onHandleLikeComment(e, index)}
+                    />
+                    <Text className='posts-commit__item-num'>{item.fabulous}</Text>
+                  </View>
                 </View>
               )
             })}

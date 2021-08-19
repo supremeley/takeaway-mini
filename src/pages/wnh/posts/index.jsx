@@ -185,7 +185,7 @@ class Posts extends Component {
 
   handleReply = () => {
     const { userId, curComment } = this.state
-    // console.log(curComment)
+    console.log(curComment)
 
     const commentQuery = {
       id: curComment.id,
@@ -304,7 +304,8 @@ class Posts extends Component {
               ...chi,
               fNickName: item.nickname,
               commentDate: commentDateC,
-              isChi: true
+              isChi: true,
+              pid: item.id
             }
           })
         }
@@ -685,13 +686,32 @@ class Posts extends Component {
                 <Text className='posts-user__info-title__name'>{nickname}</Text>
                 <Text className='posts-user__info-title__date'>{sendTimeDate}</Text>
               </View>
-              <View className='posts-user__info-tag'>
-                <Text className='posts-user__info-tag__text'>{tagName}</Text>
-              </View>
+              <View className='posts-user__info-tag'></View>
             </View>
-            <View className='posts-user__btn'>关注</View>
+            <View className='posts-user__opt'>
+              <View className='posts-user__btn'>关注</View>
+              <Image
+                src={OptionIcon}
+                mode='aspectFit'
+                className='posts-bottom__opt-icon'
+                onClick={this.openOpt}
+              />
+              {showOpt && (
+                <View className='posts-bottom__opt'>
+                  <View className='posts-bottom__opt-item' onClick={() => this.openPopup('share')}>
+                    分享
+                  </View>
+                  <View className='posts-bottom__opt-item' onClick={() => this.openPopup('report')}>
+                    举报
+                  </View>
+                </View>
+              )}
+            </View>
           </View>
-          <View className='posts-content'>{content || context}</View>
+          <View className='posts-content'>
+            <Text className='posts-user__info-tag__text'>#{tagName}#</Text>
+            {content || context}
+          </View>
           {imgList && imgList.length > 0 && (
             <View className={`posts-album ${imgList.length > 1 ? 'more-album' : ''}`}>
               {imgList.map((item, index) => {
@@ -708,22 +728,6 @@ class Posts extends Component {
             </View>
           )}
           <View className='posts-bottom'>
-            <Image
-              src={OptionIcon}
-              mode='aspectFit'
-              className='posts-bottom__opt-icon'
-              onClick={this.openOpt}
-            />
-            {showOpt && (
-              <View className='posts-bottom__opt'>
-                <View className='posts-bottom__opt-item' onClick={() => this.openPopup('share')}>
-                  分享
-                </View>
-                <View className='posts-bottom__opt-item' onClick={() => this.openPopup('report')}>
-                  举报
-                </View>
-              </View>
-            )}
             {/* {showAddress ? (
             <View className='posts-bottom__info green'>
               <Image src={AddressIcon} mode='aspectFit' className='posts-bottom__info-icon' />

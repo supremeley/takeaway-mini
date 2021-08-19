@@ -1,7 +1,6 @@
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Image, Text } from '@tarojs/components'
-import { AtFloatLayout } from 'taro-ui'
+import { View, Image, Text, ScrollView } from '@tarojs/components'
 import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
 import ForumPopup from '@/components/forumPopup'
@@ -21,7 +20,6 @@ import ShaiIcon from '@/assets/imgs/shai.png'
 import EditIcon from '@/assets/imgs/forum/edit.png'
 
 import 'taro-ui/dist/style/components/icon.scss'
-import 'taro-ui/dist/style/components/float-layout.scss'
 import './index.scss'
 
 class Mine extends Component {
@@ -38,7 +36,9 @@ class Mine extends Component {
     showPopup: false,
     postsList: [],
     updateImg: '',
-    curPosts: null
+    curPosts: null,
+    defaultImg:
+      ' https://eating-1256365647.cos.ap-shanghai.myqcloud.com/background/20210817175402.jpg'
   }
 
   componentDidShow() {
@@ -49,13 +49,13 @@ class Mine extends Component {
   }
 
   // 下拉加载
-  onReachBottom = () => {
+  handleScrollBottom = () => {
     const { pageParams } = this.state
     // debugger
     !pageParams.isLoading && pageParams.hasNext && this.nextPage()
   }
 
-  onPullDownRefresh = () => {
+  handleRefresherRefresh = () => {
     this.setState({ postsList: [] }, () => {
       this.resetPage(this.nextPage)
     })
@@ -320,7 +320,7 @@ class Mine extends Component {
       return null
     }
 
-    const { avatar, nickname, backgroundImg, gender, comment, schoolName, sign } = info
+    const { avatar, nickname, backgroundImg, defaultImg, gender, comment, schoolName, sign } = info
 
     const PostsList =
       postsList &&
@@ -373,7 +373,7 @@ class Mine extends Component {
       <View className='mine'>
         <View className='header'>
           <Image
-            src={updateImg || backgroundImg}
+            src={updateImg || backgroundImg || defaultImg}
             mode='aspectFill'
             className='header-bg'
             onClick={this.upLoadImg}
@@ -383,7 +383,13 @@ class Mine extends Component {
             <View className='at-icon at-icon-chevron-left' onClick={this.goBack}></View>
           </View>
         </View>
-        <View className='content'>
+        <ScrollView
+          scrollY
+          enableBackToTop
+          className='content'
+          onScrollToLower={this.handleScrollBottom}
+          // onRefresherRefresh={this.handleRefresherRefresh}
+        >
           <View className='title'>
             <View className='title-user'>
               <Image src={avatar} mode='aspectFill' className='title-user__avatar' />
@@ -428,10 +434,9 @@ class Mine extends Component {
               </View>
             </View>
           )}
-        </View>
-        <View className='nav'>
-          <View className='nav-title'>全部帖子</View>
-          {/* <View className='nav-more'>
+          <View className='nav'>
+            <View className='nav-title'>全部帖子</View>
+            {/* <View className='nav-more'>
             筛选
             <Image
               src={ShaiIcon}
@@ -440,27 +445,17 @@ class Mine extends Component {
               onClick={this.openPopup}
             />
           </View> */}
-        </View>
-        <View className='list'>{PostsList}</View>
-        {total > 0 && !pageParams.isLoading && !pageParams.hasNext && <BottomText />}
-        {!total && !pageParams.isLoading && !pageParams.hasNext && <Default />}
+          </View>
+          <View className='list'>{PostsList}</View>
+          {total > 0 && !pageParams.isLoading && !pageParams.hasNext && <BottomText />}
+          {!total && !pageParams.isLoading && !pageParams.hasNext && <Default />}
+        </ScrollView>
         <ForumPopup
           showPopup={showPopup}
           type='mine'
           onSelect={this.handleSelect}
           onClose={this.closePopup}
         />
-        {/* <AtFloatLayout isOpened={showOpt} onClose={this.handleClose}>
-          <View className='float-content'>
-            <View className='float-item'>回复</View>
-            <View className='float-item'>复制</View>
-            <View className='float-item'>删除</View>
-            <View className='float-item'>举报</View>
-            <View className='float-item cancel' onClick={this.closePopup}>
-              取消
-            </View>
-          </View>
-        </AtFloatLayout> */}
       </View>
     )
   }
