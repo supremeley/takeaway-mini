@@ -2,16 +2,15 @@ import Taro from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image } from '@tarojs/components'
 
-// import api from '@/api'
 import addressIcon from '@/assets/imgs/address-icon.png'
 
 import balanceIcon from '@/assets/imgs/balance-icon.png'
 import integralIcon from '@/assets/imgs/center/integral.png'
-import MallIcon from '@/assets/imgs/center/mall.png'
+// import MallIcon from '@/assets/imgs/center/mall.png'
 
 import orderIcon from '@/assets/imgs/center/first-order.png'
 import couponIcon from '@/assets/imgs/center/first-coupon.png'
-import exchangeIcon from '@/assets/imgs/center/first-exchange.png'
+// import exchangeIcon from '@/assets/imgs/center/first-exchange.png'
 import joinIcon from '@/assets/imgs/center/first-join.png'
 
 import mineIcon from '@/assets/imgs/center/wan-mine.png'
@@ -20,11 +19,15 @@ import likeIcon from '@/assets/imgs/center/wan-like.png'
 import followIcon from '@/assets/imgs/center/wan-follow.png'
 import fansIcon from '@/assets/imgs/center/wan-fans.png'
 
-import yiIcon from '@/assets/imgs/center/wei-yi.png'
-import formIcon from '@/assets/imgs/center/wei-form.png'
-import chenIcon from '@/assets/imgs/center/wei-chen.png'
-import waiIcon from '@/assets/imgs/center/wei-wai.png'
+// import yiIcon from '@/assets/imgs/center/wei-yi.png'
+// import formIcon from '@/assets/imgs/center/wei-form.png'
+// import chenIcon from '@/assets/imgs/center/wei-chen.png'
+import elementiIcon from '@/assets/imgs/center/element.png'
+import meituanIcon from '@/assets/imgs/center/meituan.png'
 import kfcIcon from '@/assets/imgs/center/wei-kfc.png'
+
+import fabuIcon from '@/assets/imgs/center/fabu.png'
+import jiedanIcon from '@/assets/imgs/center/jiedan.png'
 
 import jiMineIcon from '@/assets/imgs/center/ji-mine.png'
 import jiBalanceIcon from '@/assets/imgs/center/ji-balance.png'
@@ -36,12 +39,19 @@ import otherJoinIcon from '@/assets/imgs/center/other-join.png'
 import guanIcon from '@/assets/imgs/center/other-guan.png'
 import settingIcon from '@/assets/imgs/center/other-setting.png'
 
+import renzhengtubiaoIcon from '@/assets/imgs/setting/renzhengtubiao.png'
+import guifanIcon from '@/assets/imgs/setting/guifan.png'
+import yinsiIcon from '@/assets/imgs/setting/yinsi.png'
+import shezhiIcon from '@/assets/imgs/setting/shezhi.png'
+
 import './index.scss'
 
 class Center extends Component {
   state = {
+    showRightMenu: false,
     safeTop: 0,
     schoolName: Taro.getStorageSync('schoolName'),
+    forumUser: Taro.getStorageSync('forumUser'),
     userInfo: { nickName: '', avatarUrl: '' },
     isLogin: false,
     // balance: 0,
@@ -54,41 +64,60 @@ class Center extends Component {
       {
         icon: integralIcon,
         title: '盒盒币',
-        url: ''
+        url: '/pages/integral/index'
       },
       {
-        icon: MallIcon,
-        title: '优选商城',
-        url: '',
-        type: 'outApp',
-        id: 'wx4fb572b4acc3f929',
-        path: '/views/home/index'
+        icon: couponIcon,
+        title: '优惠券',
+        url: '/pages/coupon/list/index'
       }
+      // {
+      //   icon: MallIcon,
+      //   title: '优选商城',
+      //   url: '',
+      //   type: 'outApp',
+      //   id: 'wx4fb572b4acc3f929',
+      //   path: '/views/home/index'
+      // },
     ],
     menuList: [
       {
-        title: '早餐到寝',
+        title: '一日三餐',
         children: [
           {
             icon: orderIcon,
-            title: '我的订单',
+            title: '早餐订单',
             url: '/pages/order/list/index?status=0'
           },
           {
-            icon: couponIcon,
-            title: '优惠券',
-            url: '/pages/coupon/list/index'
+            icon: elementiIcon,
+            title: '饿了么神券',
+            url: '',
+            type: 'outApp',
+            id: 'wxece3a9a4c82f58c9',
+            path: 'ele-recommend-price/pages/guest/index?inviterId=68724bb&chInfo=ch_wechat_chsub_CopyLink&_ltracker_f=tjyj1_wx_jgw'
           },
           {
-            icon: exchangeIcon,
-            title: '盒盒币兑换',
-            url: '/pages/coupon/list/index'
+            icon: meituanIcon,
+            title: '美团神券',
+            url: '',
+            type: 'outApp',
+            id: 'wxde8ac0a21135c07d',
+            path: 'waimaiunion/pages/union/index?scene=1!p2hXVr5zsZM2!1!2!sVdWvg'
           },
           {
-            icon: joinIcon,
-            title: '成为楼长',
-            url: '/pages/coupon/list/index'
+            icon: kfcIcon,
+            title: 'KFC六折',
+            url: '',
+            type: 'outApp',
+            id: 'wx4fb572b4acc3f929',
+            path: 'views/kfc/index.html'
           }
+          // {
+          //   icon: exchangeIcon,
+          //   title: '盒盒币兑换',
+          //   url: '/pages/integral/exchange/index'
+          // },
         ]
       },
       {
@@ -102,7 +131,7 @@ class Center extends Component {
           {
             icon: commentIcon,
             title: '评论/点赞',
-            url: '/pages/wnh/comment/index'
+            url: '/pages/wnh/all/index'
           },
           {
             icon: likeIcon,
@@ -112,42 +141,60 @@ class Center extends Component {
           {
             icon: followIcon,
             title: '关注/粉丝',
-            url: '/pages/wnh/comment/index'
+            url: '/pages/wnh/follow/index'
           },
           {
             icon: fansIcon,
             title: '官方号入驻',
-            url: '/pages/wnh/list/index'
+            url: '/pages/event/settled/index'
           }
         ]
       },
+      // {
+      //   title: '微服务',
+      //   children: [
+      //     {
+      //       icon: yiIcon,
+      //       title: '充一卡通',
+      //       h5Path: 'http://pay.huilan-online.com/index.php/epay/pay/xybrecharge',
+      //       type: 'h5',
+      //       id: 'wx4fb572b4acc3f929',
+      //       path: 'http://pay.huilan-online.com/index.php/epay/pay/xybrecharge',
+      //     },
+      //     {
+      //       icon: formIcon,
+      //       title: '课表查询',
+      //       url: ''
+      //     },
+      //     {
+      //       icon: chenIcon,
+      //       title: '成绩查询',
+      //       url: ''
+      //     },
+      //     {
+      //       icon: waiIcon,
+      //       title: '外卖神券',
+      //       url: ''
+      //     },
+      //     {
+      //       icon: kfcIcon,
+      //       title: 'KFC六折',
+      //       url: ''
+      //     }
+      //   ]
+      // },
       {
-        title: '微服务',
+        title: '校内跑腿',
         children: [
           {
-            icon: yiIcon,
-            title: '充一卡通',
-            url: '/pages/order/index'
+            icon: fabuIcon,
+            title: '我的发布',
+            url: ''
           },
           {
-            icon: formIcon,
-            title: '课表查询',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: chenIcon,
-            title: '成绩查询',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: waiIcon,
-            title: '外卖神券',
-            url: '/pages/coupon/list/index'
-          },
-          {
-            icon: kfcIcon,
-            title: 'KFC六折',
-            url: '/pages/coupon/list/index'
+            icon: jiedanIcon,
+            title: '我的接单',
+            url: ''
           }
         ]
       },
@@ -157,17 +204,17 @@ class Center extends Component {
           {
             icon: jiMineIcon,
             title: '我的爱心',
-            url: '/pages/order/index'
+            url: '/pages/fund/mine/index'
           },
           {
             icon: jiBalanceIcon,
             title: '本校爱心',
-            url: '/pages/coupon/list/index'
+            url: '/pages/fund/school/index'
           },
           {
             icon: aboutIcon,
             title: '关于我们',
-            url: '/pages/coupon/list/index'
+            url: '/pages/fund/about/index'
           }
         ]
       },
@@ -177,17 +224,23 @@ class Center extends Component {
           {
             icon: otherJoinIcon,
             title: '合作',
-            url: '/pages/order/index'
+            url: '/pages/event/cooperation/index'
           },
           {
             icon: guanIcon,
             title: '新手引导',
-            url: '/pages/coupon/list/index'
+            url: '/pages/event/guide/index'
+          },
+          {
+            icon: joinIcon,
+            title: '成为楼长',
+            url: '/pages/event/join/index'
           },
           {
             icon: settingIcon,
             title: '设置',
-            url: '/pages/coupon/list/index'
+            type: 'setting',
+            url: '/pages/event/setting/index'
           }
         ]
       }
@@ -212,6 +265,16 @@ class Center extends Component {
     // this.getUserBalance()
   }
 
+  openPopup = () => {
+    this.setState({ showRightMenu: true })
+  }
+
+  closePopup = (e) => {
+    e.stopPropagation()
+
+    this.setState({ showRightMenu: false })
+  }
+
   onJump =
     (type = 'inApp', url, id, path, h5Path) =>
     () => {
@@ -233,6 +296,10 @@ class Center extends Component {
       if (type === 'h5') {
         Taro.navigateTo({ url: `/pages/event/web/index?src=${h5Path}` })
       }
+
+      if (type === 'setting') {
+        this.openPopup()
+      }
     }
 
   onJumpToLogin = () => {
@@ -243,7 +310,17 @@ class Center extends Component {
     }
   }
 
-  onJumpToProve = () => {
+  onJumpToAccount = () => {
+    const { forumUser } = this.state
+
+    if (forumUser == 'manager') {
+      Taro.navigateTo({ url: `/pages/wnh/account/index` })
+    }
+  }
+
+  onJumpToProve = (e) => {
+    e.stopPropagation()
+
     const { schoolName } = this.state
 
     if (schoolName) {
@@ -253,8 +330,29 @@ class Center extends Component {
     Taro.navigateTo({ url: `/pages/prove/school/index` })
   }
 
+  onJumpToAgreement = (e, type) => {
+    e.stopPropagation()
+
+    Taro.navigateTo({ url: `/pages/wnh/agreement/index?type=${type}` })
+  }
+
+  onJumpToSetting = (e) => {
+    e.stopPropagation()
+
+    Taro.navigateTo({ url: `/pages/event/setting/index` })
+  }
+
   render() {
-    const { schoolName, safeTop, userInfo, isLogin, titleList, menuList } = this.state
+    const {
+      forumUser,
+      showRightMenu,
+      schoolName,
+      safeTop,
+      userInfo,
+      isLogin,
+      titleList,
+      menuList
+    } = this.state
 
     const { nickName, avatarUrl } = userInfo
 
@@ -292,7 +390,7 @@ class Center extends Component {
                   className='content-item'
                   onClick={this.onJump(item.type, item.url, item.id, item.path, item.h5Path)}
                 >
-                  <Image src={item.icon} mode='aspectFill' className='content-item__icon'></Image>
+                  <Image src={item.icon} mode='aspectFit' className='content-item__icon'></Image>
                   <View className='content-item__text'>{item.title}</View>
                 </View>
               )
@@ -337,6 +435,37 @@ class Center extends Component {
           <View>盒盒超级大学™</View>
           <View>中国高校领先的校园生活服务平台</View>
         </View>
+        {forumUser == 'manager' && (
+          <View className='page-btn' onClick={this.onJumpToAccount}>
+            切换账户
+          </View>
+        )}
+        {showRightMenu && (
+          <View className='mask' onClick={this.closePopup}>
+            <View className='right-menu'>
+              <View className='right-menu__item' onClick={this.onJumpToProve}>
+                <Image
+                  src={renzhengtubiaoIcon}
+                  mode='aspectFit'
+                  className='right-menu__item-icon'
+                ></Image>
+                <View>校园认证</View>
+              </View>
+              <View className='right-menu__item' onClick={(e) => this.onJumpToAgreement(e, 1)}>
+                <Image src={guifanIcon} mode='aspectFit' className='right-menu__item-icon'></Image>
+                <View>社区规范</View>
+              </View>
+              <View className='right-menu__item' onClick={(e) => this.onJumpToAgreement(e, 0)}>
+                <Image src={yinsiIcon} mode='aspectFit' className='right-menu__item-icon'></Image>
+                <View>隐私保护指引</View>
+              </View>
+              <View className='right-menu__item' onClick={this.onJumpToSetting}>
+                <Image src={shezhiIcon} mode='aspectFit' className='right-menu__item-icon'></Image>
+                <View>隐私设置</View>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
     )
   }

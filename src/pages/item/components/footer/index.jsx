@@ -55,7 +55,7 @@ class Footer extends Component {
                 {linePrice && <Text className='footer-info__price-line'>￥{linePrice}</Text>}
               </View>
               <View className='footer-info__explain'>
-                预估配送费￥{freightPrice}
+                含配送费￥{freightPrice}
                 {lineFreight && <Text className='footer-info__explain-line'>￥{lineFreight}</Text>}
               </View>
             </View>

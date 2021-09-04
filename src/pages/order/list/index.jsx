@@ -247,12 +247,12 @@ class OrderList extends Component {
                   <View className='order-item__info-price'>余额{item.integralPrice}</View>
                 )}
               </View>
-              <View className='order-item__bottom'>
+              {/* <View className='order-item__bottom'>
                 <OrderBtn
                   type={item.handleOption}
                   onHandleClick={(type) => this.handleOrder(type, item)}
                 />
-              </View>
+              </View> */}
             </View>
           </View>
         )

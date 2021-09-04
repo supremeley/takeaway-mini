@@ -76,7 +76,7 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        font-size: 28px;
+        font-size: 30px;
         color: $global-black;
       }
       &-status {
@@ -84,14 +84,14 @@
         text-align: right;
         text-overflow: ellipsis;
         overflow: hidden;
-        font-size: 24px;
+        // font-size: 28px;
         color: $global-black;
         white-space: nowrap;
       }
     }
     &__address {
       color: $global-green;
-      font-size: 20px;
+      font-size: 26px;
       padding-bottom: 20px;
       border-bottom: 2px solid $global-line-gray;
     }
@@ -109,7 +109,7 @@
         flex: 0 0 360px;
         overflow: hidden;
         white-space: nowrap;
-        font-size: 24px;
+        font-size: 26px;
         color: $global-text-gray-b;
         &__detail {
           flex: 0 0 200px;
@@ -118,11 +118,11 @@
         }
       }
       &-price {
-        flex: 0 0 96px;
+        flex: 0 0 240px;
         text-align: right;
         // text-overflow: ellipsis;
         // overflow: hidden;
-        font-size: 24px;
+        font-size: 26px;
         color: $global-black;
         // white-space: nowrap;
       }

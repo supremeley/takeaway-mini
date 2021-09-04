@@ -1,4 +1,4 @@
 export default {
-  navigationBarTitleText: '积分兑换',
-  // navigationStyle: 'custom'
+  navigationBarTitleText: '盒盒币',
+  navigationStyle: 'custom'
 }

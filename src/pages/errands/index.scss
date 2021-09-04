@@ -1,0 +1,127 @@
+page {
+  background: #f4f8fb !important;
+}
+.errands {
+  .content {
+    padding: 20px;
+    border-radius: 45px 45px 0 0;
+  }
+  .list-item {
+    border-radius: 20px;
+    background: #fff;
+    padding: 32px 40px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
+    &:not(:last-child) {
+      margin-bottom: 28px;
+    }
+    &__top {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      &-avatar {
+        width: 94px;
+        height: 94px;
+        border-radius: 50%;
+        margin-right: 12px;
+      }
+      &-info {
+        &__name {
+          font-size: 32px;
+          font-weight: 600;
+        }
+        &__date {
+          font-size: 24px;
+          color: $global-text-gray;
+        }
+      }
+    }
+    &__title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &-tag {
+        font-size: 32px;
+        font-weight: 600;
+        margin-right: 24px;
+      }
+      &-con {
+        flex: 1;
+      }
+      &-info {
+        width: 90px;
+        line-height: 40px;
+        border-radius: 6px;
+        border: 2px solid $global-green;
+        font-size: 24px;
+        text-align: center;
+        color: $global-green;
+      }
+      &-price {
+        display: flex;
+        align-items: center;
+        color: #ee4b35;
+        font-size: 40px;
+        &__icon {
+          width: 45px;
+          height: 45px;
+        }
+      }
+    }
+    &__info {
+      display: flex;
+      align-items: center;
+      font-size: 26px;
+      color: #7c7c7c;
+      margin: 32px 0;
+      &-icon {
+        font-size: 24px;
+        border-radius: 50%;
+        color: #fff;
+        background: #22b6ba;
+        margin-right: 10px;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .song-icon {
+        background: #f58f35;
+      }
+    }
+    &__content {
+      display: flex;
+      &-item {
+        display: flex;
+        font-size: 26px;
+        color: #7c7c7c;
+        margin-bottom: 12px;
+        margin-right: 48px;
+      }
+    }
+    &__bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px 0;
+      &-text {
+        padding: 20px;
+        background: #f3f3f3;
+        border-radius: 10px;
+        width: 360px;
+        color: #666666;
+        font-size: 22px;
+      }
+      &-btn {
+        color: #fff;
+        background: #22b6ba;
+        font-size: 32px;
+        text-align: center;
+        line-height: 64px;
+        border-radius: 32px;
+        width: 192px;
+      }
+    }
+  }
+}

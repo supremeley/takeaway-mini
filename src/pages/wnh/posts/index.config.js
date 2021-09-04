@@ -2,7 +2,8 @@ export default {
   navigationBarTitleText: '动态',
   navigationBarBackgroundColor: '#ffffff',
   navigationBarTextStyle: 'black',
-  // backgroundColor: '#ffffff',
+  backgroundColor: '#ffffff',
   enablePullDownRefresh: true,
-  enableShareAppMessage: true
+  enableShareAppMessage: true,
+  enableShareTimeline: true
 }

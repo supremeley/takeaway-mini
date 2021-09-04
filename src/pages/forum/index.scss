@@ -19,8 +19,8 @@ page {
       left: 0;
       box-sizing: border-box;
       padding: 0 20px;
-      top: env(safe-area-inset-top);
-      top: constant(safe-area-inset-top);
+      // top: env(safe-area-inset-top);
+      // top: constant(safe-area-inset-top);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -36,7 +36,7 @@ page {
   }
   .nav {
     position: sticky;
-    top: 176px;
+    top: 178px;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -114,12 +114,12 @@ page {
       &__item {
         color: $global-green;
         border: 2px solid $global-green;
-        font-size: 32px;
+        font-size: 28px;
         border-radius: 26px;
         line-height: 48px;
-        padding: 0 20px;
+        padding: 0 14px;
         &:not(:last-child) {
-          margin-right: 30px;
+          margin-right: 16px;
         }
       }
     }
@@ -206,33 +206,35 @@ page {
   z-index: 999;
 }
 .first-modal {
-  padding: 32px 48px;
+  padding: 32px;
 }
 .modal {
   &-title {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 600;
     margin-bottom: 32px;
     text-align: center;
   }
   &-explain {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 50px;
   }
   &-opt {
-    font-size: 24px;
+    font-size: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: $global-text-gray;
-    margin: 36px 0;
+    margin: 48px 0;
+    white-space: nowrap;
     &__circle {
       width: 32px;
       height: 32px;
       border-radius: 50%;
       border: 2px solid $global-text-gray-b;
-      margin-right: 32px;
+      margin-right: 16px;
       position: relative;
+      flex-shrink: 0;
       &::after {
         content: '';
         width: 16px;
@@ -251,13 +253,13 @@ page {
     }
   }
   &-btn {
-    width: 540px;
-    height: 72px;
+    // width: 540px;
+    height: 80px;
     background: $global-green;
-    border-radius: 36px;
-    line-height: 72px;
+    border-radius: 40px;
+    line-height: 80px;
     color: #fff;
-    font-size: 28px;
+    font-size: 32px;
   }
 }
 .active-circle {
@@ -267,11 +269,11 @@ page {
 }
 .prove {
   &-container {
-    width: 700px;
+    // width: 700px;
     background: #fff;
     border-radius: 16px;
     text-align: center;
-    padding: 32px;
+    padding: 48px 32px;
   }
   &-icon {
     width: 184px;
@@ -279,25 +281,27 @@ page {
     margin-bottom: 24px;
   }
   &-title {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 48px;
   }
   &-explain {
-    font-size: 28px;
-    margin-bottom: 64px;
+    font-size: 30px;
+    margin-bottom: 12px;
+    // text-align: left;
   }
   &-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 48px;
     &__item {
-      width: 260px;
-      height: 72px;
-      line-height: 68px;
+      width: 220px;
+      height: 80px;
+      line-height: 76px;
       border: 2px solid $global-text-gray;
-      border-radius: 36px;
-      font-size: 28px;
+      border-radius: 40px;
+      font-size: 32px;
       color: $global-text-gray;
       background: #fff;
     }
@@ -308,13 +312,10 @@ page {
   background: $global-green;
   border: 2px solid $global-green;
 }
-.gift-gif {
-  width: 700px;
-  margin: auto;
-}
+
 .at-modal__container,
 .at-curtain__container {
-  width: 700px;
+  width: 600px;
 }
 .at-float-layout__container {
   border-radius: 40px 40px 0 0;
@@ -327,5 +328,5 @@ page {
 .at-float-layout,
 .layout-body__content {
   min-height: auto !important;
-  padding: 0;
+  // padding: 0;
 }

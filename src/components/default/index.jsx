@@ -17,7 +17,7 @@ class Default extends Component {
     return (
       <View className='default-container'>
         <Image src={DefaultIcon} className='default-icon' />
-        <View className='default-text'>{msg || '暂无相关数据'}</View>
+        <View className='default-text'>{msg || '暂无相关内容'}</View>
       </View>
     )
   }

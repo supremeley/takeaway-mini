@@ -25,7 +25,7 @@ class Editor extends Component {
     }
 
     const query = {
-      sign: content
+      sign: JSON.stringify(content.split('\n'))
     }
 
     try {

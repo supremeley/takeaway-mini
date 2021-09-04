@@ -3,9 +3,8 @@ export default {
     'pages/forum/index',
     'pages/home/index',
     'pages/center/index',
+    'pages/errands/index',
     'pages/login/index',
-    'pages/checkout/index/index',
-    // 'pages/integral/index',
   ],
   subpackages: [
     {
@@ -20,6 +19,15 @@ export default {
       pages: [
         'detail/index',
         'bill/index',
+      ]
+    },
+    {
+      root: 'pages/integral',
+      pages: [
+        'index',
+        'recharge/index',
+        'withdrawal/index',
+        'exchange/index',
       ]
     },
     {
@@ -38,10 +46,20 @@ export default {
       ]
     },
     {
+      root: 'pages/checkout',
+      pages: [
+        'index/index',
+      ]
+    },
+    {
       root: 'pages/event',
       pages: [
         'web/index',
         'setting/index',
+        'cooperation/index',
+        'settled/index',
+        'join/index',
+        'guide/index',
       ]
     },
     {
@@ -53,6 +71,20 @@ export default {
       ]
     },
     {
+      root: 'pages/fund',
+      pages: [
+        'about/index',
+        'school/index',
+        'mine/index',
+      ]
+    },
+    {
+      root: 'pages/pt',
+      pages: [
+        'release/index',
+      ]
+    },
+    {
       root: 'pages/wnh',
       pages: [
         'agreement/index',
@@ -61,11 +93,16 @@ export default {
         'mine/editor/index',
         'posts/index',
         'release/index',
-        'gift/index',
+        'ranking/index',
         'comment/index',
+        'like/index',
+        'follow/index',
         'person/index',
+        'all/index',
         'vote/index',
         'chat/index',
+        'blacklist/index',
+        'account/index',
       ]
     }
   ],
@@ -94,7 +131,7 @@ export default {
       },
       {
         text: '跑腿',
-        pagePath: 'pages/center/index',
+        pagePath: 'pages/errands/index',
         iconPath: './assets/imgs/tab-bar/test.png',
         selectedIconPath: './assets/imgs/tab-bar/test-active.png'
       },

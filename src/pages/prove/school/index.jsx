@@ -31,6 +31,7 @@ class ProveSchool extends Component {
     curIdentity: '',
     ruxueTime: '',
     locationInfo: null,
+    current: 0,
     yearRange: [
       '2000',
       '2001',
@@ -69,6 +70,18 @@ class ProveSchool extends Component {
   componentDidShow() {
     // this.getAreaList(true)
     this.getLocation()
+
+    this.handleYear()
+  }
+
+  handleYear = () => {
+    const { yearRange } = this.state
+
+    const y = new Date().getFullYear()
+
+    const index = yearRange.findIndex((item) => item == y)
+
+    this.setState({ current: index })
   }
 
   onChange = (e) => {
@@ -84,22 +97,6 @@ class ProveSchool extends Component {
     })
   }
 
-  // onColumnChange = (e) => {
-  //   // console.log('onColumnChange', e.detail)
-  //   const { areaRange } = this.state
-  //   const { column, value } = e.detail
-
-  //   const sel = areaRange[column][value]
-
-  //   if (column == 0) {
-  //     this.getSchoolList(sel.value)
-  //   }
-
-  //   // if (column == 1) {
-  //   //   this.getFloorList(sel.value)
-  //   // }
-  // }
-
   onChangeIdentity = (e) => {
     const { identity } = this.state
 
@@ -109,12 +106,11 @@ class ProveSchool extends Component {
   }
 
   onDateChange = (e) => {
-    // console.log(e)
     const { yearRange } = this.state
 
     let { value } = e.detail
 
-    this.setState({ ruxueTime: yearRange[value] })
+    this.setState({ ruxueTime: yearRange[value], current: value })
   }
 
   fetchVali = () => {
@@ -139,14 +135,11 @@ class ProveSchool extends Component {
   }
 
   getLocation = () => {
-    // const { latitude, longitude } = await Taro.getLocation()
-
     const locationInfo = Taro.getStorageSync('locationInfo')
 
     if (locationInfo) {
       this.setState({ locationInfo }, () => this.getSchoolList())
     }
-    // console.log(res)
   }
 
   getSchoolList = async () => {
@@ -170,78 +163,10 @@ class ProveSchool extends Component {
       })
 
     // const [area, school] = areaRange
-    console.log(schools)
+    // console.log(schools)
 
     this.setState({ areaRange: schools })
   }
-
-  // getAreaList = async (isFirst) => {
-  //   // console.log(locInfo)
-  //   const {
-  //     data: { items }
-  //   } = await api.home.GET_AREA_LIST()
-
-  //   const area = items
-  //     .filter((item) => !item.deleted)
-  //     .map((item) => {
-  //       return {
-  //         value: item.id,
-  //         label: item.areaName
-  //       }
-  //     })
-
-  //   if (area.length) {
-  //     let isCon = true
-
-  //     // if (locInfo) {
-  //     //   const aId = locInfo.area.value
-
-  //     //   const res = area.find((item) => item.value === aId)
-
-  //     //   if (!res) {
-  //     //     this.setState({ explainShow: true, explainType: 'area' })
-
-  //     //     isCon = false
-  //     //   }
-  //     // }
-
-  //     this.setState({ areaRange: [area, []] }, () => {
-  //       if (isFirst) {
-  //         this.getSchoolList(area[0].value, true)
-  //       }
-  //     })
-  //   }
-  // }
-
-  // getSchoolList = async (id, isFirst) => {
-  //   const { areaRange } = this.state
-
-  //   const query = { areaId: id }
-
-  //   const {
-  //     data: { items }
-  //   } = await api.home.GET_SCHOOL_LIST(query)
-
-  //   const schools = items
-  //     .filter((item) => !item.deleted)
-  //     .map((item) => {
-  //       return {
-  //         value: item.id,
-  //         label: item.schoolName
-  //       }
-  //     })
-
-  //   const [area, school] = areaRange
-
-  //   this.setState({ areaRange: [area, schools] }, () => {
-  //     // if (isFirst) {
-  //     //   // this.getFloorList(schools[0].value, locInfo, isCon)
-  //     //   if (!this.state.schoolId) {
-  //     //     this.setState({ schoolId: schools[0].value })
-  //     //   }
-  //     // }
-  //   })
-  // }
 
   nextStep = () => {
     if (!this.fetchVali()) {
@@ -250,12 +175,12 @@ class ProveSchool extends Component {
 
     const { schoolId, selectorSchool, ruxueTime, curIdentity } = this.state
 
-    const schoolInfo = {
-      selectorSchool,
+    const proveSchool = {
+      schoolName: selectorSchool,
       schoolId
     }
 
-    Taro.setStorageSync('schoolInfo', schoolInfo)
+    Taro.setStorageSync('proveSchool', proveSchool)
 
     Taro.setStorageSync('schoolId', schoolId)
 
@@ -265,7 +190,8 @@ class ProveSchool extends Component {
   }
 
   render() {
-    const { areaRange, yearRange, selectorSchool, identity, curIdentity, ruxueTime } = this.state
+    const { current, areaRange, yearRange, selectorSchool, identity, curIdentity, ruxueTime } =
+      this.state
 
     // const { nickName, avatarUrl } = userInfo
 
@@ -300,7 +226,12 @@ class ProveSchool extends Component {
             </View>
             <View className='content-opt__item'>
               <Text className='content-opt__item-title'>入学年份</Text>
-              <Picker mode='selector' range={yearRange} onChange={this.onDateChange}>
+              <Picker
+                mode='selector'
+                value={current}
+                range={yearRange}
+                onChange={this.onDateChange}
+              >
                 <View className='content-opt__item-inp'>
                   {ruxueTime || '请选择入学年份'}
                   <View className='at-icon at-icon-chevron-right'></View>

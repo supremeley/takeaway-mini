@@ -19,24 +19,6 @@
           "scene": null
         },
         {
-          "name": "pages/item/detail/index",
-          "pathName": "pages/item/detail/index",
-          "query": "id=1001322",
-          "scene": null
-        },
-        {
-          "name": "pages/checkout/index/index",
-          "pathName": "pages/checkout/index/index",
-          "query": "id=1001322",
-          "scene": null
-        },
-        {
-          "name": "pages/order/refund/index",
-          "pathName": "pages/order/refund/index",
-          "query": "id=25",
-          "scene": null
-        },
-        {
           "name": "pages/prove/school/index",
           "pathName": "pages/prove/school/index",
           "query": "",
@@ -55,45 +37,39 @@
           "scene": null
         },
         {
-          "name": "pages/order/detail/index",
-          "pathName": "pages/order/detail/index",
-          "query": "id=61",
-          "scene": null
-        },
-        {
-          "name": "pages/wnh/chat/index",
-          "pathName": "pages/wnh/chat/index",
+          "name": "pages/integral/withdrawal/index",
+          "pathName": "pages/integral/withdrawal/index",
           "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/person/index",
-          "pathName": "pages/wnh/person/index",
+          "name": "pages/event/cooperation/index",
+          "pathName": "pages/event/cooperation/index",
           "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/chat/index",
-          "pathName": "pages/wnh/chat/index",
-          "query": "id=222",
+          "name": "pages/event/join/index",
+          "pathName": "pages/event/join/index",
+          "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/chat/index",
-          "pathName": "pages/wnh/chat/index",
-          "query": "id=254",
+          "name": "pages/event/settled/index",
+          "pathName": "pages/event/settled/index",
+          "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/mine/index",
-          "pathName": "pages/wnh/mine/index",
-          "query": "id=254",
+          "name": "pages/event/setting/index",
+          "pathName": "pages/event/setting/index",
+          "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/posts/index",
-          "pathName": "pages/wnh/posts/index",
-          "query": "id=c0a13aaa94074042b738abd3329067db&type=school",
+          "name": "pages/errands/index",
+          "pathName": "pages/errands/index",
+          "query": "",
           "scene": null
         },
         {
@@ -103,15 +79,33 @@
           "scene": null
         },
         {
-          "name": "pages/center/index",
-          "pathName": "pages/center/index",
+          "name": "pages/event/setting/index",
+          "pathName": "pages/event/setting/index",
           "query": "",
           "scene": null
         },
         {
-          "name": "pages/wnh/posts/index",
-          "pathName": "pages/wnh/posts/index",
-          "query": "id=c0a13aaa94074042b738abd3329067db&type=hot",
+          "name": "pages/wnh/blacklist/index",
+          "pathName": "pages/wnh/blacklist/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/pt/release/index",
+          "pathName": "pages/pt/release/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/wnh/mine/index",
+          "pathName": "pages/wnh/mine/index",
+          "query": "id=254",
+          "scene": null
+        },
+        {
+          "name": "pages/errands/index",
+          "pathName": "pages/errands/index",
+          "query": "",
           "scene": null
         }
       ]

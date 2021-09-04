@@ -1,0 +1,210 @@
+.with {
+  .header {
+    top: 0;
+    color: #fff;
+    background: $global-green;
+    padding-top: 100px;
+    text-align: center;
+    padding-bottom: 40px;
+    &-balance {
+      font-size: 24px;
+      // font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      &__num {
+        font-size: 60px;
+        font-weight: 600;
+        margin-right: 5px;
+      }
+    }
+    &-more {
+    }
+  }
+  .plate {
+    margin: 24px;
+    background: #fff;
+
+    // background: #FFFFFF;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    padding: 0 24px 60px;
+    &-title {
+      text-align: center;
+      font-weight: 600;
+      font-size: 32px;
+      height: 120px;
+      line-height: 120px;
+    }
+    &-option {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      &__item {
+        width: 310px;
+        height: 160px;
+        background: #fff;
+        border: 2px solid $global-line-gray;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 24px;
+        margin-bottom: 24px;
+        &-title {
+          font-size: 24px;
+          line-height: 1;
+          display: flex;
+          align-items: baseline;
+          &__num {
+            // font-size: 50px;
+            // margin-right: 5px;
+            display: flex;
+            align-items: flex-end;
+            line-height: 1;
+            margin-bottom: 10px;
+            &-left {
+              font-size: 40px;
+              margin-right: 12px;
+              font-weight: 600;
+            }
+            &-right {
+              font-size: 24px;
+            }
+          }
+          &__desc {
+            font-size: 24px;
+          }
+        }
+        &-desc {
+          font-size: 24px;
+        }
+      }
+      .active-opt {
+        border: 2px solid #22b6ba;
+        background: #22b6ba;
+        color: #fff;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.17);
+      }
+    }
+    &-coupon {
+      width: 310px;
+      height: 90px;
+      background-image: linear-gradient(90deg, #fb8951 0%, #fdbe89 100%);
+      border-radius: 4px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    &-content {
+      display: flex;
+      justify-content: center;
+    }
+    &-explain {
+      color: #585858;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 24px;
+    }
+  }
+  .first-plate {
+    margin-top: -24px;
+  }
+  .explain {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 24px;
+    &-num {
+      color: $global-red;
+    }
+  }
+  .recharge-btn {
+    margin: 24px;
+    height: 90px;
+    background: $global-green;
+    // box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
+    border-radius: 45px;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    &::after {
+      border: none;
+    }
+  }
+  .num-contrl {
+    display: flex;
+    height: 114px;
+    width: 450px;
+    align-items: stretch;
+    border-radius: 8px;
+    border: 2px solid #22b6ba;
+    line-height: 110px;
+    &__inp {
+      text-align: center;
+      width: 130px;
+      line-height: 110px;
+      height: 110px;
+      border-left: 2px solid #22b6ba;
+      border-right: 2px solid #22b6ba;
+      font-size: 36px;
+    }
+    .at-icon {
+      font-size: 60px;
+      flex: 1;
+      text-align: center;
+      color: $global-green;
+      line-height: 110px;
+    }
+  }
+  .content {
+    margin-bottom: 40px;
+    &-explain {
+      width: 520px;
+      font-size: 24px;
+      color: #727272;
+      margin: 0 auto;
+    }
+  }
+  .btn-content {
+    // position: absolute;
+    // bottom: 320px;
+    // left: 50%;
+    // transform: translate(-50%);
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+    &__item {
+      width: 345px;
+      line-height: 72px;
+      text-align: center;
+      background: $global-gray;
+      border-radius: 12px;
+      margin: 0 12px;
+      color: $global-green;
+      font-size: 32px;
+    }
+  }
+
+  .green-btn {
+    color: $global-gray;
+    background: $global-green;
+  }
+  .explain {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 24px;
+    &-num {
+      color: $global-red;
+    }
+  }
+}

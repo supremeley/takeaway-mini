@@ -138,6 +138,7 @@ class Balance extends Component {
             <View className='at-icon at-icon-chevron-right'></View>
           </View>
         </View>
+
         <View className='plate first-plate'>
           <View className='plate-title'>充值金额</View>
           <View className='plate-option'>

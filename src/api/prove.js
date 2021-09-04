@@ -1,6 +1,10 @@
 import request from '@/utils/request.js'
 
-export const SUMBIT_PROVER = (data) => request.post('wnh/authentication/uploadInfo', data, { type: 'forum' })
+export const SUMBIT_PROVER = (data) => request.post('wnh/authentication/uploadInfo', data, {
+  type: 'forum', header: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+})
 
 export const CHECK_PROVER = (data) => request.post('wnh/authentication/isApproved', data, {
   type: 'forum',

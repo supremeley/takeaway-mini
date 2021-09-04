@@ -1,6 +1,10 @@
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Image, Text } from '@tarojs/components'
+import { View, Image, Text, Button } from '@tarojs/components'
+// import { AtCurtain } from 'taro-ui'
+import FooterComment from '@/components/footerComment'
+import ForumPopup from '@/components/forumPopup'
+import GiftPopup from '@/components/giftPopup'
 
 import api from '@/api'
 import D from '@/common'
@@ -10,21 +14,21 @@ import withScrollPage from '@/hocs/scrollPage'
 import { popupOpt } from '@/constants/forum'
 
 import GiftIcon from '@/assets/imgs/forum/gift.png'
+import GiftIcons from '@/assets/imgs/forum/gifts.png'
 import UnlikeIcon from '@/assets/imgs/forum/unlike.png'
 import LikeIcon from '@/assets/imgs/forum/like.png'
 import AddressIcon from '@/assets/imgs/forum/address.png'
 import CommitIcon from '@/assets/imgs/forum/commit.png'
 import ShareIcon from '@/assets/imgs/forum/share.png'
 import OptionIcon from '@/assets/imgs/forum/option.png'
+import TagIcon from '@/assets/imgs/tag.png'
 
 import OneIcon from '@/assets/imgs/forum/one.png'
 import TwoIcon from '@/assets/imgs/forum/two.png'
 import ThreeIcon from '@/assets/imgs/forum/three.png'
 
-import FooterComment from '@/components/footerComment'
-import ForumPopup from '@/components/forumPopup'
-
 import 'taro-ui/dist/style/components/icon.scss'
+// import 'taro-ui/dist/style/components/curtain.scss'
 import './index.scss'
 
 // @connect(({ counter }) => ({
@@ -34,6 +38,7 @@ import './index.scss'
 class Posts extends Component {
   state = {
     userId: Taro.getStorageSync('userId'),
+    isOwn: false,
     info: null,
     showAddress: false,
     showOpt: false,
@@ -41,6 +46,7 @@ class Posts extends Component {
     rankList: [],
     commentContext: '',
     inpFocus: false,
+    showFocus: false,
     placeholder: '',
     commentQuery: null,
     showPopup: false,
@@ -49,11 +55,58 @@ class Posts extends Component {
     curSort: 0,
     curComment: null,
     totalMoneys: 0,
-    totalPerson: 0
+    totalPerson: 0,
+    showGift: false,
+    // giftList: [],
+    // curGift: 0,
+    // giftGif: '',
+    // userBalance: 0,
+    // showGiftGif: false,
+    optNav: [
+      {
+        name: '分享',
+        needPre: true,
+        type: 'share'
+      },
+      {
+        name: '置顶',
+        needPre: Taro.getStorageSync('forumUserRole') >= 10,
+        onlyType: ['hot', 'school'],
+        type: 'top'
+      },
+      {
+        name: '加精',
+        needPre: Taro.getStorageSync('forumUserRole') >= 10,
+        onlyType: ['hot', 'school'],
+        type: 'refined'
+      },
+      {
+        name: '转热门',
+        needPre: Taro.getStorageSync('forumUserRole') >= 20,
+        onlyType: ['school'],
+        type: 'hot'
+      },
+      {
+        name: '删除',
+        needPre: Taro.getStorageSync('forumUserRole') >= 10,
+        canOwn: true,
+        type: 'delete'
+      },
+      {
+        name: '举报',
+        needPre: true,
+        type: 'report'
+      }
+    ],
+    forumStatus: Taro.getStorageSync('forumStatus') == 1
+  }
+
+  componentDidMount() {
+    this.getGiftlist()
   }
 
   componentDidShow() {
-    if (this.type !== 'hot') {
+    if (this.type === 'hot') {
       this.setState({ showAddress: true })
     }
 
@@ -80,8 +133,20 @@ class Posts extends Component {
   }
 
   onShareAppMessage = () => {
+    const { info } = this.state
+
     return {
-      title: '万能盒',
+      title: info.content || '万能盒',
+      path: `/pages/wnh/posts/index?id=${this.id}&type=${this.type}`,
+      imageUrl: ''
+    }
+  }
+
+  onShareTimeline = () => {
+    const { info } = this.state
+
+    return {
+      title: info.content || '万能盒',
       path: `/pages/wnh/posts/index?id=${this.id}&type=${this.type}`,
       imageUrl: ''
     }
@@ -94,11 +159,22 @@ class Posts extends Component {
   }
 
   onJumpToGift = () => {
-    Taro.navigateTo({ url: `/pages/wnh/gift/index?id=${this.id}&type=${this.type}` })
+    Taro.navigateTo({ url: `/pages/wnh/ranking/index?id=${this.id}&type=${this.type}` })
   }
 
   onJumpToPerson = () => {
-    Taro.navigateTo({ url: `/pages/wnh/mine/index?id=${this.id}` })
+    const { info } = this.state
+
+    Taro.navigateTo({ url: `/pages/wnh/mine/index?id=${info.userId}` })
+  }
+
+  onJumpToMine = () => {
+    const { curComment } = this.state
+
+    // const type = navOpt[curNav].type
+
+    // Taro.navigateTo({ url: `/pages/wnh/search/index?type=${type}` })
+    Taro.navigateTo({ url: `/pages/wnh/mine/index?id=${curComment.senderId}` })
   }
 
   openOpt = () => {
@@ -110,7 +186,7 @@ class Posts extends Component {
   }
 
   openPopup = (type) => {
-    console.log(type)
+    // console.log(type)
 
     this.setState({ showPopup: true, popupType: type })
   }
@@ -119,14 +195,47 @@ class Posts extends Component {
     this.setState({ showPopup: false })
   }
 
-  handleOpenItemPopup = (index) => () => {
-    const { commentList } = this.state
+  optHandle = (type) => {
+    switch (type) {
+      case 'refined':
+        this.fetchRefined()
+        break
+      case 'hot':
+        this.fetchHot()
+        break
+      case 'top':
+        this.fetchTop()
+        break
+      case 'delete':
+        this.fetchDelete()
+        break
+      default:
+        this.openPopup(type)
+        break
+    }
+  }
 
-    this.setState({ curComment: commentList[index] }, () => this.openPopup('normal'))
+  handleOpenItemPopup = (index, idx) => {
+    const { commentList, forumStatus } = this.state
+
+    if (forumStatus) {
+      D.toast('账户存在违规操作，已被封号处理')
+      return
+    }
+
+    let curComment = {}
+
+    if (idx || idx === 0) {
+      curComment = commentList[index].children[idx]
+    } else {
+      curComment = commentList[index]
+    }
+
+    this.setState({ curComment }, () => this.openPopup('normal'))
   }
 
   handleSelect = (info, index) => {
-    console.log(info, index)
+    // console.log(info, index)
 
     const { popupType } = this.state
 
@@ -143,20 +252,57 @@ class Posts extends Component {
     }
   }
 
+  // handleNormalPopup = (info) => {
+  //   switch (info.type) {
+  //     case 'reply':
+  //       this.handleReply()
+  //       break
+  //     case 'delete':
+  //       this.fetchDeleteComment()
+  //       break
+  //     case 'report':
+  //       this.openPopup('report')
+
+  //       break
+  //   }
+  // }
+
   handleNormalPopup = (info) => {
     switch (info.type) {
       case 'reply':
         this.handleReply()
+        break
+        // case 'follow':
+        //   this.handleFollowToPerson()
+        break
+      case 'person':
+        this.onJumpToMine()
         break
       case 'delete':
         this.fetchDeleteComment()
         break
       case 'report':
         this.openPopup('report')
-
+        // this.openPopup('report')
         break
     }
   }
+
+  openGift = () => {
+    this.setState({ showGift: true })
+  }
+
+  closeGift = () => {
+    this.setState({ showGift: false })
+  }
+
+  // onChangeGift = (index) => {
+  //   const { curGift } = this.state
+
+  //   if (curGift !== index) {
+  //     this.setState({ curGift: index })
+  //   }
+  // }
 
   onChangeSort = (index) => {
     this.setState({ curSort: index, commentList: [], showPopup: false }, () => {
@@ -168,14 +314,28 @@ class Posts extends Component {
     this.setState({ commentContext: e.detail.value })
   }
 
-  handleBlur = (e) => {
-    // this.setState({ commentQuery: null, placeholder: '', inpFocus: false })
+  handleBlur = () => {
+    // setTimeout(() => {
+    //   this.setState({ showFocus: false })
+    // }, 500)
+  }
+
+  handleOpenCommit = (e, index) => {
+    e.stopPropagation()
+
+    const { commentList } = this.state
+
+    let cl = commentList.concat()
+
+    cl[index].hidden = !cl[index].hidden
+
+    this.setState({ commentList: cl })
   }
 
   previewImg = (e, index) => {
     e.stopPropagation()
 
-    const { imgList } = this.info
+    const { imgList } = this.state.info
 
     Taro.previewImage({
       current: imgList[index],
@@ -183,9 +343,37 @@ class Posts extends Component {
     })
   }
 
+  previewCommentImg = (img) => {
+    Taro.previewImage({
+      current: img,
+      urls: [img]
+    })
+  }
+
+  handleComment = () => {
+    const { info, forumStatus } = this.state
+
+    if (forumStatus) {
+      D.toast('账户存在违规操作，已被封号处理')
+      return
+    }
+
+    const commentQuery = null
+
+    let placeholder = '回复:' + info.nickname
+
+    this.setState({
+      commentQuery,
+      placeholder,
+      inpFocus: true,
+      showFocus: true,
+      commentContext: ''
+    })
+  }
+
   handleReply = () => {
     const { userId, curComment } = this.state
-    console.log(curComment)
+    // console.log(curComment)
 
     const commentQuery = {
       id: curComment.id,
@@ -198,6 +386,7 @@ class Posts extends Component {
       commentQuery,
       placeholder,
       inpFocus: true,
+      showFocus: true,
       commentContext: '',
       showPopup: false
     })
@@ -245,7 +434,9 @@ class Posts extends Component {
 
       Taro.hideLoading()
 
-      this.setState({ info: { ...data, content, imgList, sendTimeDate } })
+      const isOwn = data.userId == Taro.getStorageSync('userId')
+      // console.log(data.userId)
+      this.setState({ info: { ...data, content, imgList, sendTimeDate }, isOwn })
     } catch (e) {
       // console.log(e)
     }
@@ -285,37 +476,60 @@ class Posts extends Component {
         data: { list, total }
       } = await resApi(query)
 
-      let nList = list.reduce((val, item) => {
-        let arr = [],
-          chiArr = []
+      // let nList = list.reduce((val, item) => {
+      //   let arr = [],
+      //     chiArr = []
 
+      //   let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
+
+      //   arr.push({
+      //     ...item,
+      //     commentDate
+      //   })
+
+      //   if (item.children.length) {
+      //     chiArr = item.children.map((chi) => {
+      //       let commentDateC = D.formatTimer(chi.commentDate, 'm-d h-m')
+
+      //       return {
+      //         ...chi,
+      //         fNickName: item.nickname,
+      //         commentDate: commentDateC,
+      //         isChi: true,
+      //         pid: item.id
+      //       }
+      //     })
+      //   }
+
+      //   arr.push(...chiArr)
+
+      //   val.push(...arr)
+
+      //   return val
+      // }, [])
+
+      let nList = list.map((item) => {
         let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
 
-        arr.push({
+        // const children = item.children.map((chi) => {
+        //   let commentDateC = D.formatTimer(chi.commentDate, 'm-d h-m')
+
+        //   return {
+        //     ...chi,
+        //     commentDate: commentDateC
+        //   }
+        // })
+
+        let children = this.commentHandle(item.children)
+
+        return {
           ...item,
-          commentDate
-        })
-
-        if (item.children.length) {
-          chiArr = item.children.map((chi) => {
-            let commentDateC = D.formatTimer(chi.commentDate, 'm-d h-m')
-
-            return {
-              ...chi,
-              fNickName: item.nickname,
-              commentDate: commentDateC,
-              isChi: true,
-              pid: item.id
-            }
-          })
+          children,
+          commentDate,
+          total: children.length,
+          hidden: true
         }
-
-        arr.push(...chiArr)
-
-        val.push(...arr)
-
-        return val
-      }, [])
+      })
 
       if (showLoading) {
         Taro.hideLoading()
@@ -324,13 +538,39 @@ class Posts extends Component {
       Taro.stopPullDownRefresh()
 
       nList = [...commentList, ...nList]
-
+      // console.log(nList)
       this.setState({ commentList: nList, total })
 
       return { total }
     } catch (e) {
       console.log(e)
     }
+  }
+
+  commentHandle = (list, beNickname, beSenderId) => {
+    // console.log(list, 'list')
+    const newList = list.reduce((val, item) => {
+      let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
+
+      let children = []
+
+      if (item.children.length) {
+        children = this.commentHandle(item.children, item.nickname, item.senderId)
+      }
+
+      const nt = {
+        ...item,
+        commentDate,
+        beNickname,
+        beSenderId
+      }
+
+      val.push(nt, ...children)
+
+      return val
+    }, [])
+
+    return newList
   }
 
   getRankingList = async () => {
@@ -369,12 +609,122 @@ class Posts extends Component {
 
       this.setState({ rankList: list.slice(0, 5), totalMoneys, totalPerson: total })
     } catch (e) {
+      Taro.hideLoading()
+
       console.log(e)
     }
   }
 
+  getGiftlist = async () => {
+    const {
+      data: { 1: userBalance, 2: list }
+    } = await api.forum.GET_GIFT_LIST()
+
+    const giftList = list.map((item) => {
+      return {
+        ...item
+      }
+    })
+
+    this.setState({ giftList, userBalance })
+  }
+
+  fetchLike = async () => {
+    const { userId, info } = this.state
+    let { fabulous, isFabulous } = info
+
+    let resApi
+
+    const query = {
+      id: info.postId,
+      userId
+    }
+
+    switch (this.type) {
+      case 'tree':
+        resApi = api.forum.LIKE_TREE_POSTS
+        break
+      case 'school':
+      case 'hot':
+      default:
+        resApi = api.forum.LIKE_HOT_POSTS
+        break
+    }
+
+    try {
+      const { errno, data, errmsg } = await resApi(query)
+
+      if (!errno) {
+        D.toast(data)
+
+        if (info.isFabulous == 6) {
+          fabulous--
+          isFabulous = 0
+        } else {
+          fabulous++
+          isFabulous = 6
+        }
+
+        this.setState({ info: { ...info, fabulous, isFabulous } })
+      } else {
+        D.toast(errmsg)
+      }
+    } catch (e) {}
+  }
+
+  fetchLikeComment = async (info, index, idx) => {
+    const { userId, commentList } = this.state
+
+    let resApi
+
+    const query = {
+      id: info.id,
+      senderId: userId,
+      postId: this.id
+    }
+
+    switch (this.type) {
+      case 'tree':
+        resApi = api.forum.LIKE_COMMENT_BY_TREE_POSTS
+        break
+      case 'hot':
+      case 'school':
+      default:
+        resApi = api.forum.LIKE_COMMENT_BY_HOT_POSTS
+        break
+    }
+
+    try {
+      const { data } = await resApi(query)
+
+      let pl = commentList.concat()
+
+      if (idx || idx === 0) {
+        if (info.isFabulous == 6) {
+          pl[index].children[idx].fabulous--
+          pl[index].children[idx].isFabulous = 0
+        } else {
+          pl[index].children[idx].fabulous++
+          pl[index].children[idx].isFabulous = 6
+        }
+      } else {
+        if (info.isFabulous == 6) {
+          pl[index].fabulous--
+          pl[index].isFabulous = 0
+        } else {
+          pl[index].fabulous++
+          pl[index].isFabulous = 6
+        }
+      }
+
+      D.toast(data)
+
+      this.setState({ commentList: pl })
+    } catch (e) {}
+  }
+
   fetchComment = async () => {
-    const { commentQuery, userId, commentContext } = this.state
+    const { commentQuery, userId, commentContext, info } = this.state
 
     if (!commentContext) {
       D.toast('请输入评论内容')
@@ -414,13 +764,21 @@ class Posts extends Component {
 
       D.toast(data)
 
+      let inf = info
+
+      if (!commentQuery) {
+        inf = { ...inf, comment: ++inf.comment }
+      }
+
       this.setState(
         {
+          info: inf,
           commentQuery: null,
           curComment: null,
           commentContext: '',
           placeholder: '',
           inpFocus: false,
+          showFocus: false,
           commentList: []
         },
         () => {
@@ -434,45 +792,70 @@ class Posts extends Component {
     }
   }
 
-  fetchLike = async (info, index) => {
-    const { userId, commentList } = this.state
+  fetchCommentImg = async (img) => {
+    const { commentQuery, info, userId } = this.state
 
-    let resApi
+    const { url: contextImg } = await api.common.UPLOAD_IMG(img)
 
-    const query = {
-      id: info.id,
-      senderId: userId,
-      postId: this.id
+    // return
+    let resApi,
+      query = {
+        senderId: userId,
+        postId: this.id,
+        contextImg
+      }
+
+    if (commentQuery) {
+      query = {
+        ...query,
+        ...commentQuery
+      }
     }
 
     switch (this.type) {
       case 'tree':
-        resApi = api.forum.LIKE_COMMENT_BY_TREE_POSTS
+        resApi = api.forum.COMMENT_TREE_POSTS
         break
       case 'hot':
       case 'school':
       default:
-        resApi = api.forum.LIKE_COMMENT_BY_HOT_POSTS
+        resApi = api.forum.COMMENT_HOT_POSTS
         break
     }
 
     try {
       const { data } = await resApi(query)
 
-      let pl = commentList.concat()
-
-      if (info.isFabulous == 6) {
-        pl[index].fabulous--
-        pl[index].isFabulous = 0
-      } else {
-        pl[index].fabulous++
-        pl[index].isFabulous = 6
-      }
+      Taro.stopPullDownRefresh()
 
       D.toast(data)
 
-      this.setState({ commentList: pl })
-    } catch (e) {}
+      let inf = info
+
+      if (!commentQuery) {
+        inf = { ...inf, comment: ++inf.comment }
+      }
+
+      this.setState(
+        {
+          info: inf,
+          commentQuery: null,
+          curComment: null,
+          commentContext: '',
+          placeholder: '',
+          inpFocus: false,
+          showFocus: false,
+          commentList: []
+        },
+        () => {
+          setTimeout(() => {
+            this.resetPage(this.nextPage)
+          }, 500)
+        }
+      )
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   fetchReport = async (reportType) => {
@@ -557,6 +940,183 @@ class Posts extends Component {
     } catch (e) {}
   }
 
+  fetchFollow = async () => {
+    const { info } = this.state
+    const { isFollow } = info
+
+    const query = {
+      beUserId: info.userId
+    }
+
+    try {
+      const { data, errno } = await api.mine.CHANGE_FOLLOW_PERSON(query)
+
+      if (!errno) {
+        let msg = isFollow ? '取消关注成功' : '关注成功'
+
+        D.toast(msg)
+
+        this.setState({ info: { ...info, isFollow: isFollow ? 0 : 6 } })
+      } else {
+        D.toast(data)
+      }
+    } catch (e) {}
+  }
+
+  handleSendGift = async () => {
+    const { info } = this.state
+
+    let inf = { ...info }
+
+    inf.appreciateCount++
+
+    this.setState({ info: inf })
+  }
+
+  // fetchSendGift = async () => {
+  //   const { userBalance, curGift, giftList, info } = this.state
+
+  //   const query = {
+  //     postId: this.id,
+  //     id: giftList[curGift].id
+  //   }
+
+  //   let resApi
+
+  //   switch (this.type) {
+  //     case 'tree':
+  //       resApi = api.forum.SEND_GIFT_TO_USER_BY_TREE
+  //       break
+  //     case 'hot':
+  //     case 'school':
+  //     default:
+  //       resApi = api.forum.SEND_GIFT_TO_USER
+  //       break
+  //   }
+
+  //   try {
+  //     const { errno, errmsg } = await resApi(query)
+
+  //     if (!errno) {
+  //       let inf = { ...info }
+
+  //       inf.appreciateCount++
+
+  //       const ub = userBalance - giftList[curGift].point
+  //       this.setState(
+  //         { userBalance: ub, giftGif: giftList[curGift].img2, info: inf, showGift: false },
+  //         () => {
+  //           this.openGiftGif()
+  //         }
+  //       )
+  //     } else {
+  //       D.toast(errmsg)
+  //     }
+  //   } catch (e) {}
+  // }
+
+  fetchTop = async () => {
+    const { userId, info } = this.state
+
+    const query = {
+      postId: info.postId,
+      userId
+    }
+
+    try {
+      const { data } = await api.manager.SET_TOP_POSTS(query)
+
+      D.toast(data)
+
+      // this.setState({ postsList: [], showOptIndex: null }, () => {
+      //   this.resetPage(this.nextPage)
+      // })
+      Taro.setStorageSync('needRefresh', true)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  fetchHot = async () => {
+    const { userId, info } = this.state
+
+    const query = {
+      postId: info.postId,
+      userId
+    }
+
+    try {
+      const { data } = await api.manager.SET_HOT_POSTS(query)
+
+      D.toast(data)
+
+      // this.setState({ postsList: [], showOptIndex: null }, () => {
+      //   this.resetPage(this.nextPage)
+      // })
+      Taro.setStorageSync('needRefresh', true)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  fetchRefined = async () => {
+    const { info, userId } = this.state
+
+    const query = {
+      postId: info.postId,
+      userId
+    }
+
+    try {
+      const { data } = await api.manager.SET_REFINED_POSTS(query)
+
+      D.toast(data)
+
+      // this.setState({ postsList: [], showOptIndex: null }, () => {
+      //   this.resetPage(this.nextPage)
+      // })
+      Taro.setStorageSync('needRefresh', true)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  fetchDelete = async () => {
+    const { userId, info } = this.state
+
+    let resApi
+
+    const query = {
+      id: info.postId,
+      userId
+    }
+
+    switch (this.type) {
+      case 'tree':
+        resApi = api.forum.DELETE_TREE_POSTS
+        break
+      case 'school':
+      case 'hot':
+      default:
+        resApi = api.forum.DELETE_HOT_POSTS
+        break
+    }
+
+    try {
+      const { data } = await resApi(query)
+
+      D.toast(data)
+
+      Taro.setStorageSync('needRefresh', true)
+
+      setTimeout(() => {
+        Taro.navigateBack()
+      }, 1000)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   get type() {
     return this.route.params.type
   }
@@ -577,14 +1137,18 @@ class Posts extends Component {
       commentList,
       rankList,
       commentContext,
-      inpFocus,
       placeholder,
       showPopup,
       popupType,
       sortOpt,
       curSort,
       totalMoneys,
-      totalPerson
+      totalPerson,
+      optNav,
+      isOwn,
+      inpFocus,
+      showFocus,
+      showGift
     } = this.state
 
     if (!info) {
@@ -597,15 +1161,18 @@ class Posts extends Component {
       avatar,
       nickname,
       sendTimeDate,
+      appreciateCount,
       canComment,
-      // comment,
+      comment,
       fabulous,
       isFabulous,
       context,
       schoolName,
       tagName,
       imgList,
-      content
+      content,
+      isFollow,
+      identity
     } = info
 
     const CommentList =
@@ -615,20 +1182,112 @@ class Posts extends Component {
           <View
             key={item.id}
             className='posts-commit__item'
-            onClick={this.handleOpenItemPopup(index)}
+            onClick={() => this.handleOpenItemPopup(index)}
           >
             <Image src={item.avatar} mode='aspectFill' className='posts-commit__item-avatar' />
             <View className='posts-commit__item-info'>
               <View className='posts-commit__item-info__title'>{item.nickname}</View>
               <View className='posts-commit__item-info__content'>{item.commentDate}</View>
               <View className='posts-commit__item-info__detail'>
-                {item.isChi && (
+                {/* {item.isChi && (
                   <>
                     <Text className='posts-commit__item-info__detail-name'>回复</Text>
                     <Text className='green'>{item.fNickName}:</Text>
                   </>
+                )} */}
+                <View className='posts-commit__item-info__detail-content'>
+                  {item.context}
+                  {item.contextImg && (
+                    <Image
+                      src={item.contextImg}
+                      mode='aspectFit'
+                      className='posts-commit__item-info__detail-content__img'
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        this.previewCommentImg(item.contextImg)
+                      }}
+                    />
+                  )}
+                </View>
+                {item.children &&
+                  item.children.length > 0 &&
+                  item.children.map((it, idx) => {
+                    if (item.hidden && idx) {
+                      return null
+                    }
+
+                    return (
+                      <View
+                        key={it.id}
+                        className='posts-commit__item-info__detail-self'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          this.handleOpenItemPopup(index, idx)
+                        }}
+                      >
+                        <View className='posts-commit__item-info__detail-self__top'>
+                          <Image
+                            src={it.avatar}
+                            mode='aspectFill'
+                            className='posts-commit__item-info__detail-self__avatar'
+                          />
+                          <View className='posts-commit__item-info__detail-self__name'>
+                            {it.nickname || '#' + it.senderId}
+                            {it.beNickname && (
+                              <>
+                                <View className='arrow-right'></View>
+                                {it.beNickname || '#' + it.beSenderId}
+                              </>
+                            )}
+                          </View>
+                          <View className='posts-commit__item-info__detail-self__like'>
+                            <Image
+                              src={it.isFabulous == 6 ? LikeIcon : UnlikeIcon}
+                              mode='aspectFit'
+                              className='posts-commit__item-info__detail-self__like-icon'
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                this.fetchLikeComment(it, index, idx)
+                              }}
+                            />
+                            {it.fabulous > 0 && (
+                              <Text className='posts-commit__item-info__detail-self__like-num'>
+                                {it.fabulous}
+                              </Text>
+                            )}
+                          </View>
+                        </View>
+                        <View className='posts-commit__item-info__detail-self__detail'>
+                          {it.context}
+                          {it.contextImg && (
+                            <Image
+                              src={it.contextImg}
+                              mode='aspectFit'
+                              className='posts-commit__item-info__detail-self__detail-img'
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                this.previewCommentImg(it.contextImg)
+                              }}
+                            />
+                          )}
+                        </View>
+                      </View>
+                    )
+                  })}
+                {item.total > 1 && (
+                  <View
+                    className='posts-commit__item-info__more'
+                    onClick={(e) => this.handleOpenCommit(e, index)}
+                  >
+                    {item.hidden ? `展开${item.total}条回复` : '收起'}
+                    {item.hidden ? (
+                      <View className='at-icon at-icon-chevron-down'></View>
+                    ) : (
+                      <View className='at-icon at-icon-chevron-up'></View>
+                    )}
+                    <View className='posts-commit__item-info__more-before'></View>
+                  </View>
                 )}
-                <Text className='posts-commit__item-info__detail-detail'>{item.context}</Text>
               </View>
             </View>
             <View className='posts-commit__item-like'>
@@ -638,7 +1297,7 @@ class Posts extends Component {
                 className='posts-commit__item-icon'
                 onClick={(e) => {
                   e.stopPropagation()
-                  this.fetchLike(item, index)
+                  this.fetchLikeComment(item, index)
                 }}
               />
               {item.fabulous > 0 && <Text className='posts-commit__item-num'>{item.fabulous}</Text>}
@@ -675,42 +1334,78 @@ class Posts extends Component {
         {/* <View className='posts-tag'>置顶</View> */}
         <View className='content'>
           <View className='posts-user'>
-            <Image
-              src={avatar}
-              mode='aspectFill'
-              className='posts-user__avatar'
-              onClick={this.onJumpToPerson}
-            />
+            <View className='posts-user__avatar-con'>
+              <Image
+                src={avatar}
+                mode='aspectFill'
+                className='posts-user__avatar'
+                onClick={this.onJumpToPerson}
+              />
+              {identity == 5 && (
+                <Image src={TagIcon} mode='aspectFit' className='posts-user__avatar-tag' />
+              )}
+            </View>
+
             <View className='posts-user__info'>
               <View className='posts-user__info-title'>
                 <Text className='posts-user__info-title__name'>{nickname}</Text>
-                <Text className='posts-user__info-title__date'>{sendTimeDate}</Text>
               </View>
-              <View className='posts-user__info-tag'></View>
+              <View className='posts-user__info-title__date'>
+                {sendTimeDate}
+                <Text className='posts-user__info-tag__text'>{tagName}</Text>
+              </View>
+              {/* <View className='posts-user__info-tag'></View> */}
             </View>
             <View className='posts-user__opt'>
-              <View className='posts-user__btn'>关注</View>
+              {!isOwn && (
+                <View
+                  className={`posts-user__btn ${isFollow && 'un__btn'}`}
+                  onClick={this.fetchFollow}
+                >
+                  {isFollow == 6 ? '已关注' : '关注'}
+                </View>
+              )}
               <Image
                 src={OptionIcon}
                 mode='aspectFit'
-                className='posts-bottom__opt-icon'
+                className='posts-user__opt-icon'
                 onClick={this.openOpt}
               />
               {showOpt && (
-                <View className='posts-bottom__opt'>
-                  <View className='posts-bottom__opt-item' onClick={() => this.openPopup('share')}>
-                    分享
-                  </View>
-                  <View className='posts-bottom__opt-item' onClick={() => this.openPopup('report')}>
-                    举报
-                  </View>
+                <View className='posts-opt__content'>
+                  {optNav &&
+                    optNav.map((nav) => {
+                      if (
+                        (nav.needPre || (nav.canOwn && isOwn)) &&
+                        (nav.onlyType ? nav.onlyType.includes(this.type) : true)
+                      ) {
+                        return (
+                          <View
+                            key={nav.name}
+                            className='posts-opt__content-item'
+                            onClick={() => this.optHandle(nav.type)}
+                          >
+                            {nav.name}
+                          </View>
+                        )
+                      }
+
+                      return null
+                    })}
                 </View>
               )}
             </View>
           </View>
           <View className='posts-content'>
-            <Text className='posts-user__info-tag__text'>#{tagName}#</Text>
-            {content || context}
+            {content &&
+              Array.isArray(content) &&
+              content.map((text) => {
+                return (
+                  <View key={text} className='posts-content-text'>
+                    {text}
+                  </View>
+                )
+              })}
           </View>
           {imgList && imgList.length > 0 && (
             <View className={`posts-album ${imgList.length > 1 ? 'more-album' : ''}`}>
@@ -719,7 +1414,7 @@ class Posts extends Component {
                   <Image
                     src={item}
                     key={item}
-                    mode={imgList.length > 1 ? 'aspectFill' : 'heightFix'}
+                    mode='aspectFill'
                     className='posts-album__img'
                     onClick={(e) => this.previewImg(e, index)}
                   />
@@ -727,36 +1422,50 @@ class Posts extends Component {
               })}
             </View>
           )}
-          <View className='posts-bottom'>
-            {/* {showAddress ? (
-            <View className='posts-bottom__info green'>
-              <Image src={AddressIcon} mode='aspectFit' className='posts-bottom__info-icon' />
+          {showAddress && schoolName.trim() && (
+            <View className='posts-address'>
+              <Image src={AddressIcon} mode='aspectFit' className='posts-address__icon' />
               {schoolName}
             </View>
-          ) : (
-            <View className='posts-bottom__info'>
-              <Image src={ShareIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              分享
-            </View>
           )}
-          <View className='posts-bottom__right'>
-            <View className='posts-bottom__info'>
-              <Image src={GiftIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              赞赏
+          <View className='posts-bottom'>
+            <View className='posts-bottom__right'>
+              <View className='posts-bottom__info' onClick={this.openGift}>
+                <Image
+                  src={appreciateCount > 0 ? GiftIcons : GiftIcon}
+                  mode='aspectFit'
+                  className='posts-bottom__info-icon'
+                />
+                {appreciateCount || 0}
+              </View>
+              <View className='posts-bottom__info' onClick={this.fetchLike}>
+                <Image
+                  src={isFabulous == 6 ? LikeIcon : UnlikeIcon}
+                  mode='aspectFit'
+                  className='posts-bottom__info-icon'
+                ></Image>
+                {fabulous}
+              </View>
+              <View className='posts-bottom__info'>
+                <Image
+                  src={CommitIcon}
+                  mode='aspectFit'
+                  className='posts-bottom__info-icon'
+                  onClick={this.handleComment}
+                />
+                {comment}
+              </View>
+              <View className='posts-bottom__info'>
+                {/* <Button className='posts-bottom__info-share' openType='share'> */}
+                <Image
+                  src={ShareIcon}
+                  mode='aspectFit'
+                  className='posts-bottom__info-icon'
+                  onClick={() => this.openPopup('share')}
+                />
+                {/* </Button> */}
+              </View>
             </View>
-            <View className='posts-bottom__info' onClick={this.onHandleLike}>
-              <Image
-                src={fabulous ? LikeIcon : UnlikeIcon}
-                mode='aspectFit'
-                className='posts-bottom__info-icon'
-              ></Image>
-              {fabulous}
-            </View>
-            <View className='posts-bottom__info'>
-              <Image src={CommitIcon} mode='aspectFit' className='posts-bottom__info-icon' />
-              {comment}
-            </View>
-          </View> */}
           </View>
         </View>
         {rankList.length > 0 && (
@@ -775,22 +1484,7 @@ class Posts extends Component {
                 <View className='at-icon at-icon-chevron-right'></View>
               </View>
             </View>
-            <View className='plate-content'>
-              {RankList}
-              {/* <View className='plate-content__item'>
-                <Image src={LikeIcon} mode='aspectFill' className='plate-content__item-avatar' />
-                <View className='plate-content__item-info'>
-                  <Image src={LikeIcon} mode='aspectFit' className='plate-content__item-icon' />
-                  <Text>迷路的</Text>
-                </View>
-              </View>
-              <View className='plate-content__item'>
-                <Image src={LikeIcon} mode='aspectFill' className='plate-content__item-avatar' />
-                <View className='plate-content__item-info'>
-                  <Text className='plate-content__item-btn'>赞赏</Text>
-                </View>
-              </View> */}
-            </View>
+            <View className='plate-content'>{RankList}</View>
           </View>
         )}
         <View className='posts-commit'>
@@ -803,20 +1497,30 @@ class Posts extends Component {
           </View>
           {CommentList}
         </View>
+        <GiftPopup
+          show={showGift}
+          type={this.type}
+          postId={this.id}
+          onClose={this.closeGift}
+          onHandleSendGift={this.handleSendGift}
+        />
         <ForumPopup
           showPopup={showPopup}
           type={popupType}
           onSelect={this.handleSelect}
           onClose={this.closePopup}
         />
-        <FooterComment
-          focus={inpFocus}
-          content={commentContext}
-          placeholder={placeholder}
-          onChange={this.onChangeInp}
-          onSubmit={this.fetchComment}
-          onBlur={this.handleBlur}
-        />
+        {showFocus && (
+          <FooterComment
+            focus={inpFocus}
+            content={commentContext}
+            placeholder={placeholder}
+            onChange={this.onChangeInp}
+            onSubmit={this.fetchComment}
+            onSubmitImg={this.fetchCommentImg}
+            onBlur={this.handleBlur}
+          />
+        )}
       </View>
     )
   }

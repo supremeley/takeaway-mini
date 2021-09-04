@@ -67,7 +67,7 @@ class ItemList extends Component {
 
     Taro.setStorageSync('searchList', tagList)
 
-    this.setState({ tagList, keywords }, () => {
+    this.setState({ tagList, keywords, shopList: [] }, () => {
       this.resetPage(this.nextPage)
     })
   }
@@ -142,7 +142,7 @@ class ItemList extends Component {
             <Input
               value={keywords}
               type='text'
-              placeholder='请输入店铺名称'
+              placeholder='请输入店铺名称或商品'
               onInput={this.onChange}
               onConfirm={this.onConfirm}
             />

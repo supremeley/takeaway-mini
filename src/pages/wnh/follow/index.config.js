@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: '排行榜',
+  navigationBarTitleText: '关注/粉丝',
   navigationBarBackgroundColor: '#ffffff',
   navigationBarTextStyle: 'black',
   // backgroundColor: '#ffffff'

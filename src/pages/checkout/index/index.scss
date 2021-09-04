@@ -1,6 +1,5 @@
 page {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
-  padding-bottom: calc(constant(safe-area-inset-bottom) + 90px);
+  padding-bottom: 140px;
 }
 .checkout {
   padding: 20px;
@@ -8,10 +7,11 @@ page {
 .explain {
   background: #fff;
   border-radius: 10px;
-  line-height: 70px;
-  font-size: 28px;
+  line-height: 80px;
+  font-size: 26px;
   color: $global-red;
-  padding: 0 32px;
+  padding: 0 12px;
+  font-weight: 600;
 }
 .user {
   &-container {
@@ -37,7 +37,7 @@ page {
     }
     &__info {
       color: #acacac;
-      font-size: 24px;
+      font-size: 26px;
       display: flex;
       &-item {
         margin-right: 10px;
@@ -99,7 +99,7 @@ page {
       }
       &-title {
         color: $global-text-gray-b;
-        font-size: 24px;
+        font-size: 28px;
         display: flex;
         align-items: center;
         width: 440px;
@@ -107,9 +107,9 @@ page {
           margin-right: 10px;
           flex-shrink: 0;
           text-align: center;
-          font-size: 20px;
-          line-height: 30px;
-          height: 30px;
+          font-size: 24px;
+          line-height: 32px;
+          height: 32px;
           border-radius: 4px;
         }
         &__name {
@@ -171,10 +171,10 @@ page {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 90px;
+    height: 100px;
     // background: #fff;
     padding: 0 20px;
-    font-size: 24px;
+    font-size: 28px;
     &:not(:last-child) {
       border-bottom: 2px solid rgba(153, 153, 153, 0.2);
     }
@@ -314,7 +314,7 @@ page {
             }
             &-date {
               color: $global-green;
-              font-size: 20px;
+              font-size: 24px;
             }
           }
           &__price {
@@ -324,7 +324,7 @@ page {
               font-weight: 600;
             }
             &-explain {
-              font-size: 20px;
+              font-size: 24px;
               color: $global-black;
             }
           }

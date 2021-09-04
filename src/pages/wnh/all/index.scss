@@ -1,0 +1,140 @@
+page {
+  background: #fff !important;
+}
+.person {
+  padding: 24px 0;
+  // .title {
+  //   display: flex;
+  //   align-items: center;
+  //   height: 90px;
+  //   padding: 0 40px;
+  // }
+  .list {
+    &-item {
+      flex: 1 0 100%;
+      height: 120px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 24px;
+      position: relative;
+      &__container {
+        display: flex;
+        align-items: stretch;
+        overflow: scroll;
+        height: 120px;
+      }
+      &__avatar {
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+        margin-right: 40px;
+        border-radius: 50%;
+      }
+      &__icon {
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+        margin-right: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fdcf51;
+        &-img {
+          width: 40px;
+          height: 40px;
+        }
+      }
+      &__info {
+        flex: 1;
+        height: 100%;
+        border-bottom: 2px solid $global-line-gray;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 16px;
+        &-name {
+          font-size: 32px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+        &-desc {
+          font-size: 24px;
+          color: $global-text-gray;
+        }
+        .at-icon {
+          color: $global-text-gray;
+        }
+      }
+      &__date {
+        align-self: center;
+        transform: translateY(-50%);
+        color: $global-text-gray;
+      }
+      &__dot {
+        position: absolute;
+        right: 24px;
+        bottom: 16px;
+        background: red;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 20px;
+        width: 28px;
+        height: 28px;
+        text-align: center;
+      }
+      &__del {
+        background: $global-red;
+        color: #fff;
+        width: 180px;
+        height: 100%;
+        text-align: center;
+        flex-shrink: 0;
+        line-height: 120px;
+      }
+    }
+  }
+  .footer-item {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 140px;
+    padding: 24px;
+    background: linear-gradient(90deg, #68d8da 0%, #31aeb1 100%);
+    &__avatar {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      margin: 0 18px;
+      border-radius: 50%;
+    }
+    &__info {
+      flex: 1;
+      color: #fff;
+      &-name {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      &-desc {
+        font-size: 24px;
+      }
+    }
+    &__btn {
+      width: 120px;
+      height: 50px;
+      border-radius: 25px;
+      // border: 2px solid $global-green;
+      text-align: center;
+      color: $global-green;
+      line-height: 46px;
+      background: #fff;
+    }
+  }
+}

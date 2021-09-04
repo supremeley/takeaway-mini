@@ -1,0 +1,33 @@
+.about {
+  width: 100vw;
+  min-height: 100vh;
+  padding: 240px 26px 70px;
+  background: #ffeab5
+    url(https://eating-1256365647.cos.ap-shanghai.myqcloud.com/qj63901nfpbhmygi0gz4.png) no-repeat
+    center 40px / 70%;
+  .content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.18);
+    padding: 40px 60px;
+    height: 100%;
+    &-title {
+      font-size: 32px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    &-desc {
+      color: #808080;
+      font-size: 28px;
+      line-height: 38px;
+      text-indent: 52px;
+    }
+  }
+  .page-img {
+    width: 100%;
+    // margin: 0 auto;
+    transform: scale(1.2);
+    margin-top: 100px;
+  }
+}

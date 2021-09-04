@@ -5,5 +5,6 @@ export default {
   backgroundColor: '#ffffff',
   navigationStyle: 'custom',
   enableShareAppMessage: true,
-  enablePullDownRefresh: true,
+  // enablePullDownRefresh: true,
+  disableScroll: true
 }

@@ -11,6 +11,9 @@ import * as forum from './forum'
 import * as prove from './prove'
 import * as chat from './chat'
 import * as mine from './mine'
+import * as manager from './manager'
+import * as blackList from './blackList'
+import * as pt from './pt'
 
 
-export default { common, cart, coupon, home, order, shop, user, goods, recharge, forum, prove, chat, mine }
+export default { pt, blackList, manager, common, cart, coupon, home, order, shop, user, goods, recharge, forum, prove, chat, mine }

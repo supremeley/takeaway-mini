@@ -2,6 +2,7 @@ import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image, Text, ScrollView } from '@tarojs/components'
 import { AtCurtain, AtFloatLayout } from 'taro-ui'
+import Header from '@/components/header'
 
 import api from '@/api'
 import D from '@/common'
@@ -31,8 +32,11 @@ class itemDetail extends Component {
     currentIndex: 0,
     info: null,
     rule: null,
-    shopBottom: 215,
+    shopBottom: 245,
     goodsList: [],
+    oriGoods: [],
+    productNumList: [],
+    filterCategoryList: [],
     cartList: [],
     curInfo: {},
     curIndex: 0,
@@ -70,7 +74,6 @@ class itemDetail extends Component {
   fetchData = async () => {
     this.getShopData()
     await this.getGoodsData()
-    await this.getCartData()
   }
 
   openCartShow = () => {
@@ -87,10 +90,6 @@ class itemDetail extends Component {
 
   closeExplainShow = () => {
     this.setState({ explainShow: false })
-  }
-
-  goBack = () => {
-    Taro.navigateBack()
   }
 
   onJumpToCheckout = () => {
@@ -198,7 +197,9 @@ class itemDetail extends Component {
         i = currentIndex - 1
       }
 
+      // console.log(cur, 'cur.top')
       // console.log(i, 'i')
+      // console.log(goodsList[i], 'i')
 
       if (i != currentIndex) {
         const currentTitle = goodsList[i].name
@@ -217,30 +218,70 @@ class itemDetail extends Component {
 
     const explainShow = !!brand.welcomeMessage
 
-    this.setState({ info: brand, rule: brokerageMerchantVo, cashBackList, explainShow }, () => {
-      // setTimeout(() => {
-      Taro.nextTick(() => {
-        const q = Taro.createSelectorQuery()
-        const selector = q.select(`.shop`).boundingClientRect()
-        // console.log(selector)
-        selector.exec((res) => {
-          // console.log(res,'res')
+    this.setState({ info: brand, rule: brokerageMerchantVo, cashBackList, explainShow }, () => {})
 
-          this.setState({ shopBottom: res[0].bottom })
+    setTimeout(() => {
+      Taro.nextTick(() => {
+        const querya = Taro.createSelectorQuery()
+
+        const selector = querya.select(`.shop`).boundingClientRect()
+
+        selector.exec((res) => {
+          // console.log(res)
+          const arr = res[0]
+          if (arr.bottom) {
+            this.setState({ shopBottom: arr.bottom })
+          }
         })
       })
-      // }, 500)
+    }, 500)
+  }
+
+  getGoodsData = async (page = 1, size = 50) => {
+    const { oriGoods, filterCategoryList, productNumList } = this.state
+
+    const query = { brandId: this.id, page, size }
+
+    if (page == 1) {
+      Taro.showLoading({
+        title: '加载中',
+        icon: 'none'
+      })
+    }
+
+    const {
+      data: { goodsList, filterCategoryList: fList, productNumList: pList, count }
+    } = await api.goods.GET_GOODS_LIST(query)
+
+    let gl = [...goodsList]
+    let fl = [...fList]
+    let pl = [...pList]
+
+    if (page != 1) {
+      gl = [...oriGoods, ...gl]
+      fl = [...filterCategoryList, ...fl]
+      pl = [...productNumList, ...pl]
+    }
+
+    this.setState({ oriGoods: gl, filterCategoryList: fl, productNumList: pl }, () => {
+      // console.log(count > size * page)
+      if (count > size * page) {
+        this.getGoodsData(page + 1)
+      } else {
+        Taro.hideLoading()
+        this.handleGoodsList()
+      }
     })
   }
 
-  getGoodsData = async () => {
-    const query = { brandId: this.id }
+  handleGoodsList = () => {
+    const { oriGoods, productNumList, filterCategoryList } = this.state
 
-    const {
-      data: { goodsList, filterCategoryList, productNumList }
-    } = await api.goods.GET_GOODS_LIST(query)
+    if (!oriGoods.length) {
+      return
+    }
 
-    const nGoods = goodsList.reduce((vals, goods) => {
+    const nGoods = oriGoods.reduce((vals, goods) => {
       const res = vals.find((info) => info.categoryId == goods.categoryId)
 
       const proRes = productNumList.find((info) => info.goodsId === goods.id)
@@ -251,7 +292,6 @@ class itemDetail extends Component {
         goodsId: goods.id,
         name: goods.name,
         brief: goods.brief,
-        // sale: 127,
         price: goods.retailPrice,
         linePrice: goods.counterPrice,
         picUrl: goods.picUrl,
@@ -267,9 +307,9 @@ class itemDetail extends Component {
       } else {
         vals.push({ categoryId: goods.categoryId, goods: [goodsItem] })
       }
+
       return vals
     }, [])
-    // console.log(nGoods)
 
     const nGoodsList = nGoods.map((item) => {
       const n = filterCategoryList.find((gn) => gn.id == item.categoryId)
@@ -280,10 +320,13 @@ class itemDetail extends Component {
         return { name: '默认', goods: item.goods }
       }
     })
-    // console.log(nGoodsList)
-    const currentTitle = nGoodsList[0].name
 
-    this.setState({ currentTitle, goodsList: nGoodsList })
+    const currentTitle = nGoodsList[0].name
+    // console.log(nGoodsList)
+
+    this.setState({ currentTitle, goodsList: nGoodsList }, () => {
+      this.getCartData()
+    })
   }
 
   getGoodsDetail = async (id) => {
@@ -649,7 +692,7 @@ class itemDetail extends Component {
       return item.productId === res.id
     })
 
-    console.log(cartList, res, curCart, 'curProduct')
+    // console.log(cartList, res, curCart, 'curProduct')
 
     if (curCart) {
       const cur = {
@@ -677,7 +720,7 @@ class itemDetail extends Component {
       number += item.number
       packingFee += item.packingFee
     })
-    console.log({ price, number, packingFee })
+    // console.log({ price, number, packingFee })
     if (price && number) {
       return { price, number, packingFee }
     }
@@ -744,7 +787,7 @@ class itemDetail extends Component {
           </View>
         )
       })
-
+    // console.log(goodsList)
     const AsideList =
       goodsList.length > 0 &&
       goodsList.map((item, index) => {
@@ -855,9 +898,7 @@ class itemDetail extends Component {
       <View className='item-detail'>
         <View className='header'>
           <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
-          <View className='header-container'>
-            <View className='at-icon at-icon-chevron-left' onClick={this.goBack}></View>
-          </View>
+          <Header />
         </View>
         <View className='shop'>
           <View className='shop-content'>
@@ -876,18 +917,9 @@ class itemDetail extends Component {
           </View>
         </View>
         <View className='content'>
-          {/* {goodsList.length > 1 && (
-            <ScrollView
-              scrollY
-              style={{ height: `calc(100vh - ${shopBottom + 85}px)` }}
-              className='content-aside'
-            >
-              {AsideList}
-            </ScrollView>
-          )} */}
           <ScrollView
             scrollY
-            style={{ height: `calc(100vh - ${shopBottom + 85}px)` }}
+            style={{ height: `calc(100vh - ${shopBottom + 90}px)` }}
             className='content-aside'
           >
             {AsideList}
@@ -896,15 +928,13 @@ class itemDetail extends Component {
             scrollIntoView={scrollIntoView}
             scrollWithAnimation
             scrollY
-            style={{ height: `calc(100vh - ${shopBottom + 85}px)` }}
+            style={{ height: `calc(100vh - ${shopBottom + 90}px)` }}
             className='content-goods'
             onScroll={this.handelScroll}
           >
-            <View style={{ top: shopBottom + 'px' }} className='cur-title'>
-              {currentTitle}
-            </View>
             {GoodsList}
           </ScrollView>
+          <View className='cur-title'>{currentTitle}</View>
         </View>
         <Footer
           isfloatLayout={false}
@@ -933,7 +963,11 @@ class itemDetail extends Component {
           {productList.length > 1 ? (
             <View className='sku-selector'>
               <View className='content-goods__item'>
-                <Image src={curInfo.picUrl} className='content-goods__item-img'></Image>
+                <Image
+                  src={curInfo.picUrl}
+                  mode='aspectFill'
+                  className='content-goods__item-img'
+                ></Image>
                 <View className='content-goods__item-info'>
                   <View className='content-goods__item-info__name'>{curInfo.name}</View>
                   <View className='content-goods__item-info__sale'>{curInfo.brief}</View>

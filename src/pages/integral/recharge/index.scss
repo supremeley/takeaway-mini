@@ -1,0 +1,163 @@
+.recharge {
+  .header {
+    top: 0;
+    color: #fff;
+    background: $global-green;
+    padding-top: 100px;
+    text-align: center;
+    padding-bottom: 40px;
+    &-balance {
+      font-size: 24px;
+      // font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      &__num {
+        font-size: 60px;
+        font-weight: 600;
+        margin-right: 5px;
+      }
+    }
+    &-explain {
+    }
+    &-more {
+      position: absolute;
+      top: 0;
+      right: 32px;
+    }
+  }
+  .plate {
+    margin: 24px;
+    background: #fff;
+
+    // background: #FFFFFF;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    padding: 0 24px 24px;
+    &-title {
+      text-align: center;
+      font-weight: 600;
+      font-size: 32px;
+      height: 120px;
+      line-height: 120px;
+    }
+    &-option {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      &__item {
+        width: 310px;
+        height: 160px;
+        background: #fff;
+        border: 2px solid $global-line-gray;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 24px;
+        margin-bottom: 24px;
+        &-title {
+          font-size: 24px;
+          line-height: 1;
+          display: flex;
+          align-items: baseline;
+          &__num {
+            // font-size: 50px;
+            // margin-right: 5px;
+            display: flex;
+            align-items: flex-end;
+            line-height: 1;
+            margin-bottom: 10px;
+            &-left {
+              font-size: 40px;
+              margin-right: 12px;
+              font-weight: 600;
+            }
+            &-right {
+              font-size: 24px;
+            }
+          }
+          &__desc {
+            font-size: 24px;
+          }
+        }
+        &-desc {
+          font-size: 24px;
+        }
+      }
+      .active-opt {
+        border: 2px solid #22b6ba;
+        background: #22b6ba;
+        color: #fff;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.17);
+      }
+    }
+    &-coupon {
+      width: 310px;
+      height: 90px;
+      background-image: linear-gradient(90deg, #fb8951 0%, #fdbe89 100%);
+      border-radius: 4px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    &-content {
+      display: flex;
+      justify-content: center;
+    }
+  }
+  .first-plate {
+    margin-top: -24px;
+  }
+  .explain {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 24px;
+    &-num {
+      color: $global-red;
+    }
+  }
+  .recharge-btn {
+    margin: 24px;
+    height: 90px;
+    background: $global-green;
+    // box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
+    border-radius: 45px;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    &::after {
+      border: none;
+    }
+  }
+  .num-contrl {
+    display: flex;
+    height: 80px;
+    width: 300px;
+    align-items: stretch;
+    border-radius: 8px;
+    border: 2px solid #22b6ba;
+    line-height: 76px;
+    &__inp {
+      text-align: center;
+      width: 130px;
+      line-height: 76px;
+      height: 76px;
+      border-left: 2px solid #22b6ba;
+      border-right: 2px solid #22b6ba;
+    }
+    .at-icon {
+      font-size: 40px;
+      flex: 1;
+      text-align: center;
+      color: $global-green;
+      line-height: 76px;
+    }
+  }
+}

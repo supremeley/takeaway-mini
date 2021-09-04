@@ -133,3 +133,10 @@ export const SEND_GIFT_TO_USER = (data) => request.post('/wnh/hot/Appreciate', d
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 })
+
+export const SEND_GIFT_TO_USER_BY_TREE = (data) => request.post('/wnh/treehole/Appreciate', data, {
+  type: 'forum',
+  header: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+})

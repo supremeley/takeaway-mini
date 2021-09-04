@@ -1,4 +1,105 @@
-.web-container {
-  width: 100vw;
-  height: 100vh;
+page {
+  background: #fff !important;
+}
+.setting {
+  padding: 24px;
+  &-opt {
+    display: flex;
+    height: 120px;
+    align-items: center;
+    justify-content: space-between;
+    &:not(:last-child) {
+      border-bottom: 2px solid $global-line-gray;
+    }
+    &__name {
+    }
+    &__desc {
+      font-size: 24px;
+      color: $global-text-gray;
+    }
+  }
+  &-switch {
+    display: flex;
+    align-items: center;
+    // margin-bottom: 50px;
+    // font-size: 24px;
+    // font-weight: 600;
+    &__opt {
+      width: 120px;
+      border-radius: 60px;
+      height: 50px;
+      background: $global-line-gray;
+      position: relative;
+      // margin-left: 8px;
+      transition: 0.2s;
+      &-cir {
+        border-radius: 50%;
+        background: #fff;
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        width: 46px;
+        height: 46px;
+        transform: translateY(-50%);
+        transition: 0.2s;
+      }
+    }
+    .active-opt {
+      background: $global-green;
+      .setting-switch__opt-cir {
+        left: 72px;
+      }
+    }
+  }
+  .float-content {
+    padding: 24px 0 0;
+    .float-item {
+      font-weight: 600;
+      font-size: 30px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px;
+      margin: 0;
+      background: #fff;
+      border: none;
+      color: $global-black;
+      &::after {
+        border: none;
+      }
+      &:not(:last-child) {
+        border-bottom: 2px solid $global-line-gray;
+      }
+      &__name {
+      }
+      &__desc {
+        font-size: 24px;
+        color: $global-text-gray;
+        margin-top: 8px;
+      }
+      &__icon {
+        width: 36px;
+        height: 36px;
+        margin-right: 24px;
+      }
+    }
+    .cancel {
+      border-top: 10px solid $global-line-gray;
+      line-height: 110px;
+    }
+  }
+  .at-float-layout__container {
+    border-radius: 40px 40px 0 0;
+    width: 700px;
+    left: 50%;
+    transform: translate(-50%);
+    min-height: auto;
+  }
+  .layout-body,
+  .at-float-layout,
+  .layout-body__content {
+    min-height: auto;
+    padding: 0;
+  }
 }

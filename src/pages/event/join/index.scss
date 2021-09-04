@@ -1,0 +1,73 @@
+.cooperation {
+  width: 100vw;
+  height: 100vh;
+  padding: 420px 26px 70px;
+  background: #f7f7ff
+    url(https://eating-1256365647.cos.ap-shanghai.myqcloud.com/upqxyipw2sz3jkcid9x8.png) no-repeat
+    top / 100%;
+  .content {
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.18);
+    border-radius: 16px;
+    background: #fff;
+    // height: 786px;
+    padding: 40px 60px;
+    position: relative;
+    &-opt {
+      min-height: 90px;
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      &:not(:first-child) {
+        border-top: 2px solid $global-line-gray;
+      }
+      &__title {
+        font-weight: 600;
+        line-height: 90px;
+      }
+      &__inp {
+        flex: 1;
+        text-align: center;
+      }
+      &__rid {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        &-item {
+          display: flex;
+          align-items: center;
+        }
+      }
+      .item__cir {
+        background: #d9d9d9;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 24px;
+      }
+      .active-item {
+        background: #47cfca;
+      }
+      &__area {
+        width: 100%;
+        background: #f7fdfe;
+        border-radius: 10px;
+        height: 112px;
+        padding: 24px;
+      }
+    }
+    &-btn {
+      width: 594px;
+      line-height: 70px;
+      background: #47cfca;
+      border-radius: 40px;
+      color: #fff;
+      text-align: center;
+      margin-top: 24px;
+      // position: absolute;
+      // bottom: 80px;
+      // left: 50%;
+      // transform: translateX(-50%);
+    }
+  }
+}

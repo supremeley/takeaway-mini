@@ -1,7 +1,8 @@
 import Taro from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Input, Button } from '@tarojs/components'
+import { View, Input, Image, Button } from '@tarojs/components'
 
+import PhotoIcon from '@/assets/imgs/photo.png'
 import './index.scss'
 
 class FooterComment extends Component {
@@ -11,6 +12,7 @@ class FooterComment extends Component {
     placeholder: '',
     onChange: () => {},
     onSubmit: () => {},
+    onSubmitImg: () => {},
     onBlur: () => {}
   }
 
@@ -32,11 +34,27 @@ class FooterComment extends Component {
     onBlur && onBlur(e)
   }
 
+  upLoadImg = async () => {
+    const { onSubmitImg } = this.props
+
+    const {tempFiles} = await Taro.chooseImage({ count: 1 })
+
+    // console.log(res)
+
+    onSubmitImg && onSubmitImg(tempFiles[0].path)
+  }
+
   render() {
     const { focus, content, placeholder } = this.props
 
     return (
       <View className='comment-footer'>
+        <Image
+          src={PhotoIcon}
+          mode='aspectFit'
+          className='comment-footer__upimg'
+          onClick={this.upLoadImg}
+        />
         <Input
           focus={focus}
           value={content}

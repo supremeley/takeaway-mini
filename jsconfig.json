@@ -5,5 +5,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "experimentalDecorators": false
+  // "experimentalDecorators": false
 }

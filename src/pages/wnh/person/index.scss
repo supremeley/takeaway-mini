@@ -1,10 +1,14 @@
-.gift {
-  .title {
-    display: flex;
-    align-items: center;
-    height: 90px;
-    padding: 0 40px;
-  }
+page {
+  background: #fff !important;
+}
+.person {
+  padding: 24px 0;
+  // .title {
+  //   display: flex;
+  //   align-items: center;
+  //   height: 90px;
+  //   padding: 0 40px;
+  // }
   .list {
     &-item {
       flex: 1 0 100%;
@@ -37,7 +41,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #FDCF51;
+        background: #fdcf51;
         &-img {
           width: 40px;
           height: 40px;
@@ -51,14 +55,18 @@
         align-items: center;
         justify-content: space-between;
         padding-right: 16px;
+        overflow: hidden;
         &-name {
           font-size: 32px;
           font-weight: 600;
           margin-bottom: 8px;
+          @include text-overflow()
         }
         &-desc {
           font-size: 24px;
+          width: 280px;
           color: $global-text-gray;
+          @include text-overflow()
         }
         .at-icon {
           color: $global-text-gray;
@@ -133,4 +141,14 @@
       background: #fff;
     }
   }
+  .default {
+    margin-top: 120px;
+  }
+}
+::-webkit-scrollbar {
+  width: 0;
+
+  height: 0;
+
+  color: transparent;
 }

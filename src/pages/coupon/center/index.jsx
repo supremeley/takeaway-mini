@@ -18,9 +18,9 @@ class CouponCenter extends Component {
   }
 
   componentDidMount() {
-    const locInfo = Taro.getStorageSync('locInfo')
+    const orderSchool = Taro.getStorageSync('orderSchool')
 
-    this.setState({ schoolId: locInfo.school.value }, () => {
+    this.setState({ schoolId: orderSchool.school.value }, () => {
       this.nextPage()
     })
   }

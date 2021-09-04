@@ -6,7 +6,6 @@ import ShopItem from '@/components/shopItem'
 import Default from '@/components/default'
 import BottomText from '@/components/bottomText'
 
-import headerBg from '@/assets/imgs/header-bg.png'
 import addressIcon from '@/assets/imgs/address-icon.png'
 import noticeIcon from '@/assets/imgs/notice-icon.png'
 
@@ -20,9 +19,15 @@ import './index.scss'
 // @scrollPage
 class Home extends Component {
   state = {
+    safeTop: 0,
+    locationInfo: null,
     explainShow: false,
     explainType: null,
-    schoolId: '',
+    areaRange: [[], []],
+    selectorSchool: '',
+    selectorFloor: '',
+    selectorSchoolId: '',
+    schoolIndex: [],
     banner1Data: [
       // {
       //   appId: '',
@@ -53,34 +58,35 @@ class Home extends Component {
     banner1Show: true,
     banner2Show: true,
     alertData: {
-      // bgColor: '#fff',
-      // borderColor: '#000',
       content: '',
       showAlert: true
-      // textColor: '#000'
     },
     modalShow: false,
     modalData: [],
     navList: [],
-    shopList: [],
-    areaRange: [[], [], []],
-    selectorSchool: '',
-    selectorFloor: ''
+    shopList: []
   }
 
   async componentDidMount() {
-    const locInfo = Taro.getStorageSync('locInfo')
+    const info = await Taro.getMenuButtonBoundingClientRect()
 
-    if (!locInfo) {
+    this.setState({ safeTop: info.top })
+
+    const orderSchool = Taro.getStorageSync('orderSchool')
+
+    if (!orderSchool) {
       this.fetchData()
 
       this.setState({ explainShow: true })
     } else {
-      const selectorSchool = locInfo.school.label
-      const selectorFloor = locInfo.floor.label
+      const selectorSchool = orderSchool.school.label
+      const selectorSchoolId = orderSchool.school.value
+      const selectorFloor = orderSchool.floor.label
 
-      this.setState({ selectorSchool, selectorFloor, schoolId: locInfo.school.value }, () => {
-        this.fetchData(locInfo)
+      this.setState({ selectorSchool, selectorFloor, selectorSchoolId }, () => {
+        this.fetchData(orderSchool)
+        this.getHomeIndex()
+        this.getHomeBanner()
       })
     }
   }
@@ -93,25 +99,27 @@ class Home extends Component {
     }
   }
 
-  fetchData = async (locInfo) => {
-    await this.getHomeIndex()
-    await this.getHomeBanner()
-    await this.getAreaList(true, locInfo)
-    // await this.getBrandList()
+  fetchData = async (orderSchool) => {
+    await this.getLocation(orderSchool)
+    // await this.getHomeIndex()
+    // await this.getHomeBanner()
   }
 
   bannerHandle = (banner, type) => {
     // console.log(banner)
-    const { schoolId } = this.state
+    const { selectorSchoolId } = this.state
 
     let bannerList = []
 
-    if (!schoolId) {
+    if (!selectorSchoolId) {
       bannerList = banner.filter((item) => !item.schoolType)
     } else {
       bannerList = banner.filter((item) => {
         // console.log(item.schoolList)
-        return !item.schoolType || (item.schoolList && item.schoolList.find((it) => it == schoolId))
+        return (
+          !item.schoolType ||
+          (item.schoolList && item.schoolList.find((it) => it == selectorSchoolId))
+        )
       })
     }
 
@@ -125,26 +133,27 @@ class Home extends Component {
   onChange = (e) => {
     // console.log('onChange', e.detail)
     const { areaRange } = this.state
-    let [area, school, floor] = e.detail.value
+    let [school, floor] = e.detail.value
     // console.log(school, floor)
-    const selectorSchool = areaRange[1][school].label
-    const selectorFloor = areaRange[2][floor].label
+    const selectorSchool = areaRange[0][school].label
+    const selectorFloor = areaRange[1][floor].label
     // console.log(selectorSchool)
-    const locInfo = {
-      area: areaRange[0][area],
-      school: areaRange[1][school],
-      floor: areaRange[2][floor]
+    const orderSchool = {
+      // area: areaRange[0][area],
+      school: areaRange[0][school],
+      floor: areaRange[1][floor]
     }
 
-    // console.log(locInfo)
-    Taro.setStorageSync('locInfo', locInfo)
+    // console.log(orderSchool)
+    Taro.setStorageSync('orderSchool', orderSchool)
 
     this.setState(
       {
         explainShow: false,
         selectorSchool,
         selectorFloor,
-        schoolId: areaRange[1][school].value
+        schoolIndex: e.detail,
+        selectorSchoolId: areaRange[0][school].value
       },
       () => {
         this.getHomeIndex()
@@ -154,17 +163,17 @@ class Home extends Component {
   }
 
   onColumnChange = (e) => {
-    // console.log('onColumnChange', e.detail)
-    const { areaRange } = this.state
+    console.log('onColumnChange', e.detail)
+    const { areaRange, schoolIndex } = this.state
     const { column, value } = e.detail
 
     const sel = areaRange[column][value]
 
-    if (column == 0) {
-      this.getSchoolList(sel.value)
-    }
+    // if (column == 0) {
+    //   this.getSchoolList(sel.value)
+    // }
 
-    if (column == 1) {
+    if (column == 0) {
       this.getFloorList(sel.value)
     }
   }
@@ -191,9 +200,9 @@ class Home extends Component {
   }
 
   onJupmToList = () => {
-    const { schoolId } = this.state
+    const { selectorSchoolId } = this.state
 
-    Taro.navigateTo({ url: `/pages/item/list/index?=schoolId=${schoolId}` })
+    Taro.navigateTo({ url: `/pages/item/list/index?=schoolId=${selectorSchoolId}` })
   }
 
   onJumpToDetail = (id) => {
@@ -222,21 +231,23 @@ class Home extends Component {
   }
 
   getHomeIndex = async () => {
-    const { schoolId } = this.state
+    const { selectorSchoolId } = this.state
 
-    const query = { schoolId }
+    const query = { schoolId: selectorSchoolId }
 
     const {
       data: { brandGoodsList = [] }
     } = await api.home.GET_HOME_INDEX(query)
 
-    const navList = brandGoodsList.map((item) => {
+    const bl = brandGoodsList.filter((item) => item.merchant.inBusiness)
+
+    const navList = bl.map((item) => {
       return {
         ...item.merchant
       }
     })
     // debugger
-    this.setState({ shopList: brandGoodsList, navList })
+    this.setState({ shopList: bl, navList })
   }
 
   getHomeBanner = async () => {
@@ -274,52 +285,72 @@ class Home extends Component {
     // this.setState({ shopList: brandList, navList })
   }
 
-  getAreaList = async (isFirst, locInfo) => {
-    // console.log(locInfo)
-    const {
-      data: { items }
-    } = await api.home.GET_AREA_LIST()
+  // getAreaList = async (isFirst, orderSchool) => {
+  //   // console.log(orderSchool)
+  //   const {
+  //     data: { items }
+  //   } = await api.home.GET_AREA_LIST()
 
-    const area = items
-      .filter((item) => !item.deleted)
-      .map((item) => {
-        return {
-          value: item.id,
-          label: item.areaName
-        }
-      })
+  //   const area = items
+  //     .filter((item) => !item.deleted)
+  //     .map((item) => {
+  //       return {
+  //         value: item.id,
+  //         label: item.areaName
+  //       }
+  //     })
 
-    if (area.length) {
-      let isCon = true
+  //   if (area.length) {
+  //     let isCon = true
 
-      if (locInfo) {
-        const aId = locInfo.area.value
+  //     if (orderSchool) {
+  //       const aId = orderSchool.area.value
 
-        const res = area.find((item) => item.value === aId)
+  //       const res = area.find((item) => item.value === aId)
 
-        if (!res) {
-          this.setState({ explainShow: true, explainType: 'area' })
+  //       if (!res) {
+  //         this.setState({ explainShow: true, explainType: 'area' })
 
-          isCon = false
-        }
-      }
+  //         isCon = false
+  //       }
+  //     }
 
-      this.setState({ areaRange: [area, [], []] }, () => {
-        if (isFirst) {
-          this.getSchoolList(area[0].value, true, locInfo, isCon)
-        }
-      })
+  //     this.setState({ areaRange: [area, [], []] }, () => {
+  //       if (isFirst) {
+  //         this.getSchoolList(area[0].value, true, orderSchool, isCon)
+  //       }
+  //     })
+  //   }
+  // }
+
+  getLocation = async (orderSchool) => {
+    const locationInfo = Taro.getStorageSync('locationInfo')
+
+    if (locationInfo) {
+      this.setState({ locationInfo }, () => this.getSchoolList(true, orderSchool))
+    } else {
+      const { latitude, longitude } = await Taro.getLocation()
+
+      Taro.setStorageSync('locationInfo', { latitude, longitude })
+
+      this.setState({ locationInfo: { latitude, longitude } }, () =>
+        this.getSchoolList(true, orderSchool)
+      )
     }
   }
 
-  getSchoolList = async (id, isFirst, locInfo, isCon) => {
-    const { areaRange } = this.state
+  getSchoolList = async (isFirst, orderSchool) => {
+    const { selectorSchoolId } = this.state
 
-    const query = { areaId: id }
+    const {
+      locationInfo: { longitude: longi, latitude: lanti }
+    } = this.state
+
+    const query = { longi, lanti }
 
     const {
       data: { items }
-    } = await api.home.GET_SCHOOL_LIST(query)
+    } = await api.forum.GET_SCHOOL_LIST(query)
 
     const schools = items
       .filter((item) => !item.deleted)
@@ -331,8 +362,11 @@ class Home extends Component {
       })
 
     if (schools.length) {
-      if (locInfo && isCon) {
-        const sId = locInfo.school.value
+      let isCon = true
+      let sId
+
+      if (orderSchool) {
+        sId = orderSchool.school.value
 
         const res = schools.find((item) => item.value === sId)
 
@@ -341,23 +375,36 @@ class Home extends Component {
 
           isCon = false
         }
+      } else {
+        const fSId = Taro.getStorageSync('schoolId')
+
+        const schoolIndex = schools.findIndex((item) => item.value === fSId)
+
+        if (schoolIndex == !-1) {
+          sId = fSId
+
+          // this.setState({ schoolIndex: [schoolIndex,0] })
+        } else {
+          sId = schools[0].value
+        }
       }
 
-      const [area, school, floor] = areaRange
-
-      this.setState({ areaRange: [area, schools, floor] }, () => {
+      this.setState({ areaRange: [schools, []] }, () => {
         if (isFirst) {
-          this.getFloorList(schools[0].value, locInfo, isCon)
-
-          if (!this.state.schoolId) {
-            this.setState({ schoolId: schools[0].value })
+          this.getFloorList(sId, orderSchool, isCon)
+          // console.log(selectorSchoolId)
+          if (!selectorSchoolId) {
+            this.setState({ selectorSchoolId: sId }, () => {
+              this.getHomeIndex()
+              this.getHomeBanner()
+            })
           }
         }
       })
     }
   }
 
-  getFloorList = async (id, locInfo, isCon) => {
+  getFloorList = async (id, orderSchool, isCon) => {
     const { areaRange } = this.state
 
     const query = { schoolId: id, page: 1, limit: 9999 }
@@ -375,10 +422,10 @@ class Home extends Component {
         }
       })
 
-    const [area, school] = areaRange
+    const [school] = areaRange
 
-    if (locInfo && isCon) {
-      const fId = locInfo.floor.value
+    if (orderSchool && isCon) {
+      const fId = orderSchool.floor.value
 
       const res = floor.find((item) => item.value === fId)
 
@@ -387,7 +434,7 @@ class Home extends Component {
       }
     }
 
-    this.setState({ areaRange: [area, school, floor] })
+    this.setState({ areaRange: [school, floor] })
     // if (floor.length) {
     //   const [area, school] = areaRange
 
@@ -395,25 +442,26 @@ class Home extends Component {
     // }
   }
 
-  getBrandList = async () => {
-    const { schoolId } = this.state
+  // getBrandList = async () => {
+  //   const { selectorSchoolId } = this.state
 
-    const query = { schoolId, page: 1, size: 10 }
+  //   const query = { schoolId: selectorSchoolId, page: 1, size: 10 }
 
-    const {
-      data: { brandList, total }
-    } = await api.shop.GET_BRAND_LIST(query)
+  //   const {
+  //     data: { brandList, total }
+  //   } = await api.shop.GET_BRAND_LIST(query)
 
-    const navList = brandList.map((item) => {
-      return {
-        icon: item.picUrl,
-        id: item.id,
-        title: item.name
-      }
-    })
+  //   const bl = brandList.filter((item) => item.inBusiness)
+  //   const navList = bl.map((item) => {
+  //     return {
+  //       icon: item.picUrl,
+  //       id: item.id,
+  //       title: item.name
+  //     }
+  //   })
 
-    this.setState({ shopList: brandList, navList })
-  }
+  //   this.setState({ shopList: bl, navList })
+  // }
 
   render() {
     const {
@@ -430,7 +478,10 @@ class Home extends Component {
       modalShow,
       modalData,
       navList,
-      shopList
+      shopList,
+      safeTop,
+      selectorSchoolId,
+      schoolIndex
     } = this.state
 
     const SwiperList =
@@ -509,14 +560,14 @@ class Home extends Component {
     return (
       <View className='home'>
         <View className='header'>
-          <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
-          <View className='header-container'>
-            <View className='header-title'>吃饭鸭</View>
+          {/* <Image src={headerBg} mode='aspectFill' className='header-bg'></Image> */}
+          <View style={{ top: safeTop + 'px' }} className='header-container'>
+            {/* <View className='header-title'>吃饭鸭</View> */}
             <Picker
+              // value={[schoolIndex]}
               mode='multiSelector'
               rangeKey='label'
               range={areaRange}
-              // value={}
               onChange={this.onChange}
               onColumnChange={this.onColumnChange}
             >
@@ -532,13 +583,13 @@ class Home extends Component {
                 )}
               </View>
             </Picker>
-            <View className='header-search' onClick={this.onJupmToList}>
-              <View className='at-icon at-icon-search'></View>
-              <View>请输入店铺名称</View>
-            </View>
           </View>
         </View>
         <View className='content'>
+          <View className='content-search' onClick={this.onJupmToList}>
+            <View className='at-icon at-icon-search'></View>
+            <View>吃什么鸭</View>
+          </View>
           {banner1Data.length > 0 && banner1Show && (
             <Swiper
               className='content-swiper'
@@ -551,7 +602,7 @@ class Home extends Component {
               {SwiperList}
             </Swiper>
           )}
-          <View className='nav-container'>{NavList}</View>
+          <View className='nav-container'>{selectorSchoolId && NavList}</View>
           {banner2Data.length > 0 && banner2Show && (
             <Swiper
               className='content-swiper swiper-second'
@@ -566,7 +617,7 @@ class Home extends Component {
           )}
           {Explain}
           <View className='list-container'>
-            {ShopList}
+            {selectorSchoolId && ShopList}
             {shopList.length > 0 && <BottomText />}
             {!shopList.length && <Default msg='敬请期待' />}
           </View>
@@ -574,10 +625,10 @@ class Home extends Component {
         <AtModal isOpened={explainShow}>
           <AtModalHeader>提示</AtModalHeader>
           <AtModalContent>
-            {explainType === 'area' && '所在大学城暂停服务，是否选择新的大学城'}
+            {/* {explainType === 'area' && '所在大学城暂停服务，是否选择新的大学城'} */}
             {explainType === 'school' && '所在学校暂停服务，是否选择新的学校'}
             {explainType === 'floor' && '所在楼宇暂停服务，是否选择新的楼宇'}
-            {!explainType && '您还没有选择所在大学城，需要您选择大学城后，才能为您提供最佳服务'}
+            {!explainType && '您还没有选择所在学校，需要您选择学校后，才能为您提供最佳服务'}
           </AtModalContent>
           <AtModalAction>
             <Button onClick={this.closeExplainModal}>暂不选择</Button>
@@ -590,7 +641,7 @@ class Home extends Component {
                 onChange={this.onChange}
                 onColumnChange={this.onColumnChange}
               >
-                <View className='modal-btn'>选择大学城</View>
+                <View className='modal-btn'>选择学校</View>
               </Picker>
             </Button>
           </AtModalAction>

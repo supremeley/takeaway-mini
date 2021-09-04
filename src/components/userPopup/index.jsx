@@ -3,6 +3,11 @@ import { Component } from 'react'
 import { View, Image, Button } from '@tarojs/components'
 import { AtFloatLayout } from 'taro-ui'
 
+import api from '@/api'
+import D from '@/common'
+
+import TagIcon from '@/assets/imgs/tag.png'
+
 import 'taro-ui/dist/style/components/float-layout.scss'
 
 import './index.scss'
@@ -10,9 +15,23 @@ import './index.scss'
 class GiftPopup extends Component {
   defaultProps = {
     show: false,
-    curUser: null,
-    onJumpToPerson: () => {},
-    onJumpToChat: () => {}
+    curUserId: null,
+    identity: 0,
+    // onJumpToPerson: () => {},
+    // onJumpToChat: () => {},
+    onFollow: () => {}
+  }
+
+  state = {
+    userId: Taro.getStorageSync('userId'),
+    curUser: null
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { curUserId } = this.props
+    if (nextProps.curUserId != curUserId) {
+      this.checkUserFollow(nextProps.curUserId)
+    }
   }
 
   handleClose = () => {
@@ -21,64 +40,93 @@ class GiftPopup extends Component {
     onClose && onClose()
   }
 
-  handleJumpToPerson = (id) => () => {
-    const { onJumpToPerson } = this.props
+  checkUserFollow = async (id) => {
+    const query = {
+      beUserId: id,
+      userId: this.state.userId
+    }
 
-    onJumpToPerson && onJumpToPerson(id)
+    const { data } = await api.mine.CHECK_USER_IS_FOLLOW(query)
+
+    this.setState({ curUser: data })
   }
 
-  handleJumpToChat = (id) => () => {
-    const { onJumpToChat } = this.props
+  handleFollowToPerson = async () => {
+    const { curUser } = this.state
 
-    onJumpToChat && onJumpToChat(id)
+    const query = {
+      beUserId: curUser.userId
+    }
+
+    try {
+      const { data, errno } = await api.mine.CHANGE_FOLLOW_PERSON(query)
+
+      if (!errno) {
+        let msg = curUser.isFollow ? '取消关注成功' : '关注成功'
+
+        D.toast(msg)
+
+        this.setState({ curUser: { ...curUser, isFollow: curUser.isFollow ? 0 : 8 } })
+      } else {
+        D.toast(data)
+      }
+    } catch (e) {}
+  }
+
+  handleJumpToPerson = () => {
+    const { curUser } = this.state
+
+    Taro.navigateTo({ url: `/pages/wnh/mine/index?id=${curUser.userId}` })
+  }
+
+  handleJumpToChat = () => {
+    const { curUser } = this.state
+
+    Taro.navigateTo({ url: `/pages/wnh/chat/index?id=${curUser.userId}` })
   }
 
   render() {
-    const { curUser, show } = this.props
+    const { show, identity } = this.props
+    const { curUser } = this.state
 
     if (!curUser) {
       return null
     }
+
+    const { avatar, nickName, schoolName, isFollow } = curUser
 
     return (
       <AtFloatLayout isOpened={show} onClose={this.handleClose}>
         <View className='user-float'>
           <View className='user-float-top'>
             <View className='user-float-top__right'>
-              <Image
-                src={curUser.avatar}
-                mode='aspectFill'
-                className='user-float-top__right-avatar'
-              />
+              <View className='user-float-top__right-avatar-con'>
+                <Image src={avatar} mode='aspectFill' className='user-float-top__right-avatar' />
+                {identity == 5 && (
+                  <Image
+                    src={TagIcon}
+                    mode='aspectFit'
+                    className='user-float-top__right-avatar-tag'
+                  />
+                )}
+              </View>
             </View>
             <View className='user-float-top__user'>
-              <View className='user-float-top__user-name'>{curUser.nickname}</View>
-              <View className='user-float-top__user-school'>{curUser.schoolName}</View>
+              <View className='user-float-top__user-name'>{nickName}</View>
+              <View className='user-float-top__user-school'>{schoolName}</View>
             </View>
-
-            {/* <View className='user-float-top__user'> */}
-            {/* <View className='user-float-top__user-info'>
-                <View className='user-float-top__user-info__btn'>+关注</View>
-              </View> */}
-            {/* </View> */}
           </View>
           <View className='user-float-bottom'>
             <Button
-              className='user-float-bottom__btn green-btn'
-              onClick={this.handleJumpToPerson(curUser.userId)}
+              className={`user-float-bottom__btn ${isFollow && 'green-btn'}`}
+              onClick={this.handleFollowToPerson}
             >
-              +关注
+              {isFollow ? '已关注' : '关注'}
             </Button>
-            <Button
-              className='user-float-bottom__btn'
-              onClick={this.handleJumpToPerson(curUser.userId)}
-            >
+            <Button className='user-float-bottom__btn' onClick={this.handleJumpToPerson}>
               个人主页
             </Button>
-            <Button
-              className='user-float-bottom__btn'
-              onClick={this.handleJumpToChat(curUser.userId)}
-            >
+            <Button className='user-float-bottom__btn' onClick={this.handleJumpToChat}>
               私聊
             </Button>
           </View>

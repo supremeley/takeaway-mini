@@ -6,25 +6,38 @@
   bottom: 0;
   background: #fff;
   width: 100%;
-  padding: 0 24px;
-  height: 120px;
+  padding: 0 24px 40px;
+  height: 160px;
+  &__upimg {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    margin-right: 12px;
+  }
   &__inp {
     flex: 1;
     background: $global-gray;
     height: 72px;
     line-height: 72px;
-    border-radius: 36px;
+    border-radius: 12px;
     padding: 0 24px;
   }
   &__btn {
     flex-shrink: 0;
-    width: 145px;
+    width: 100px;
     line-height: 72px;
-    background: $global-green;
+    background: #fff;
     border-radius: 36px;
-    color: #fff;
+    color: $global-green;
     font-size: 28px;
     text-align: center;
-    margin-left: 24px;
+    margin-left: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0;
+    border: none;
+    &::after {
+      border: none;
+    }
   }
 }

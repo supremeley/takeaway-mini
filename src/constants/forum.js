@@ -49,11 +49,13 @@ export const popupOpt = {
   share: [
     {
       name: '分享给朋友',
-      value: 1
+      value: 1,
+      type: 'share'
     },
     {
       name: '生成海报分享',
-      value: 2
+      value: 2,
+      // type: 'post'
     },
   ],
   normal: [
@@ -62,15 +64,39 @@ export const popupOpt = {
       type: 'reply',
       value: 1
     },
+    //  {
+    //   name: '关注',
+    //   type: 'follow',
+    //   value: 1
+    // },
+    {
+      name: '个人主页',
+      type: 'person',
+      value: 1
+    },
     {
       name: '删除',
       type: 'delete',
-      value: 2
+      value: 2,
+      permissions: ['mine', 'school', 'manager']
     },
     // {
-    //   name: '设置最佳评论',
-    //   type: 'reply',
-    //   value: 3
+    //   name: '置顶',
+    //   type: 'delete',
+    //   value: 2,
+    //   permissions: ['school', 'manager']
+    // },
+    // {
+    //   name: '加精',
+    //   type: 'delete',
+    //   value: 2,
+    //   permissions: ['school', 'manager']
+    // },
+    // {
+    //   name: '转热门',
+    //   type: 'delete',
+    //   value: 2,
+    //   permissions: ['manager']
     // },
     {
       name: '举报',

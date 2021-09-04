@@ -1,6 +1,7 @@
 import Taro from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image, Button } from '@tarojs/components'
+import Header from '@/components/header'
 
 import api from '@/api'
 import D from '@/common'
@@ -15,10 +16,6 @@ class Login extends Component {
   async componentDidShow() {
     const { code } = await Taro.login()
     this.setState({ code })
-  }
-
-  goBack = () => {
-    Taro.navigateBack()
   }
 
   getUserInfo = async () => {
@@ -94,15 +91,13 @@ class Login extends Component {
       data: { token, userInfo: user }
     } = await api.user.WECHAT_LOGIN(query)
 
-    // console.log(errno, data)
     if (!errno) {
       D.toast('登录成功')
-      // this.setState({ userInfo: user })
 
       Taro.setStorageSync('userInfo', user)
       Taro.setStorageSync('token', token)
-      Taro.setStorageSync('openid', user.weixinOpenid)
       Taro.setStorageSync('userId', user.userId)
+      Taro.setStorageSync('forumStatus', user.status)
 
       setTimeout(() => Taro.switchTab({ url: '/pages/home/index' }), 1000)
     }
@@ -115,9 +110,7 @@ class Login extends Component {
       <View className='login'>
         <View className='header'>
           <Image src={headerBg} mode='aspectFill' className='header-bg'></Image>
-          <View className='header-container'>
-            <View className='at-icon at-icon-chevron-left' onClick={this.goBack}></View>
-          </View>
+          <Header />
           <View class='title'>
             <View class='title-name'>吃饭鸭</View>
             <View class='title-explain'>今天也要记得吃饭鸭~</View>

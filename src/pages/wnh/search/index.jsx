@@ -36,7 +36,7 @@ class Search extends Component {
   }
 
   componentDidMount() {
-    this.getGiftlist()
+    // this.getGiftlist()
   }
 
   componentDidShow() {
@@ -110,6 +110,7 @@ class Search extends Component {
 
   onJumpToDetail = (id) => () => {
     // return
+    console.log(this.type)
     Taro.navigateTo({ url: `/pages/item/detail/index?id=${id}&type=${this.type}` })
   }
 
@@ -146,11 +147,9 @@ class Search extends Component {
   }
 
   getPostsList = async (params) => {
-    const { keywords, postsList } = this.state
+    const { userId, keywords, postsList } = this.state
 
-    const userId = Taro.getStorageSync('userId')
-
-    const schoolInfo = Taro.getStorageSync('schoolInfo')
+    const schoolId = Taro.getStorageSync('schoolId')
 
     let resApi,
       query = {
@@ -163,7 +162,7 @@ class Search extends Component {
       case 'school':
         resApi = api.forum.GET_HOT_LIST
 
-        query.schoolId = schoolInfo.schoolId
+        query.schoolId = schoolId
 
         break
       case 'hot':
@@ -172,7 +171,7 @@ class Search extends Component {
       case 'tree':
         resApi = api.forum.GET_TREE_LIST
 
-        // query.schoolId = schoolInfo.schoolId
+        // query.schoolId = proveSchool.schoolId
 
         break
       default:
@@ -189,6 +188,7 @@ class Search extends Component {
       const {
         data: { list, total }
       } = await resApi(query)
+
       let nList = await list.map(async (item) => {
         let sendTimeDate = D.formatTimer(item.sendTimeDate, 'm-d h-m')
 
@@ -198,28 +198,34 @@ class Search extends Component {
 
         try {
           context = JSON.parse(item.context)
+          // console.log(context)
 
           imgList = context.imgList
           content = context.context
         } catch {
+          // console.log(1111)
           content = context
         }
-
-        let commentList = await this.getCommentList(item.postId)
+        // console.log(content)
+        let { list: commentList, total: commentTotal } = await this.getCommentList(
+          item.postId,
+          item.userId
+        )
 
         const info = {
           ...item,
           sendTimeDate,
           imgList,
           content,
-          commentList
+          commentList,
+          commentTotal
         }
 
         return info
       })
-      debugger
+
       nList = await Promise.all(nList)
-      debugger
+      console.log(nList)
       nList = [...postsList, ...nList]
 
       Taro.hideLoading()
@@ -234,8 +240,75 @@ class Search extends Component {
     }
   }
 
-  getCommentList = async (postId) => {
+  // getCommentList = async (postId) => {
+  //   const { userId } = this.state
+
+  //   let resApi,
+  //     query = {
+  //       limit: 3,
+  //       page: 1,
+  //       userId,
+  //       postId
+  //     }
+
+  //   switch (this.id) {
+  //     case 'tree':
+  //       resApi = api.forum.GET_COMMENT_TREE_POSTS
+  //       break
+  //     case 'hot':
+  //     case 'school':
+  //     default:
+  //       resApi = api.forum.GET_COMMENT_HOT_POSTS
+  //       break
+  //   }
+
+  //   try {
+  //     const {
+  //       data: { list }
+  //     } = await resApi(query)
+
+  //     let nList = list.map((item) => {
+  //       let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
+
+  //       let children = item.children.map((it) => {
+  //         let commentDateC = D.formatTimer(it.commentDate, 'm-d h-m')
+
+  //         return {
+  //           ...it,
+  //           commentDate: commentDateC
+  //         }
+  //       })
+
+  //       return {
+  //         ...item,
+  //         commentDate,
+  //         children: children.slice(0, 3)
+  //       }
+  //     })
+
+  //     return nList
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
+
+  // getGiftlist = async () => {
+  //   const { data } = await api.forum.GET_GIFT_LIST()
+
+  //   const giftList = data.map((item) => {
+  //     return {
+  //       ...item
+  //     }
+  //   })
+
+  //   this.setState({ giftList })
+  // }
+
+  getCommentList = async (postId, pId) => {
+    // console.log(pId)
     const { userId } = this.state
+
+    // const type = navOpt[curNav].type
 
     let resApi,
       query = {
@@ -245,7 +318,7 @@ class Search extends Component {
         postId
       }
 
-    switch (this.id) {
+    switch (this.type) {
       case 'tree':
         resApi = api.forum.GET_COMMENT_TREE_POSTS
         break
@@ -258,11 +331,13 @@ class Search extends Component {
 
     try {
       const {
-        data: { list }
+        data: { list, total }
       } = await resApi(query)
 
       let nList = list.map((item) => {
         let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
+
+        // let children = this.commentHandle(item.children)
 
         let children = item.children.map((it) => {
           let commentDateC = D.formatTimer(it.commentDate, 'm-d h-m')
@@ -276,26 +351,40 @@ class Search extends Component {
         return {
           ...item,
           commentDate,
-          children: children.slice(0, 3)
+          total: children.length,
+          isFather: pId === item.senderId,
+          children: children.slice(0, 1)
         }
       })
-
-      return nList
+      // console.log(nList, 'nList')
+      return { list: nList, total }
     } catch (e) {
       console.log(e)
     }
   }
 
-  getGiftlist = async () => {
-    const { data } = await api.forum.GET_GIFT_LIST()
+  commentHandle = (list, beNickname) => {
+    // console.log(list)
+    const newList = list.map((item) => {
+      let commentDate = D.formatTimer(item.commentDate, 'm-d h-m')
 
-    const giftList = data.map((item) => {
+      let children = []
+
+      if (item.children.length) {
+        children = item.children.map((it) => {
+          return this.commentHandle(it.children, item.nickname)
+        })
+      }
+
       return {
-        ...item
+        ...item,
+        commentDate,
+        children,
+        beNickname
       }
     })
 
-    this.setState({ giftList })
+    return newList
   }
 
   fetchLike = (info, index) => async () => {
@@ -434,15 +523,16 @@ class Search extends Component {
           <Posts
             key={item.postId}
             info={item}
+            type={this.type}
             showAddress={this.type === 'hot'}
             showOpt={showOptIndex === index}
-            onHandleLike={this.fetchLike(item, index)}
-            onHandleLikeComment={(idx) => this.fetchLikeComment(item, index, idx)}
-            onHandleJump={() => this.onJumpToPerson(item.userId)}
+            // onHandleLike={this.fetchLike(item, index)}
+            // onHandleLikeComment={(idx) => this.fetchLikeComment(item, index, idx)}
+            // onHandleJump={() => this.onJumpToPerson(item.userId)}
             onHandleClick={this.onJumpToDetail(item)}
-            onHandleShowOpt={this.onChangeOptIndex(index)}
-            onHandleGift={this.openGift(item)}
-            onHandleShowUser={this.openUser(item)}
+            // onHandleShowOpt={this.onChangeOptIndex(index)}
+            // onHandleGift={this.openGift(item)}
+            // onHandleShowUser={this.openUser(item)}
           />
         )
       })

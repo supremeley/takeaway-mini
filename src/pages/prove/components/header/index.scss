@@ -8,30 +8,5 @@
       width: 100%;
       height: 514px;
     }
-    &-container {
-      position: absolute;
-      width: 100%;
-      left: 0;
-      box-sizing: border-box;
-      padding: 0 20px;
-      top: env(safe-area-inset-top);
-      top: constant(safe-area-inset-top);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      // background: red;
-      height: 80px;
-    }
-    &-title {
-      font-weight: 600;
-      font-size: 36px;
-    }
-    .at-icon {
-      font-size: 48px;
-      position: absolute;
-      left: 30px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
   }
 }

@@ -9,15 +9,16 @@
   }
   &-top {
     display: flex;
-    align-items: stretch;
-    height: 100px;
-    margin-bottom: 12px;
+    align-items: center;
+    // height: 100px;
+    margin-bottom: 24px;
     &-avator {
-      width: 100px;
-      height: 100px;
-      margin-right: 10px;
+      width: 140px;
+      height: 140px;
+      margin-right: 32px;
       flex-shrink: 0;
       border-radius: 8px;
+      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
     }
     &__title {
       flex: 1;
@@ -33,11 +34,11 @@
           color: #fff;
           min-width: 108px;
           margin-right: 10px;
-          font-size: 22px;
+          font-size: 24px;
           text-align: center;
         }
         &-name {
-          font-weight: 500;
+          font-weight: 600;
           font-size: 32px;
           color: $global-black;
           @include text-overflow();

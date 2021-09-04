@@ -25,7 +25,7 @@ class CouponItem extends Component {
 
     if (!info) return null
 
-    let { name, startTime, endTime, discount, min, typeDesc } = info
+    let { name, startTime, endTime, discount, min, typeDesc, number } = info
 
     return (
       <View className='coupon-item' onClick={this.handleClick}>
@@ -50,7 +50,7 @@ class CouponItem extends Component {
           </View>
         </View>
         <View className='coupon-item-bottom'>
-          <Text className='coupon-item-bottom__title'>{typeDesc}</Text>
+          <Text className='coupon-item-bottom__title'>{typeDesc || 'x' + number + '张'}</Text>
         </View>
         {showCouponOut && <Image src={CouponOut} className='coupon-item-icon' />}
       </View>

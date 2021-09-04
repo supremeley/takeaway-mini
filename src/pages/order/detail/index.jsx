@@ -24,6 +24,7 @@ class OrderDetail extends Component {
     shopInfo: {},
     canPay: true,
     optType: 'cancle',
+    mphone: '',
     modalShow: false,
     modalTitle: '取消订单',
     modalContent: '是否确认取消该订单',
@@ -79,8 +80,10 @@ class OrderDetail extends Component {
     Taro.makePhoneCall({ phoneNumber: shopInfo.phone })
   }
 
-  onClipboard = (data = '123') => {
-    Taro.setClipboardData({ data })
+  onClipboard = () => {
+    const { mphone } = this.state
+    Taro.setClipboardData({ data: mphone })
+    // D.toast('复制成功')
   }
 
   handleOrder = (type) => {
@@ -151,6 +154,7 @@ class OrderDetail extends Component {
 
     const {
       data: {
+        mphone,
         orderDetailFee: priceInfo = {},
         orderGoods: goodsList,
         orderInfo: info,
@@ -158,7 +162,7 @@ class OrderDetail extends Component {
       }
     } = await api.order.GET_ORDER_DETAIL(query)
 
-    this.setState({ info, priceInfo, goodsList, shopInfo })
+    this.setState({ mphone, info, priceInfo, goodsList, shopInfo })
   }
 
   fetchSumbitOrder = async () => {
@@ -205,6 +209,7 @@ class OrderDetail extends Component {
 
   render() {
     const {
+      mphone,
       cancelShow,
       managerShow,
       info,
@@ -345,10 +350,10 @@ class OrderDetail extends Component {
                 <View className='at-icon at-icon-phone'></View>
                 <View className='shop-plate__item-opt-text'>联系商家</View>
               </View>
-              {/* <View className='shop-plate__item-opt' onClick={this.openManager}>
+              <View className='shop-plate__item-opt' onClick={this.openManager}>
                 <View className='at-icon at-icon-message'></View>
                 <View className='shop-plate__item-opt-text'>联系楼长</View>
-              </View> */}
+              </View>
             </View>
           </View>
         </View>
@@ -419,24 +424,12 @@ class OrderDetail extends Component {
         <AtModal isOpened={managerShow}>
           <AtModalHeader>请选择楼长</AtModalHeader>
           <AtModalContent>
-            {reasonOption &&
-              reasonOption.map((item) => {
-                return (
-                  <View key={item.title} className='cancel-option'>
-                    <View className='cancel-option__title'>xxx</View>
-                    <View className='cancel-option__info'>wxwxwxwx</View>
-                    {/* <View
-                      className={`cancel-option__circle ${
-                        currentReason === index ? 'red-circle' : ''
-                      }`}
-                      onClick={this.changeReason(index)}
-                    ></View> */}
-                    <View className='cancel-option__text' onClick={this.onClipboard}>
-                      复制微信
-                    </View>
-                  </View>
-                )
-              })}
+            <View className='cancel-option'>
+              <View className='cancel-option__info'>{mphone}</View>
+              <View className='cancel-option__text' onClick={this.onClipboard}>
+                复制微信
+              </View>
+            </View>
           </AtModalContent>
           <AtModalAction>
             <Button onClick={this.closeManager}>取消</Button>

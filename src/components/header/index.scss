@@ -1,0 +1,28 @@
+.header {
+  &-container {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    box-sizing: border-box;
+    padding: 0 20px;
+    top: env(safe-area-inset-top);
+    top: constant(safe-area-inset-top);
+    z-index: 4;
+    .at-icon {
+      font-size: 48px;
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+    }
+  }
+  &-title {
+    text-align: center;
+    line-height: 66px;
+    height: 66px;
+    font-weight: 600;
+    font-size: 36px;
+    // margin-bottom: 10px;
+  }
+}

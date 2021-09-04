@@ -48,7 +48,7 @@ class Footer extends Component {
           </View>
         )}
         {type.pay && (
-          <View className='order-btn red-btn' onClick={(e) => this.handleClick(e, 'pay')}>
+          <View className='order-btn' onClick={(e) => this.handleClick(e, 'pay')}>
             立即支付
           </View>
         )}

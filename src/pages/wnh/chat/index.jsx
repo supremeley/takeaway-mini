@@ -16,18 +16,29 @@ class Chat extends Component {
     userId: Taro.getStorageSync('userId'),
     total: 0,
     commentContext: '',
-    chatList: [
-      // {}, { user: true }, {}, {}, { user: true }
-    ]
+    chatList: [],
+    lastId: '',
+    lastPage: ''
   }
 
-  timer = null
+  componentWillUnmount() {
+    console.log('componentWillUnmount')
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
+  }
 
   componentDidShow() {
     this.nextPage()
+
+    this.timer = setInterval(() => {
+      this.getNewMessage()
+    }, 2000)
   }
 
   componentDidHide() {
+    console.log('componentDidHide')
     if (this.timer) {
       clearInterval(this.timer)
       this.timer = null
@@ -41,9 +52,7 @@ class Chat extends Component {
     !pageParams.isLoading && pageParams.hasNext && this.nextPage()
   }
 
-  onChangeInp = (e) => {
-    this.setState({ commentContext: e.detail.value })
-  }
+  timer = null
 
   fetch = async (params) => {
     const { total } = await this.getChatList(params)
@@ -51,71 +60,15 @@ class Chat extends Component {
     return { total }
   }
 
-  getChatList = async (params) => {
-    const { chatList } = this.state
+  onChangeInp = (e) => {
+    this.setState({ commentContext: e.detail.value })
+  }
 
-    const query = {
-      ...params,
-      receive: this.id
-    }
-
-    Taro.showLoading({
-      title: '加载中',
-      icon: 'none'
+  previewImg = (url) => () => {
+    Taro.previewImage({
+      current: url,
+      urls: [url]
     })
-
-    try {
-      const {
-        data: { list, total }
-      } = await api.chat.GET_CHAT_LIST_BY_USER(query)
-      // console.log(data, count, 1000)
-      let nList = list.map((item) => {
-        let receiveTime = D.formatTimer(item.receiveTime)
-        return {
-          ...item,
-          receiveTime
-        }
-      })
-
-      nList = nList.reverse()
-
-      nList = [...nList, ...chatList]
-
-      Taro.hideLoading()
-
-      Taro.stopPullDownRefresh()
-
-      this.setState({ chatList: nList }, () => {
-        if (this.state.pageParams.page === 1) {
-          // setTimeout(() => {
-          Taro.nextTick(() => {
-            const q = Taro.createSelectorQuery()
-            // console.log(q)
-            const selector = q.select(`.chat`).boundingClientRect()
-            // console.log(selector)
-
-            selector.exec((res) => {
-              // console.log(res)
-              Taro.pageScrollTo({
-                scrollTop: res[0].bottom,
-                duration: 300
-                // success: (e) => {
-                //   console.log(e)
-                // }
-              })
-            })
-          })
-          // }, 500)
-        }
-      })
-
-      return { total }
-    } catch (e) {
-      console.log(e)
-      Taro.hideLoading()
-
-      this.setState({ chatList: [] })
-    }
   }
 
   getNewMessage = async () => {
@@ -125,8 +78,99 @@ class Chat extends Component {
 
     try {
       const { data } = await api.chat.SELECT_NEW_CHAT(query)
+
+      if (data) {
+        if (this.state.pageParams.page == 2) {
+          this.resetPage(this.nextPage)
+        } else {
+          this.setState({ messageNum: data })
+        }
+      }
     } catch (e) {
       console.log(e)
+    }
+  }
+
+  getChatList = async (params) => {
+    const { chatList, lastId, lastPage } = this.state
+
+    const query = {
+      ...params,
+      receive: this.id
+    }
+
+    if (params.page != 1) {
+      Taro.showLoading({
+        title: '加载中',
+        icon: 'none'
+      })
+    }
+
+    try {
+      const {
+        data: { list, total }
+      } = await api.chat.GET_CHAT_LIST_BY_USER(query)
+      // console.log(data, count, 1000)
+      let nList = list.map((item) => {
+        let receiveTime = D.formatTimer(item.receiveTime)
+        let contextImg = item.context.split('img:').length ? item.context.split('img:')[1] : null
+
+        return {
+          ...item,
+          receiveTime,
+          contextImg
+        }
+      })
+
+      nList = nList.reverse()
+
+      let cl = chatList.concat()
+
+      let isPush = nList.find((item) => item.id === lastId)
+
+      let nnList = nList.filter((item) => {
+        const res = cl.find((info) => info.id === item.id)
+
+        return !res
+      })
+      console.log(isPush, params.page, lastPage)
+      if ((isPush || params.page > lastPage) && chatList.length >= params.limit) {
+        cl.unshift(...nnList)
+      } else {
+        cl.push(...nnList)
+      }
+
+      Taro.hideLoading()
+
+      Taro.stopPullDownRefresh()
+      // console.log(cl)
+      this.setState({ chatList: cl, lastId: cl[0].id, lastPage: params.page }, () => {
+        if (this.state.pageParams.page == 1) {
+          Taro.nextTick(() => {
+            const q = Taro.createSelectorQuery()
+            // console.log(q)
+            const selector = q.selectAll(`.list-item`).boundingClientRect()
+            // console.log(selector)
+            selector.exec((res) => {
+              console.log(res)
+              Taro.pageScrollTo({
+                scrollTop: res[res.length - 1].bottom + 15,
+                duration: 300
+                // success: (e) => {
+                //   console.log(e)
+                // }
+              })
+            })
+          })
+        }
+      })
+
+      return { total }
+    } catch (e) {
+      console.log(e)
+      Taro.hideLoading()
+
+      // this.setState({ chatList: [] })
     }
   }
 
@@ -138,7 +182,7 @@ class Chat extends Component {
       return
     }
 
-    const userInfo = Taro.getStorageSync('userInfo')
+    // const userInfo = Taro.getStorageSync('userInfo')
 
     let query = {
       senderId: userId,
@@ -147,17 +191,91 @@ class Chat extends Component {
     }
 
     try {
-      const { data } = await api.chat.SEND_CHAT(query)
+      const { errno, data } = await api.chat.SEND_CHAT(query)
 
-      // Taro.stopPullDownRefresh()
+      if (!errno) {
+        D.toast(data)
 
-      let lc = chatList.concat()
+        this.setState({ commentContext: '' }, () => {
+          this.resetPage(this.nextPage)
+          // console.log(this.state.pageParams)
+          // if (this.state.pageParams.page === 2) {
+          setTimeout(() => {
+            Taro.nextTick(() => {
+              const q = Taro.createSelectorQuery()
+              // console.log(q)
 
-      lc.push({ avatar: userInfo.avatarUrl, ...query, sender: userId })
+              const selector = q.selectAll(`.list-item`).boundingClientRect()
+              // console.log(selector)
+              selector.exec((res) => {
+                console.log(res)
+                Taro.pageScrollTo({
+                  scrollTop: res[res.length - 1].bottom + 15,
+                  duration: 300
+                  // success: (e) => {
+                  //   console.log(e)
+                  // }
+                })
+              })
+            })
+          }, 500)
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
-      D.toast(data)
+  fetchCommentImg = async (img) => {
+    const { chatList, userId } = this.state
 
-      this.setState({ commentContext: '', chatList: lc })
+    // if (!commentContext) {
+    //   D.toast('请输入评论内容')
+    //   return
+    // }
+
+    // const userInfo = Taro.getStorageSync('userInfo')
+
+    const { url: contextImg } = await api.common.UPLOAD_IMG(img)
+    // console.log(contextImg)
+    // return
+    let query = {
+      context: `img:${contextImg}`,
+      senderId: userId,
+      receive: this.id
+      // context: commentContext
+    }
+
+    try {
+      const { errno, data } = await api.chat.SEND_CHAT(query)
+
+      if (!errno) {
+        D.toast(data)
+
+        this.setState({ commentContext: '' }, () => {
+          this.resetPage(this.nextPage)
+          // console.log(this.state.pageParams)
+          // if (this.state.pageParams.page === 2) {
+          // setTimeout(() => {
+          Taro.nextTick(() => {
+            const q = Taro.createSelectorQuery()
+            // console.log(q)
+            const selector = q.selectAll(`.list-item`).boundingClientRect()
+            // console.log(selector)
+            selector.exec((res) => {
+              console.log(res)
+              Taro.pageScrollTo({
+                scrollTop: res[res.length - 1].bottom + 15,
+                duration: 300
+                // success: (e) => {
+                //   console.log(e)
+                // }
+              })
+            })
+          })
+          // }, 500)
+        })
+      }
     } catch (e) {
       console.log(e)
     }
@@ -178,7 +296,17 @@ class Chat extends Component {
       return (
         <View key={item.id} className={`list-item ${item.sender == userId && 'user-item'}`}>
           <Image src={item.avatar} className='list-item__avatar' />
-          <View className='list-item__info'>{item.context}</View>
+
+          {item.contextImg ? (
+            <Image
+              src={item.contextImg}
+              mode='aspectFill'
+              className='list-item__img'
+              onClick={this.previewImg(item.contextImg)}
+            />
+          ) : (
+            <View className='list-item__info'>{item.context}</View>
+          )}
         </View>
       )
     })
@@ -191,6 +319,7 @@ class Chat extends Component {
           content={commentContext}
           onChange={this.onChangeInp}
           onSubmit={this.fetchComment}
+          onSubmitImg={this.fetchCommentImg}
         />
       </View>
     )

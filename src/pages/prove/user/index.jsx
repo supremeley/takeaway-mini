@@ -46,7 +46,7 @@ class ProveUser extends Component {
     // console.log(res)
 
     try {
-      const {url} = await api.common.UPLOAD_IMG(res.tempFilePaths[0])
+      const { url } = await api.common.UPLOAD_IMG(res.tempFilePaths[0])
 
       // console.log(a)
 
@@ -81,13 +81,25 @@ class ProveUser extends Component {
 
     const query = {
       auSchool,
-      ruxueTime,
+      ruxueTime: Number(ruxueTime),
       identity: 1,
       certificates,
       userId
     }
 
-    const { data } = await api.prove.SUMBIT_PROVER(query)
+    const { errmsg, errno } = await api.prove.SUMBIT_PROVER(query)
+
+    if (!errno) {
+      D.toast('认证成功')
+
+      Taro.setStorageSync('isProve', true)
+
+      setTimeout(() => {
+        Taro.switchTab({ url: '/pages/forum/index' })
+      },500)
+    } else {
+      D.toast(errmsg)
+    }
   }
 
   render() {

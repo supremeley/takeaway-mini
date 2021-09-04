@@ -75,12 +75,12 @@ class Checkout extends Component {
     this.fetchData()
     this.resetPage(this.nextPage)
 
-    const locInfo = Taro.getStorageSync('locInfo')
+    const orderSchool = Taro.getStorageSync('orderSchool')
     const orderUser = Taro.getStorageSync('orderUser')
 
-    if (locInfo) {
-      const currentSchool = locInfo.school.label
-      const currentFloor = locInfo.floor.label
+    if (orderSchool) {
+      const currentSchool = orderSchool.school.label
+      const currentFloor = orderSchool.floor.label
 
       this.setState({ currentSchool, currentFloor })
     }
@@ -310,7 +310,7 @@ class Checkout extends Component {
 
     let { form, currentCoupon, currentPayType } = this.state
 
-    const locInfo = Taro.getStorageSync('locInfo')
+    const orderSchool = Taro.getStorageSync('orderSchool')
 
     // console.log(form)
 
@@ -319,9 +319,9 @@ class Checkout extends Component {
       cartId: 0,
       couponId: currentCoupon ? currentCoupon.id : -1,
       brandId: this.id,
-      schoolName: locInfo.school.label,
-      buildingId: locInfo.floor.value,
-      buildingNo: locInfo.floor.label,
+      schoolName: orderSchool.school.label,
+      buildingId: orderSchool.floor.value,
+      buildingNo: orderSchool.floor.label,
       payType: currentPayType.type === 'wechat' ? 2 : 1
     }
 
@@ -403,7 +403,7 @@ class Checkout extends Component {
       additionalPrice,
       extraAdditionalPrice,
       freightPrice,
-      goodsPrice,
+      // goodsPrice,
       packagePrice
     } = priceInfo
 
@@ -444,13 +444,13 @@ class Checkout extends Component {
 
     const CouponList =
       couponList.length > 0 &&
-      couponList.map((item, index) => {
+      couponList.map((item) => {
         return <CouponItem key={item.id} info={item} onHandleClick={this.onSelectCoupon} />
       })
 
     return (
       <View className='checkout'>
-        <View className='explain'>公益：每次下单吃饭鸭公益捐赠0.1元</View>
+        <View className='explain'>爱心：每下一单早餐，平台将献出0.05元爱心帮助流浪动物</View>
         <View className='plate'>
           <View className='plate-title'>外卖到寝</View>
           {/* <View className='plate'> */}
@@ -460,6 +460,10 @@ class Checkout extends Component {
               <View className='plate-option__info-text'>{sendTime}</View>
               {/* <View className='at-icon at-icon-chevron-right'></View> */}
             </View>
+          </View>
+          <View className='plate-option'>
+            <Text className='plate-option__title'>所在学校</Text>
+            <View className='plate-option__info'>{currentSchool}</View>
           </View>
           <View className='plate-option'>
             <Text className='plate-option__title'>所在楼宇</Text>

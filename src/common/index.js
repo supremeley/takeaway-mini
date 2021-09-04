@@ -35,8 +35,8 @@ const login = async (callback) => {
 
     Taro.setStorageSync('userInfo', user)
     Taro.setStorageSync('token', token)
-    Taro.setStorageSync('openid', user.weixinOpenid)
     Taro.setStorageSync('userId', user.userId)
+    Taro.setStorageSync('forumStatus', user.status)
 
     const isLogin = Object.keys(user).length && user.nickName && user.avatarUrl
 

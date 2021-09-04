@@ -1,23 +1,29 @@
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
 import { View, Image, Text } from '@tarojs/components'
+// import UserPopup from '@/components/userPopup'
+import GiftPopup from '@/components/giftPopup'
 
 import api from '@/api'
 import D from '@/common'
 import withScrollPage from '@/hocs/scrollPage'
 
-import GiftIcon from '@/assets/imgs/forum/gift.png'
 import OneIcon from '@/assets/imgs/forum/one.png'
 import TwoIcon from '@/assets/imgs/forum/two.png'
 import ThreeIcon from '@/assets/imgs/forum/three.png'
 
 import './index.scss'
 
-class Gift extends Component {
+class Ranking extends Component {
   state = {
+    userId: Taro.getStorageSync('userId'),
+    userInfo: Taro.getStorageSync('userInfo'),
     total: 0,
     rankList: [],
-    totalMoneys: 0
+    totalMoneys: 0,
+    curUser: null,
+    showUser: false,
+    showGift: false
   }
 
   componentDidShow() {
@@ -37,6 +43,35 @@ class Gift extends Component {
     const { total } = await this.getRankingList(params)
 
     return { total }
+  }
+
+  openGift = () => {
+    this.setState({ showGift: true })
+  }
+
+  closeGift = () => {
+    this.setState({ showGift: false })
+  }
+
+  openUser = (info) => () => {
+    // const { userId } = this.state
+
+    // if (userId == info.userId) {
+    Taro.navigateTo({ url: `/pages/wnh/mine/index?id=${info.id}` })
+    //   return
+    // }
+
+    // this.setState({ curUser: { ...info, userId: info.id }, showUser: true })
+  }
+
+  closeUser = () => {
+    this.setState({ showUser: false })
+  }
+
+  handleSendGift = async () => {
+    this.setState({ rankList: [] }, () => {
+      this.resetPage(this.nextPage)
+    })
   }
 
   getRankingList = async (params) => {
@@ -94,19 +129,20 @@ class Gift extends Component {
     return this.route.params.id
   }
 
+  get type() {
+    return this.route.params.type
+  }
+
   get route() {
     return getCurrentInstance().router
   }
 
-  get type() {
-    return this.route.params.type
-  }
   render() {
-    const { total, rankList, totalMoneys } = this.state
+    const { showGift, curUser, showUser, total, rankList, totalMoneys, userInfo } = this.state
 
     const RankList = rankList.map((item, index) => {
       return (
-        <View key={item.id} className='list-item'>
+        <View key={item.id} className='list-item' onClick={this.openUser(item)}>
           {index === 0 && <Image src={OneIcon} className='list-item__icon' />}
           {index === 1 && <Image src={TwoIcon} className='list-item__icon' />}
           {index === 2 && <Image src={ThreeIcon} className='list-item__icon' />}
@@ -115,7 +151,7 @@ class Gift extends Component {
             <View className='list-item__info-name'>{item.nickname}</View>
             <View className='list-item__info-desc'>{item.totalMoney}盒盒币</View>
           </View>
-          <View className='list-item__btn'>关注</View>
+          <View className='list-item__btn'>看Ta</View>
           {/* <Image src={GiftIcon} className='list-item__emj' /> */}
         </View>
       )
@@ -128,22 +164,38 @@ class Gift extends Component {
           <Text className='green'>{totalMoneys}</Text>
           <Text>盒盒币</Text>
           <Text className='green'>{total}</Text>
-          <Text>人送礼</Text>
+          <Text>人赞赏</Text>
         </View>
         <View className='list'>{RankList}</View>
-        {rankList.length > 0 && (
+        {userInfo && (
           <View className='footer-item'>
-            <Image src={rankList[0].avatar} className='footer-item__avatar' />
+            <Image src={userInfo.avatarUrl} className='footer-item__avatar' />
             <View className='footer-item__info'>
-              <View className='footer-item__info-name'>{rankList[0].nickname}</View>
-              <View className='footer-item__info-desc'>{rankList[0].totalMoney}盒盒币 第一名</View>
+              <View className='footer-item__info-name'>{userInfo.nickName}</View>
+              {/* <View className='footer-item__info-desc'>{userInfo.totalMoney}盒盒币 第1名</View> */}
             </View>
-            <View className='footer-item__btn'>送礼</View>
+            <View className='footer-item__btn' onClick={this.openGift}>
+              打榜
+            </View>
           </View>
         )}
+        {/* <UserPopup
+          show={showUser}
+          curUser={curUser}
+          onClose={this.closeUser}
+          onJumpToPerson={this.onJumpToPerson}
+          onJumpToChat={this.onJumpToChat}
+        /> */}
+        <GiftPopup
+          show={showGift}
+          type={this.type}
+          postId={this.id}
+          onClose={this.closeGift}
+          onHandleSendGift={this.handleSendGift}
+        />
       </View>
     )
   }
 }
 
-export default withScrollPage(Gift)
+export default withScrollPage(Ranking)

@@ -1,6 +1,7 @@
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { Component } from 'react'
-import { View, Image, Text, Button } from '@tarojs/components'
+import { View } from '@tarojs/components'
+import Header from '@/components/header'
 
 import api from '@/api'
 
@@ -14,10 +15,6 @@ class Agreement extends Component {
 
   componentDidMount() {
     this.getAgreement()
-  }
-
-  goBack = () => {
-    Taro.navigateBack()
   }
 
   getAgreement = async () => {
@@ -50,10 +47,7 @@ class Agreement extends Component {
     return (
       <View className='agreement'>
         <View className='agreement-header'>
-          <View className='header-container'>
-            <View className='header-title'>万能盒</View>
-            <View className='at-icon at-icon-chevron-left' onClick={this.goBack}></View>
-          </View>
+          <Header title='万能盒' />
         </View>
         <View className='agreement-content'>
           <View className='agreement-content__title'>{info.title}</View>

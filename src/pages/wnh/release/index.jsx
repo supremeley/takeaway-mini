@@ -108,6 +108,21 @@ class Release extends Component {
 
     const { canComment, tagList, curTag, context, imgList } = this.state
 
+    if (!curTag && curTag !== 0) {
+      D.toast('请选择话题')
+      return
+    }
+
+    if (!context && !imgList.length) {
+      D.toast('请添加帖子或者图片')
+      return
+    }
+
+    Taro.showLoading({
+      title: '上传中',
+      icon: 'none'
+    })
+
     const resList = imgList.map((item) => {
       return api.common.UPLOAD_IMG(item.path)
     })
@@ -115,9 +130,11 @@ class Release extends Component {
     const imgRes = await Promise.all(resList)
 
     // return
+    // console.log(context.split('\n'))
+    // return
 
     let con = {
-      context,
+      context: context.split('\n'),
       imgList: imgRes.map((item) => {
         return item.url
       })
@@ -156,6 +173,9 @@ class Release extends Component {
 
       if (!errno) {
         D.toast(errmsg)
+        Taro.hideLoading()
+
+        Taro.setStorageSync('needRefresh', true)
 
         setTimeout(Taro.navigateBack(), 1000)
       }
@@ -165,8 +185,18 @@ class Release extends Component {
   }
 
   getTaglist = async () => {
-    const query = {
-      diffent: 2
+    const query = {}
+
+    switch (this.type) {
+      case 'tree':
+        query.diffent = 2
+        break
+      case 'school':
+        query.diffent = 1
+        break
+      case 'hot':
+        query.diffent = 3
+        break
     }
 
     const { data } = await api.forum.GET_TAG_LIST(query)
@@ -208,15 +238,16 @@ class Release extends Component {
     return (
       <View className='release'>
         <View className='content'>
-          <View className='content-header'>
-            <View className='content-header__title'>选择主题</View>
+          <View className='content-header' onClick={this.openScreenPopup}>
+            <View className='content-header__title'>选择话题</View>
             <View className='content-header__inp'>
-              {tagList[curTag] ? tagList[curTag].tagName : '主题格式说明'}
+              {tagList[curTag] ? tagList[curTag].tagName : '话题格式说明'}
             </View>
-            <View className='at-icon at-icon-chevron-right' onClick={this.openScreenPopup}></View>
+            <View className='at-icon at-icon-chevron-right'></View>
           </View>
           <Textarea
             value={context}
+            maxlength={1000}
             placeholder='记录这一刻'
             className='content-text'
             onInput={this.onChangeInp}
@@ -260,7 +291,7 @@ class Release extends Component {
         <AtModal isOpened={showScreenPopup}>
           <View className='popup'>
             <View className='popup__title'>
-              选择主题
+              选择话题
               <View className='at-icon at-icon-close' onClick={this.closeScreenPopup}></View>
             </View>
             <View className='popup__list'>{ScreenPopupList}</View>

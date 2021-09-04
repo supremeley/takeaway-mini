@@ -1,4 +1,4 @@
 export default {
-  // navigationBarTitleText: '授权',
+  navigationBarTitleText: '隐私设置',
   // navigationStyle: 'custom'
 }

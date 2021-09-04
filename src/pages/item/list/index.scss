@@ -7,17 +7,17 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 .header-search {
-  height: 50px;
+  height: 72px;
   display: flex;
   align-items: center;
-  background: #fff;
-  border-radius: 25px;
-  color: rgba(102, 102, 102, 0.5);
+  background: #f0f1f2;
+  border-radius: 36px;
+  color: #969795;
   font-size: 24px;
   padding: 0 20px;
-  background: rgba(209, 209, 209, 0.5);
-  box-sizing: border-box;
   line-height: 1;
+  margin-bottom: 20px;
+
   .at-icon {
     // height: 28px;
     // width: 28px;
@@ -36,7 +36,7 @@
     display: flex;
     justify-content: space-between;
     background: #fff;
-    padding: 20px;
+    // padding: 20px;
   }
   &-item {
     font-size: 24px;
